@@ -62,38 +62,26 @@ router.get('/', async (ctx)=>{
  */
 router.get('/nav', async (ctx)=>{
     var user = ctx.session.user;
+    var src  = sysdata.navigation;
 
-    var nav = [];
-    var navSource = sysdata.navigation;
-
-    for (var i=0; i<navSource.length; i++) { // 遍历一级菜单
-        // 判断是否能够访问该节点
-        if ((navSource[i].access=='any') || 
-            (user && (user.username=='root')) || 
-            (user && (navSource[i].access=='user'))) 
-        { 
-            var obj = {'name': navSource[i].name, 'url': navSource[i].url}; 
-
-            // 如果有子菜单，则遍历二级菜单
-            if (navSource[i].children && navSource[i].children.length) {
-                var sub = navSource[i].children;
-                for (var j=0; j<sub.length; j++) {
-                    // 判断是否能够访问该节点
-                    if ((sub[j].access=='any') || 
-                        (user && (user.username=='root')) || 
-                        (user && (sub[j].access=='user'))) 
-                    {
-                        if (!obj['children']) obj['children'] = [];
-                        obj['children'].push({'name': sub[j].name, 'url': sub[j].url});
-                    } 
-                }
-            }  
-
-            nav.push(obj);
-        }      
+    var nav = {}, navSub = {};
+    for (var i=0; i<src.length; i++) {
+        if ((src[i]['access']!='any') && (!user || (user.username!='root' && (src[i]['access']!='user')))) continue;
+        var father = src[i]['father'];
+        if (father) {
+            if (!navSub[father]) navSub[father] = [];
+            navSub[father].push(src[i]); 
+        } else {
+            var name = src[i]['name'];
+            nav[name] = src[i];
+        }
     }
+    // 将二级菜单关联到一级菜单
+    for (x in navSub) { nav[x]['children'] = navSub[x]; }
+    var navlist = [];
+    for (x in nav) { navlist.push(nav[x]); }
     
-    ctx.body = {'errorCode': 0, 'message': {'user': user ? user : null, 'nav': nav}}
+    ctx.body = {'errorCode': 0, 'message': {'user': user ? user : null, 'nav': navlist}}
 });
 
 

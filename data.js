@@ -1,26 +1,17 @@
-/* 导航菜单
- * 
- */
+/* 导航菜单数据 */
 exports.navigation = [
-    {'name': 'Websys',       'access': 'any',    'url': '/',                   'children': [
-        {'name': 'User',     'access': 'root',   'url': '/view/user.html'},
-        {'name': 'Found',    'access': 'any',    'url': '/found'},
-        {'name': 'Finance',  'access': 'user',   'url': '/finance'},        
-    ]},
-    {'name': 'Tag',          'access': 'any',    'url': '/tag', },
-    {'name': 'Category',     'access': 'user',   'url': '/category'},
-    {'name': 'File',         'access': 'any',    'url': '/file',               'children':[
-        {'name': 'edit',     'access': 'user',   'url': '/file/view/file.html'},
-        {'name': 'upload',   'access': 'user',   'url': '/file/view/upload.html'},
-    ]},       
-    {'name': 'Document',     'access': 'any',    'url': '/document',           'children':[
-        {'name': 'edit',     'access': 'user',   'url': '/document/edit/0'},
-    ]},          
-    {'name': 'Chip',         'access': 'any',    'url': '/chip/view',          'children':[
-        {'name': 'document', 'access': 'user',   'url': '/chip/view/document.html'},
-        {'name': 'map',      'access': 'user',   'url': '/chip/view/map.html'},
-        {'name': 'edit',     'access': 'user',   'url': '/chip/view/edit.html'},        
-    ]},     
+    {'name':'websys',        'father':null,                'url':'/',                    'access':'any'},
+    {'name':'User',          'father':'websys',            'url':'/view/user.html',      'access':'root'},
+    {'name':'Found',         'father':'websys',            'url':'/found',               'access':'any'},
+    {'name':'Finance',       'father':'websys',            'url':'/finance',             'access':'user'},
+    {'name':'Tag',           'father':null,                'url':'/tag',                 'access':'any'},
+    {'name':'Category',      'father':null,                'url':'/category',            'access':'user'},
+    {'name':'File',          'father':null,                'url':'/file',                'access':'any'},
+    {'name':'edit',          'father':'File',              'url':'/file/view/file.html', 'access':'user'},
+    {'name':'upload',        'father':'File',              'url':'/file/view/upload.html','access':'user'},
+    {'name':'Document',      'father':null,                'url':'/document',            'access':'any'},
+    {'name':'edit',          'father':'Document',          'url':'/document/edit/0',     'access':'user'},
+    {'name':'Chip',          'father':null,                'url':'/chip',                'access':'any'},
 ];
 
 /* 接口列表
