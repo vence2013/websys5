@@ -33,7 +33,6 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/',                   'group':'/'},
         {'method': 'GET', 'url': '/nav',                'group':'/'},
         {'method': 'GET', 'url': '/found',              'group':'/'},
-        
         // tag
         {'method': 'GET', 'url': '/tag',                'group':'/'},
         {'method': 'GET', 'url': '/tag/search',         'group':'/tag'},

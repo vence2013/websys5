@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="data:;base64,=">  <!-- 禁止加载facon.ico -->
+    <title>tag</title>
+
+    <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
+    <script src="/node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="/node_modules/angular/angular.min.js" type="text/javascript"></script>
+    <!-- bootstrap -->   
+    <script src="/node_modules/popper.js/dist/umd/popper.min.js" type="text/javascript"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <link  href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- toastr(notify) -->
+    <script src="/node_modules/toastr/build/toastr.min.js" type="text/javascript"></script>
+    <link  href="/node_modules/toastr/build/toastr.min.css" rel="stylesheet" />
+    <!-- font-awesome -->
+    <link  href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" />  
+    <!-- 自定义 -->   
+    <script src="/view/js/library.js" type="text/javascript"></script>
+    <link  href="/view/css/all.css" rel="stylesheet" />
+    <script src="/tag/view/js/tag.js" type="text/javascript"></script>
+</head>
+<body ng-app="tagApp">
+
+    <div ng-include="'/view/nav.html'"></div>
+    <div id="wrapper" class="container-fluid" ng-controller="tagCtrl">
+        <div class="row">
+            <div class="col-md-4 border border-success rounded my-2 mx-1">
+                <div class="row mt-3">
+                    <div class="col-md">
+                        <input type="text" class="form-control" ng-model="tagname"  ng-keydown="$event.keyCode == 13 && search();" 
+                            placeholder="请输入标签名称， 回车执行搜索。">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md mt-3 pb-2 text-right">
+                        <button ng-click="search();" type="button" class="btn btn-outline-secondary px-4 ml-1">搜索</button>
+                        <button ng-show="user.username" ng-click="add();" type="button" class="btn btn-outline-success ml-1">添加标签</button>                       
+                        <button ng-show="user.username&&tagsel" data-toggle="modal" data-target="#deleteConfirmWnd" type="button" class="btn btn-outline-danger px-4 ml-1">删除选中标签</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md mt-2 mx-2 border-top pt-2">该标签相关的文件/文章列表</div>
+                </div>
+            </div>
+            <div class="col-md border border-secondary rounded my-2 mr-1">
+                <div class="row">
+                    <div class="col-md taglist" style="height: 780px;">
+                        <h4 ng-repeat="x in taglist" id="{{x.id}}" ng-click="select(x);" class="float-left m-1" style="cursor: pointer;">
+                            <span class="badge badge-secondary px-3" style="line-height: 25px;">{{x.name}}</span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">                    
+                    <div class="col-md" style="line-height: 40px;">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
+                    <nav class="col-md">
+                        <ul class="pagination  justify-content-end">
+                            <li ng-repeat="x in pagelist" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="opts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>                    
+                </div>
+            </div>
+        </div>
+        <!-- 选中标签删除确认窗口 -->
+        <div id="deleteConfirmWnd" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title font-weight-bold font-italic">选中标签删除确认</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        确认要删除选中标签吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary px-4" ng-click="delete();">删除</button>
+                        <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>                
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
