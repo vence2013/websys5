@@ -1,0 +1,58 @@
+{
+  "name": "websys4",
+  "version": "1.0.0",
+  "description": "websys version4",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "none",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vence2013/websys4.git"
+  },
+  "author": "vence",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vence2013/websys4/issues"
+  },
+  "homepage": "https://github.com/vence2013/websys4#readme",
+  "dependencies": {
+    "angular": "^1.7.8",
+    "angular-file-upload": "^2.5.0",
+    "angular-tree-control": "^0.2.30",
+    "angular-ui-router": "^1.0.22",
+    "bootstrap": "^4.3.1",
+    "cheerio": "^1.0.0-rc.3",
+    "clipboard": "^2.0.4",
+    "dotenv": "^7.0.0",
+    "editor.md": "^1.5.0",
+    "font-awesome": "^4.7.0",
+    "glob": "^7.1.3",
+    "jquery": "^3.4.1",
+    "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
+    "koa-compose": "^4.1.0",
+    "koa-error": "^3.2.0",
+    "koa-logger": "^3.2.0",
+    "koa-router": "^7.4.0",
+    "koa-send": "^5.0.0",
+    "koa-session": "^5.10.1",
+    "koa-sslify": "^4.0.3",
+    "koa-static-server": "^1.4.0",
+    "koa-views": "^6.2.0",
+    "magnific-popup": "^1.1.0",
+    "moment": "^2.24.0",
+    "mysql2": "^1.6.5",
+    "ngclipboard": "^2.0.0",
+    "popper.js": "^1.15.0",
+    "request": "^2.88.0",
+    "sequelize": "^5.2.13",
+    "toastr": "^2.1.4",
+    "underscore": "^1.9.1",
+    "video.js": "^7.5.4"
+  }
+}

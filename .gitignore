@@ -1,0 +1,4 @@
+/.env
+/docker-compose.yml
+/index.js
+/node_modules/

@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  mysql:
+    image: "mysql:5.5"
+    restart: "always"
+    container_name: "${CONTAINER_MYSQL_NAME}"
+    volumes:
+      - ${ROOTFS_DATA}/export:/export        
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_USER=${SYSNAME}
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${SYSNAME}
+
+  web:
+    image: "node:9.11"
+    restart: "always"
+    container_name: "${CONTAINER_WEB_NAME}"
+    command: "npm start"
+    working_dir: /web
+    volumes:
+      - ${ROOTFS_DATA}/export:/export    
+      - ${ROOTFS_DATA}/upload:/upload      
+      - .:/web
+    links:
+      - mysql
+    ports:
+      - "443:443" 
