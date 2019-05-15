@@ -1,0 +1,15 @@
+/* 适用于所有页面的样式 */
+html, body { margin: 0px; padding: 0px; font-size: 14px; }
+a { text-decoration: none; font-style: italic; color: #000000; }
+a:hover { color: #ff0000; }
+
+/* 通用性的样式 */
+
+/* 指定的样式 */
+#nav { height: 40px; line-height: 40px; background-color: #563d7c; }
+#navMenu>a { font-size: 16px; font-weight: bold; color: #ffffff; }
+#navLogin { text-align: right; color: #ffffff; font-style: italic; cursor: pointer; }
+#navSub { display: none; line-height: 40px; background-color: rgb(240, 239, 239); z-index: 999; }
+#navAlert { display: none; position: absolute; bottom: 0px; right: 10px; z-index: 999; font-size: 14px; font-style: italic; }
+
+#wrapper>div>div { height: 820px; }
