@@ -1,15 +1,16 @@
-<div id="nav" class="container-fluid" ng-controller="navCtrl">
+<div id="nav" class="container-fluid" ng-controller="navCtrl" style="height: 40px; line-height: 40px; background-color: #563d7c;">
     <div class="row">
         <div id="navMenu" class="col-sm-10">
-            <a ng-repeat="x in navlist" ng-mouseenter="subShow(x);" ng-mouseleave="subDelay();" name="{{x.name}}" href="{{x.url}}" class="mx-2">{{x.name}}</a>
+            <a ng-repeat="x in navlist" ng-mouseenter="subShow(x);" ng-mouseleave="subDelay();" name="{{x.name}}" href="{{x.url}}" 
+                class="mx-2" style="font-size: 16px; font-weight: bold; color: #ffffff;">{{x.name}}</a>
         </div>
-        <div id="navLogin" class="col-sm-2">
+        <div id="navLogin" class="col-sm-2" style="text-align: right; color: #ffffff; font-style: italic; cursor: pointer;">
             <div ng-show="!user.username" data-toggle="modal" data-target="#loginWnd"><i class="fa fa-sign-in mx-2"></i>login</div>
             <div ng-show="user.username" data-toggle="modal" data-target="#logoutWnd"><i class="fa fa-user-o mx-2"></i>{{user.username}}</div>
         </div>
     </div>
     <!-- 二级菜单 -->
-    <div id="navSub" class="rounded px-2" ng-mouseenter="subEnter();" ng-mouseleave="subDelay();">
+    <div id="navSub" class="rounded px-2" ng-mouseenter="subEnter();" ng-mouseleave="subDelay();" style="display: none; line-height: 40px; background-color: rgb(240, 239, 239); z-index: 999;">
         <a ng-repeat="x in sub" href="{{x.url}}" class="mx-2">{{x.name}}</a>
     </div>
     <!-- 登录界面 -->
