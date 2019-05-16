@@ -46,9 +46,9 @@
                     <div class="col-md bg-info mx-2 rounded py-2">
                         <div ng-repeat="x in userlist" style="line-height: 30px; border-bottom: 1px dashed #cccccc;">
                             <a href="#" ng-mouseenter="userSelect(x);" class="font-weight-bold">{{x.username}}</a>
-                            <span>{{x.createdAt|limitTo:10}}</span>
-                            <a href="#" ng-show="usersel && usersel!=x" ng-click="groupJoin(x.username);" class="ml-2"><i class="fa fa-group" title="Add This Group"></i></a>
-                            <a href="#" ng-show="usersel==x" data-toggle="modal" data-target="#delUserConfirm" class="ml-2"><i class="fa fa-trash-o" title="Delete User"></i></a>
+                            <a href="#" ng-show="usersel && usersel!=x" ng-click="groupJoin(x.username);" class="mx-2"><i class="fa fa-group" title="Add This Group"></i></a>
+                            <a href="#" ng-show="usersel==x" data-toggle="modal" data-target="#delUserConfirm" class="mx-2"><i class="fa fa-trash-o" title="Delete User"></i></a>
+                            <span style="font-size: 12px; font-style: italic;">{{x.createdAt|limitTo:10}}</span>
                         </div>
                     </div>
                 </div>

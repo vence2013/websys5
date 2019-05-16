@@ -22,7 +22,7 @@ function userCtrl($scope, $http) {
         $("#interfacelist").find("input[type='checkbox']:checked").map((idx, item)=>{ interfacelist.push($(item).val()); });
 
         $http
-        .post('/interface/'+$scope.usersel.id, {'interfacestr': interfacelist.join(' ')})
+        .post('/interface/set/'+$scope.usersel.id, {'interfacestr': interfacelist.join(' ')})
         .then((res)=>{
             if (errorCheck(res)) return ;
             interfaceRefresh(res.data.message);
@@ -60,7 +60,7 @@ function userCtrl($scope, $http) {
     // 多个接口之间使用逗号分隔， 因为空格无法传递
     function interfaceAttach(interfacestr) {
         $http
-        .post('/interface/'+$scope.usersel.id, {'interface': interfacestr})
+        .post('/interface/add/'+$scope.usersel.id, {'interface': interfacestr})
         .then((res)=>{
             if (errorCheck(res)) return ;
             interfaceRefresh(res.data.message);

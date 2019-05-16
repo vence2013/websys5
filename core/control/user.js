@@ -19,15 +19,7 @@ const crypto = require('crypto');
 var newPassword = '123456'; // 新创建用户的密码
 
 
-/* 
- * Function     : create
- * Description  : 
- *      创建用户。
- * 
- * Parameter    : 
- * Return       : 已创建的用户实例。
- */
-
+/* 创建用户 */
 exports.create = async (ctx, username)=>{    
     const User = ctx.models['User'];
     const Group= ctx.models['Group'];
@@ -44,16 +36,7 @@ exports.create = async (ctx, username)=>{
     return created;
 }
 
-
-/* 
- * Function     : update
- * Description  : 
- *      更新用户数据，包括用户名和密码。
- * 
- * Parameter    : 
- * Return       : 修改后的用户实例。
- */
-
+/* 更新用户数据，包括用户名和密码。 */
 exports.update = async (ctx, username, password)=>{
     const User = ctx.models['User'];
     const hash = crypto.createHash('sha256');
@@ -68,16 +51,7 @@ exports.update = async (ctx, username, password)=>{
     return userIns ? true : false;
 }
 
-
-/* 
- * Function     : delete
- * Description  : 
- *      删除指定的用户。
- * 
- * Parameter    : 
- * Return       : none.
- */
-
+/* 删除指定的用户 */
 exports.delete = async (ctx, id)=>{
     const User = ctx.models['User'];
     const Group= ctx.models['Group'];
@@ -109,150 +83,6 @@ exports.get = async (ctx, username)=>{
     } else {
         return await User.findAll({logging: false, order: [['username', 'ASC']] });
     }
-}
-
-
-/* 
- * Function     : getGroupByUser
- * Description  : 获取某个用户所属的组列表 
- * Parameter    : 
- * Return       : 组实例
- */
-
-exports.getGroupByUser = async (ctx, userid)=>{
-    const User = ctx.models['User'];
-    const Group= ctx.models['Group'];
-
-    // 获取该用户属于的组
-    var ret = await User.findAll({logging: false, raw: true, 
-        attributes: [],
-        where: {'id': userid},
-        include: [{ model: Group }]
-    });
-
-    var grouplist = [];
-    for (var i=0; i<ret.length; i++) {
-        grouplist.push({'id': ret[i]['Groups.id'], 'name': ret[i]['Groups.name']});
-    }
-
-    return grouplist;
-}
-
-
-/* 
- * Function     : addGroup
- * Description  : 添加用户到某个组
- * Parameter    : 
- * Return       : 该用户的关联组对象数组
- */
-
-exports.addGroup = async (ctx, userid, groupname)=>{
-    const User = ctx.models['User'];
-    const Group= ctx.models['Group'];
-
-    // 获取当前用户实例
-    var userIns = await User.findOne({logging: false, where: {'id': userid}});
-    if (!userIns) return false;
-
-    // 获取该名称的组实例
-    await Group
-    .findOne({logging: false, where: {'name': groupname}})
-    .then(async (groupIns)=>{
-        await userIns.addGroup(groupIns, {logging: false});
-    });
-
-    return true;
-}
-
-
-/* 
- * Function     : delGroup
- * Description  : 将用户移除组
- * Parameter    : 
- * Return       : 是否成功(true, false)
- */
-
-exports.delGroup = async (ctx, userid, groupname)=>{
-    const User = ctx.models['User'];
-    const Group= ctx.models['Group'];
-
-    // 获取当前用户实例
-    var userIns = await User.findOne({logging: false, where: {'id': userid}});
-    if (!userIns) return false;
-
-    // 获取该名称的组实例
-    await Group
-    .findOne({logging: false, where: {'name': groupname}})
-    .then((groupIns)=>{
-        userIns.removeGroup(groupIns, {logging: false});
-    });
-    return true;
-}
-
-
-/* 设置用户可访问的私有接口 */
-exports.setInterface = async (ctx, userid, interfacestr)=>{
-    const User = ctx.models['User'];
-    var interfacelist = [];
-
-    var userIns = await User.findOne({logging: false, where: {'id': userid}});
-    await userIns.update({'interfaces': interfacestr}, {logging: false});
-    return interfacestr;
-}
-
-
-/* 
- * Function     : addInterface
- * Description  : 添加接口
- * 将接口列表从字符串解析为数组， 新增接口后，重组为字符串
- * Parameter    : 
- * Return       : 
- */
-
-exports.addInterface = async (ctx, userid, interface)=>{
-    const User = ctx.models['User'];
-    var interfacelist = [];
-
-    var userIns = await User.findOne({logging: false, where: {'id': userid}});
-    var res = userIns.get({plain: true}).interfaces;
-    if (res) {
-        interfacelist = res.toString()
-                        .replace(/[\s]+/, ' ')  // 删除多余的空格
-                        .replace(/^\s+|\s+$/g,'') // 删除首尾的空格
-                        .split(' ');
-    }
-    if (interfacelist.indexOf(interface)==-1) { interfacelist.push(interface); }
-    var res2 = interfacelist.join(' ');
-    await userIns.update({'interfaces': res2}, {logging: false});
-    return res2;
-}
-
-
-/* 
- * Function     : delInterface
- * Description  : 删除接口
- * 将接口列表从字符串解析为数组， 新增接口后，重组为字符串
- * Parameter    : 
- * Return       : 
- */
-
-exports.delInterface = async (ctx, userid, interface)=>{
-    const User = ctx.models['User'];
-    var interfacelist = [];
-
-    var userIns = await User.findOne({logging: false, where: {'id': userid}});
-    var res = userIns.get({plain: true}).interfaces;
-    if (res) {
-        interfacelist = res.toString()
-                        .replace(/[\s]+/, ' ')  // 删除多余的空格
-                        .replace(/^\s+|\s+$/g,'') // 删除首尾的空格
-                        .split(' ');
-    }
-    var idx = interfacelist.indexOf(interface);
-    if (idx!=-1) { interfacelist.splice(idx, 1); }
-    var res2 = interfacelist.join(' ');
-    await userIns.update({'interfaces': res2}, {logging: false});
-    return res2;
 }
 
 

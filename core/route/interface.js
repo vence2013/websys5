@@ -18,8 +18,8 @@ const Router = require('koa-router');
 var router = new Router();
 
 /* 设置用户可访问的私有接口 */
-router.post('/:userid', async (ctx)=>{
-    const UserCtrl = ctx.controls['user'];
+router.post('/set/:userid', async (ctx)=>{
+    const InterfaceCtrl = ctx.controls['interface'];
 
     var req  = ctx.request.body;
     var req2 = ctx.params; 
@@ -27,14 +27,14 @@ router.post('/:userid', async (ctx)=>{
     var userid = req2.userid;
     var interfacestr = req.interfacestr; 
 
-    var ret = await UserCtrl.setInterface(ctx, userid, interfacestr);
+    var ret = await InterfaceCtrl.set(ctx, userid, interfacestr);
     ctx.body = {'errorCode': 0, 'message': ret};
 })
 
 
 /* 增加用户的可访问私有接口 */
-router.post('/:userid', async (ctx)=>{
-    const UserCtrl = ctx.controls['user'];
+router.post('/add/:userid', async (ctx)=>{
+    const InterfaceCtrl = ctx.controls['interface'];
 
     var req  = ctx.request.body;
     var req2 = ctx.params; 
@@ -42,14 +42,14 @@ router.post('/:userid', async (ctx)=>{
     var userid    = req2.userid;
     var interface = req.interface; 
 
-    var ret = await UserCtrl.addInterface(ctx, userid, interface);
+    var ret = await InterfaceCtrl.add(ctx, userid, interface);
     ctx.body = {'errorCode': 0, 'message': ret};
 })
 
 
 /* 删除用户的可访问私有接口 */
 router.delete('/:userid', async (ctx)=>{
-    const UserCtrl = ctx.controls['user'];
+    const InterfaceCtrl = ctx.controls['interface'];
 
     var req  = ctx.query;
     var req2 = ctx.params; 
@@ -57,7 +57,7 @@ router.delete('/:userid', async (ctx)=>{
     var userid    = req2.userid;
     var interface = req.interface; 
 
-    var ret = await UserCtrl.delInterface(ctx, userid, interface);
+    var ret = await InterfaceCtrl.del(ctx, userid, interface);
     ctx.body = {'errorCode': 0, 'message': ret};
 })
 
