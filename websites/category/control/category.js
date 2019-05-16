@@ -10,12 +10,15 @@
  *****************************************************************************/  
 
 
-/* 新增节点继承父级节点的隐私属性，只能多不能少
- */
 exports.create = async (ctx, userid, father, name, desc)=>{    
     const Category = ctx.models['Category'];
     
-    var [categoryIns, created] = await Category.findOrCreate({logging: false, 
+    // 新增节点的父节点只能是：根节点， 自己创建的节点
+    if (!father) {
+        var categoryObj = await Category.findOne({raw:true, logging:false, where:{'id':father}});
+        if (!categoryObj || (categoryObj.ownerId!=userid)) return false;
+    }
+    var [categoryIns, created] = await Category.findOrCreate({logging:false, 
         where: {'name': name, 'father': father}, defaults: {'desc': desc, 'ownerId':userid}
     });
     return created;
@@ -38,7 +41,10 @@ exports.update = async (ctx, userid, categoryid, name , desc)=>{
 exports.delete = async (ctx, userid, categoryid)=>{
     var Category = ctx.models['Category'];
     
-
+    // 当前节点的创建者必须为当前用户，否则无权删除
+    var categoryObj = await Category.findOne({raw:true, logging:false, where:{'id':categoryid}});
+    if (!categoryObj || (categoryObj.ownerId!=userid)) return;
+    
     // 获取所有的子树节点
     var ids = [ categoryid ];
     var list = await getListByRoot(ctx, categoryid);

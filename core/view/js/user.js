@@ -13,6 +13,7 @@ function userCtrl($scope, $http) {
 
     userGet();
     interfacesGet();
+    /*
     $scope.$watch('interfaceSelectAll', (val)=>{
         if (!$scope.usersel) return ;
 
@@ -27,7 +28,7 @@ function userCtrl($scope, $http) {
             if (errorCheck(res)) return ;
             interfaceRefresh(res.data.message);
         });
-    })
+    })*/
 
     function interfacesGet() {
         $http
@@ -70,6 +71,21 @@ function userCtrl($scope, $http) {
     function interfaceDetach(interfacestr) {
         $http
         .delete('/interface/'+$scope.usersel.id, {'params': {'interface': interfacestr}})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            interfaceRefresh(res.data.message);
+        });
+    }
+
+    $scope.interfaceSet = ()=>{        
+        var val = $scope.interfaceSelectAll ? '' : 'checked';
+        $("#interfacelist").find("input[type='checkbox']").each((idx, itm)=>{ $(itm).prop("checked", val); });
+        // 查找当前所有被选中的接口，组成列表字符串
+        var interfacelist = [];
+        $("#interfacelist").find("input[type='checkbox']:checked").map((idx, item)=>{ interfacelist.push($(item).val()); });
+
+        $http
+        .post('/interface/set/'+$scope.usersel.id, {'interfacestr': interfacelist.join(' ')})
         .then((res)=>{
             if (errorCheck(res)) return ;
             interfaceRefresh(res.data.message);
