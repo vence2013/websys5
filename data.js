@@ -24,7 +24,13 @@ exports.interfaces = {
         {'method': 'POST','url': '/login',              'group':'/'},
         {'method': 'GET', 'url': '/',                   'group':'/'},
         {'method': 'GET', 'url': '/nav',                'group':'/'},
-        {'method': 'GET', 'url': '/found',              'group':'/'},
+        // found
+        {'method': 'GET', 'url': '/found',                   'group':'/'},
+        {'method': 'GET', 'url': '/found/company/:code',     'group':'/'},
+        {'method': 'GET', 'url': '/found/found/:code',       'group':'/'},
+        {'method': 'GET', 'url': '/found/filter',            'group':'/'},
+        {'method': 'GET', 'url': '/found/filter/apply',      'group':'/'},
+        {'method': 'GET', 'url': '/found/filter/detail/:id', 'group':'/'},
         // tag
         {'method': 'GET', 'url': '/tag',                'group':'/'},
         {'method': 'GET', 'url': '/tag/search',         'group':'/tag'},
@@ -43,6 +49,9 @@ exports.interfaces = {
     'private': [
         {'method': 'GET', 'url': '/logout',             'group':'/'},
         {'method': 'PUT', 'url': '/user',               'group':'/'},
+        // found
+        {'method': 'POST',   'url': '/found/filter',     'group':'/'},
+        {'method': 'DELETE', 'url': '/found/filter/:id', 'group':'/'},
         // tag
         {'method': 'POST',   'url': '/tag',       'group':'/tag'},
         {'method': 'DELETE', 'url': '/tag',       'group':'/tag'},
@@ -53,12 +62,12 @@ exports.interfaces = {
         {'method': 'GET',    'url': '/category',             'group':'/category'},
         {'method': 'GET',    'url': '/category/tree/:categoryid', 'group':'/category'},
         // file
-        {'method': 'GET',    'url': '/file/last',    'group':'/file'},  
         {'method': 'POST',   'url': '/file/upload',  'group':'/file'},
         {'method': 'PUT',    'url': '/file/:fileid', 'group':'/file'},
-        {'method': 'DELETE', 'url': '/file/:fileid', 'group':'/file'},               
+        {'method': 'DELETE', 'url': '/file/:fileid', 'group':'/file'}, 
+        {'method': 'GET',    'url': '/file/last',    'group':'/file'},                
         {'method': 'POST',   'url': '/file/tag/:fileid',      'group':'/file'},
-        {'method': 'PUT',    'url': '/file/tag/:fileid',      'group':'/file'},
+        {'method': 'DELETE', 'url': '/file/tag/:fileid',      'group':'/file'},
         {'method': 'POST',   'url': '/file/category/:fileid', 'group':'/file'},
         {'method': 'PUT',    'url': '/file/category/:fileid', 'group':'/file'},
         {'method': 'GET',    'url': '/file/category/:fileid', 'group':'/file'},

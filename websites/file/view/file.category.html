@@ -1,0 +1,19 @@
+<div class="container-fluid" ng-controller="categoryCtrl">
+    <div class="row mt-2" style="height: 720px; overflow: hidden;">
+        <div class="col-md">
+            <treecontrol class="tree-classic" options="treeOptions" filter-expression="predicate" filter-comparator="comparator"
+                tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
+                on-selection="select(node, selected);" on-node-toggle="toggle();">
+                <span title="{{node.desc}}">{{node.name}} /{{node.id}}</span>
+            </treecontrol>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md" style="line-height: 40px;">
+            目录节点总数
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" ng-model="predicate" placeholder="搜索目录" /> 
+        </div>
+    </div>
+</div>

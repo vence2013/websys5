@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="data:;base64,=">  <!-- 禁止加载facon.ico -->
+    <title>file edit</title>
+
+    <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
+    <script src="/node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="/node_modules/angular/angular.min.js" type="text/javascript"></script>
+    <!-- bootstrap -->   
+    <script src="/node_modules/popper.js/dist/umd/popper.min.js" type="text/javascript"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <link  href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- toastr(notify) -->
+    <script src="/node_modules/toastr/build/toastr.min.js" type="text/javascript"></script>
+    <link  href="/node_modules/toastr/build/toastr.min.css" rel="stylesheet" /> 
+    <!-- font-awesome -->
+    <link  href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" />  
+    <!-- tree -->
+    <link rel="stylesheet" type="text/css" href="/node_modules/angular-tree-control/css/tree-control.css">
+    <script type="text/javascript" src="/node_modules/angular-tree-control/angular-tree-control.js"></script>
+    <script type="text/javascript" src="/node_modules/angular-tree-control/context-menu.js"></script>
+    <!-- magnific popup -->
+    <script type="text/javascript" src="/node_modules/magnific-popup/dist/jquery.magnific-popup.min.js"></script>
+    <link href="/node_modules/magnific-popup/dist/magnific-popup.css" rel="stylesheet" />
+    <!-- video.js -->
+    <script type="text/javascript" src="/node_modules/video.js/dist/video.min.js"></script>
+    <link href="/node_modules/video.js/dist/video-js.min.css" rel="stylesheet" />
+    <!-- 自定义 -->
+    <script src="/view/js/library.js" type="text/javascript"></script>
+    <link  href="/view/css/all.css" rel="stylesheet" />
+    <script src="/file/view/js/file.edit.js" type="text/javascript"></script>
+    <script src="/file/view/js/file.tag.js" type="text/javascript"></script>
+    <script src="/file/view/js/file.category.js" type="text/javascript"></script>
+    <script src="/file/view/js/file.js" type="text/javascript"></script>
+    <link  href="/file/view/css/file.css" rel="stylesheet" />     
+</head>
+<body ng-app="fileApp">
+
+    <div ng-include="'/view/nav.html'"></div>
+    <div id="wrapper" class="container-fluid" ng-controller="fileCtrl">
+        <div class="row">
+            <div class="col-md border border-success rounded my-2 mx-1">
+                <nav>
+                    <div class="nav nav-tabs mt-2" role="tablist" id="tablist">
+                        <a class="nav-item nav-link active" id="nav-file-tab" data-toggle="tab" href="#file" role="tab">File</a>
+                        <a class="nav-item nav-link" id="nav-tag-tab" data-toggle="tab" href="#tag" role="tab">Tag</a>                 
+                        <a class="nav-item nav-link" id="nav-category-tab" data-toggle="tab" href="#category" role="tab">Category</a>
+                    </div>
+                </nav>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="file" role="tabpanel" ng-include="'/file/view/file.edit.html'"></div>
+                    <div class="tab-pane fade" id="tag" role="tabpanel" ng-include="'/file/view/file.tag.html'"></div>
+                    <div class="tab-pane fade" id="category" role="tabpanel" ng-include="'/file/view/file.category.html'"></div>
+                </div>
+            </div>
+            <div class="col-md-7 border border-secondary rounded my-2 mr-1">
+                <div class="row">
+                    <div class="col-md filelist">
+                        <div class="row" ng-repeat="x in filelist" id="{{x.id}}">
+                            <div class="col-md">
+                                <a href="{{x.location}}" target="_blank" ng-mouseenter="select(x);">{{x.name|limitTo:200}}</a>
+                                <a ng-if="x.media=='image'" class="image-link" href="{{x.location}}"><i class="fa fa-file-image-o ml-2"></i></a>
+                                <i ng-if="x.media=='video'" class="fa fa-file-video-o ml-2" ng-click="play(x.location);"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <input type="text" class="form-control" ng-model="opts.str" placeholder="搜索文件名称" /> 
+                    </div>
+                    <div class="col-md" style="line-height: 36px;">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
+                    <nav class="col-md">
+                        <ul class="pagination justify-content-end">
+                            <li ng-repeat="x in pagelist" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="opts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- video.js -->
+    <div id="video-box"></div>
+
+</body>
+</html>

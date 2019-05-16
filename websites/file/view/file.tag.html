@@ -1,0 +1,17 @@
+<div class="container-fluid mt-3" ng-controller="tagCtrl">
+    <div class="row" style="height: 100px;">        
+        <div class="col-md taglist" id="tagsel">
+            <h4 class="mr-2" ng-repeat="x in rellist" ng-click="dettach(x);"><span class="badge badge-secondary">{{x}}</span></h4>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md">
+            <input type="text" class="form-control" ng-model="opts.str" placeholder="请输入标签搜索内容">
+        </div>
+    </div>
+    <div class="row mt-2 h-50">
+        <div class="col-md taglist" id="tagres">
+            <h4 class="mr-2" ng-repeat="x in reslist" ng-click="attach(x);"><span class="badge badge-secondary">{{x}}</span></h4>
+        </div>
+    </div>
+</div>
