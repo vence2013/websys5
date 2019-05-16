@@ -33,9 +33,9 @@ global.sysdata = require('./data');
 
 // SSL证书文件
 const options = {
-    key : fs.readFileSync('core/cert/server-key.pem'),
-    ca  : fs.readFileSync('core/cert/ca-cert.pem'),
-    cert: fs.readFileSync('core/cert/server-cert.pem')
+    key : fs.readFileSync('cert/server-key.pem'),
+    ca  : fs.readFileSync('cert/ca-cert.pem'),
+    cert: fs.readFileSync('cert/server-cert.pem')
 }
 // 子网站目录
 const webdir = path.join(__dirname, 'websites');

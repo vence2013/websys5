@@ -1,4 +1,5 @@
 /.env
+/cert/
 /docker-compose.yml
 /index.js
 /node_modules/
