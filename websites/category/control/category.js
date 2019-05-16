@@ -14,14 +14,14 @@ exports.create = async (ctx, userid, father, name, desc)=>{
     const Category = ctx.models['Category'];
     
     // 新增节点的父节点只能是：根节点， 自己创建的节点
-    if (!father) {
+    if (father) {
         var categoryObj = await Category.findOne({raw:true, logging:false, where:{'id':father}});
-        if (!categoryObj || (categoryObj.ownerId!=userid)) return false;
+        if (!categoryObj || (categoryObj.ownerId!=userid)) return -1;  // 无权在该节点下添加子节点
     }
     var [categoryIns, created] = await Category.findOrCreate({logging:false, 
         where: {'name': name, 'father': father}, defaults: {'desc': desc, 'ownerId':userid}
     });
-    return created;
+    return created ? 0 : -2;
 }
 
 

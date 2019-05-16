@@ -29,8 +29,11 @@ router.post('/', async (ctx)=>{
 
     var user = ctx.session.user;
     var ret  = await CategoryCtrl.create(ctx, user.id, father, name, desc);
-    ctx.body = ret ? {'errorCode':  0, 'message': 'SUCCESS'}
-                   : {'errorCode': -1, 'message': '该目录已经存在！'}
+    switch(ret) {
+        case -1: ctx.body = {'errorCode': -1, 'message': '无权在不是自己创建的节点下添加子节点'}; break;
+        case -2: ctx.body = {'errorCode': -1, 'message': '该目录已经存在！'}; break;
+        default: ctx.body = {'errorCode':  0, 'message': 'SUCCESS'};
+    }
 })
 
 router.put('/:id', async (ctx)=>{

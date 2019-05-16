@@ -21,9 +21,9 @@ exports.navigation = [
  */
 exports.interfaces = {
     'public': [
-        {'method': 'POST','url': '/login',              'group':'/'},
-        {'method': 'GET', 'url': '/',                   'group':'/'},
-        {'method': 'GET', 'url': '/nav',                'group':'/'},
+        {'method': 'POST','url': '/login', 'group':'/'},
+        {'method': 'GET', 'url': '/',      'group':'/'},
+        {'method': 'GET', 'url': '/nav',   'group':'/'},
         // found
         {'method': 'GET', 'url': '/found',                   'group':'/'},
         {'method': 'GET', 'url': '/found/company/:code',     'group':'/'},
@@ -32,8 +32,8 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/found/filter/apply',      'group':'/'},
         {'method': 'GET', 'url': '/found/filter/detail/:id', 'group':'/'},
         // tag
-        {'method': 'GET', 'url': '/tag',                'group':'/'},
-        {'method': 'GET', 'url': '/tag/search',         'group':'/tag'},
+        {'method': 'GET', 'url': '/tag',        'group':'/'},
+        {'method': 'GET', 'url': '/tag/search', 'group':'/tag'},
         // file        
         {'method': 'GET', 'url': '/file',               'group':'/'},
         {'method': 'GET', 'url': '/file/search',        'group':'/file'},
@@ -47,14 +47,14 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},
     ],
     'private': [
-        {'method': 'GET', 'url': '/logout',             'group':'/'},
-        {'method': 'PUT', 'url': '/user',               'group':'/'},
+        {'method': 'GET', 'url': '/logout', 'group':'/'},
+        {'method': 'PUT', 'url': '/user',   'group':'/'},
         // found
         {'method': 'POST',   'url': '/found/filter',     'group':'/'},
         {'method': 'DELETE', 'url': '/found/filter/:id', 'group':'/'},
         // tag
-        {'method': 'POST',   'url': '/tag',       'group':'/tag'},
-        {'method': 'DELETE', 'url': '/tag',       'group':'/tag'},
+        {'method': 'POST',   'url': '/tag',     'group':'/tag'},
+        {'method': 'DELETE', 'url': '/tag/:id', 'group':'/tag'},
         // category        
         {'method': 'POST',   'url': '/category',             'group':'/category'},
         {'method': 'PUT',    'url': '/category/:categoryid', 'group':'/category'},
@@ -72,8 +72,8 @@ exports.interfaces = {
         {'method': 'PUT',    'url': '/file/category/:fileid', 'group':'/file'},
         {'method': 'GET',    'url': '/file/category/:fileid', 'group':'/file'},
         // document
-        {'method': 'POST',   'url': '/document/:docid',      'group':'/document'},
-        {'method': 'DELETE', 'url': '/document/:docid',      'group':'/document'},        
+        {'method': 'POST',   'url': '/document/:docid', 'group':'/document'},
+        {'method': 'DELETE', 'url': '/document/:docid', 'group':'/document'},        
     ]
 }
 
