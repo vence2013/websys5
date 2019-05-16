@@ -2,6 +2,8 @@
 exports.navigation = [
     {'name':'websys',        'father':null,                'url':'/',                    'access':'any'},
     {'name':'User',          'father':'websys',            'url':'/view/user.html',      'access':'root'},
+    // 用户设置界面
+    {'name':'Setting',       'father':'websys',            'url':'/view/setting.html',   'access':'user'},
     {'name':'Found',         'father':'websys',            'url':'/found',               'access':'any'},
     {'name':'Finance',       'father':'websys',            'url':'/finance',             'access':'user'},
     {'name':'Tag',           'father':null,                'url':'/tag',                 'access':'any'},
@@ -20,7 +22,6 @@ exports.navigation = [
 exports.interfaces = {
     'public': [
         {'method': 'POST','url': '/login',              'group':'/'},
-        {'method': 'GET', 'url': '/logout',             'group':'/'},
         {'method': 'GET', 'url': '/',                   'group':'/'},
         {'method': 'GET', 'url': '/nav',                'group':'/'},
         {'method': 'GET', 'url': '/found',              'group':'/'},
@@ -39,7 +40,9 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/display/:docid', 'group':'/document'},
         {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},
     ],
-    'private': [        
+    'private': [
+        {'method': 'GET', 'url': '/logout',             'group':'/'},
+        {'method': 'PUT', 'url': '/user',               'group':'/'},
         // tag
         {'method': 'POST',   'url': '/tag',       'group':'/tag'},
         {'method': 'DELETE', 'url': '/tag',       'group':'/tag'},

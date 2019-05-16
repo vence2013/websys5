@@ -36,19 +36,24 @@ exports.create = async (ctx, username)=>{
     return created;
 }
 
-/* 更新用户数据，包括用户名和密码。 */
-exports.update = async (ctx, username, password)=>{
+/* 修改密码 */
+exports.changePassword = async (ctx, userid, oldPassword, password)=>{
     const User = ctx.models['User'];
-    const hash = crypto.createHash('sha256');
+    const hash1 = crypto.createHash('sha256');
+    const hash2 = crypto.createHash('sha256');
+
+    hash1.update(oldPassword);
+    var oldhex = hash1.digest('hex');
+    var userIns = await User.findOne({logging:false, where: {'id': userid}});
+    var userObj = userIns.get({plain:true});
+    if (userObj.password!==oldhex) return false;
 
     // 生成新密码
-    hash.update(password);
-    var cryptoPassword = hash.digest('hex');
-    // 更新数据库
-    var userIns = await User.findOne({logging: false, where: {'username': username}});
-    if (userIns) await res.update({'password': cryptoPassword});
-
-    return userIns ? true : false;
+    hash2.update(password);
+    var newhex = hash2.digest('hex');
+    // 更新数据库    
+    await userIns.update({'password': newhex}, {logging:false});
+    return true;
 }
 
 /* 删除指定的用户 */

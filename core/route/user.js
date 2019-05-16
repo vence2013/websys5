@@ -42,12 +42,13 @@ router.put('/', async (ctx)=>{
 
     var req  = ctx.request.body;
     // 提取有效参数
-    var username = req.username;
+    var oldPassword = req.oldPassword;
     var password = req.password;
 
-    var ret = await UserCtrl.update(ctx, username, password);
+    var user = ctx.session.user;
+    var ret = await UserCtrl.changePassword(ctx, user.id, oldPassword, password);
     ctx.body = ret ? {'errorCode': 0, 'message': 'SUCCESS'} :
-                     {'errorCode': -1, 'message': '用户不存在'}
+                     {'errorCode': -1, 'message': '密码错误，修改失败'}
 })
 
 /* 删除用户
