@@ -26,7 +26,7 @@ while true; do
         -h|--help)
             shift
             echo "usage: ./install.sh -h|--help -c|--clean -d|--debug"
-            echo "This script will check software: git, docker, docker-compose"
+            echo "This script will check software: docker, docker-compose"
             exit
             ;;
         -d|--debug)
@@ -60,17 +60,12 @@ exit_with_message() {
 
 # #############################################################################
 # 检查相关软件的安装
-# 1. 系统软件： git, docker-ce, docker-compose(至少支持v2)
+# 1. 系统软件： docker-ce, docker-compose(至少支持v2)
 # 2. docker容器： mysql:5.5, node:9.11
 #
 # 参考： [Shell脚本实现简单分割字符串](https://blog.csdn.net/gb4215287/article/details/78090821)
 # #############################################################################
 
-# Git
-VerGit=$(git --version 2>&1)
-if [ ${VerGit:0:3} != "git" ]; then
-    exit_with_message "Error> Git not installed."
-fi
 # Docker
 VerDocker=$(docker -v 2>&1)
 if [ ${VerDocker:0:6} != "Docker" ]; then
@@ -91,7 +86,7 @@ VerDockerComposeMinor=`echo ${VerDockerComposeX}|cut -d \. -f 2`
 if [ ${VerDockerComposeMajor} -lt 1 ] || [ ${VerDockerComposeMinor} -lt 12 ]; then
     exit_with_message "Error> docker-compose(>=1.12.x) version too old!";
 fi
-echo -e "System Software:\n\t"${VerGit}"\n\t"${VerDocker}"\n\t"${VerDockerCompose} 
+echo -e "System Software:\n\t"${VerDocker}"\n\t"${VerDockerCompose} 
 
 # Docker Images
 ImageMysql="mysql:5.5"
@@ -109,21 +104,7 @@ fi
 
 
 # #############################################################################
-# 构建系统运行环境
-# 1. 当前目录是一个git仓库(该项要求不是必须的，但仍然可以保留)
-# 2. 根据配置，创建目录结构
-# #############################################################################
-
-VerSourceGitShort=$(git log -1 --format="%h" 2>&1)
-VerSourceGitFull=$(git log -1 --pretty=format:"%H" 2>&1)
-if [ ${VerSourceGitShort:0:5} == "fatal" ]; then
-    exit_with_message "Error> Current directory is not a git reposory."
-fi
-echo -e "Source Version(git):\n\tshort: "${VerSourceGitShort}"\n\t full: "${VerSourceGitFull}
-
-
-# #############################################################################
-# 数据目录结构
+# 检查并创建数据目录结构
 # dataroot/
 #   upload/
 #     big/              上传文件大小：(1GB, ~)
