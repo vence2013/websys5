@@ -40,11 +40,11 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/file/detail/:fileid','group':'/file'}, 
         {'method': 'GET', 'url': '/file/tag/:fileid',   'group':'/file'},        
         // document
-        {'method': 'GET', 'url': '/document',                'group':'/document'},
-        {'method': 'GET', 'url': '/document/edit/:docid',    'group':'/document'},
-        {'method': 'GET', 'url': '/document/search',         'group':'/document'},
-        {'method': 'GET', 'url': '/document/display/:docid', 'group':'/document'},
-        {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},
+        {'method': 'GET', 'url': '/document',                'group':'/document'},  // 搜索页面
+        {'method': 'GET', 'url': '/document/edit/:docid',    'group':'/document'},  // 编辑页面
+        {'method': 'GET', 'url': '/document/search',         'group':'/document'},  // 搜索接口
+        {'method': 'GET', 'url': '/document/display/:docid', 'group':'/document'},  // 显示页面
+        {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},  // 显示接口
     ],
     'private': [
         {'method': 'GET', 'url': '/logout', 'group':'/'},
