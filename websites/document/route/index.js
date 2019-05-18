@@ -88,14 +88,13 @@ router.get('/detail/:docid', async (ctx)=>{
                    : {'errorCode': -1, 'message': '无效的文档'};
 })
 
-router.get('/search', async (ctx)=>{
-    const DocumentCtrl = ctx.controls['document/document'];
+
+function reqCheck(req2) {
     var query = {};
 
-    var req2  = ctx.query;
-    // 提取有效参数
-    var page     = parseInt(req2.page);
-    var pageSize = parseInt(req2.pageSize);
+    query['page']     = parseInt(req2.page);
+    query['pageSize'] = parseInt(req2.pageSize);
+    // 以空格分开的字符串
     var fields = ['content', 'tag'];
     for (var i=0; i<fields.length; i++) {
         var key   = fields[i];
@@ -106,19 +105,45 @@ router.get('/search', async (ctx)=>{
                           .replace(/(^\s*)|(\s*$)/g, "") // 删除字符串首尾的空格
                           .split(' ');
     }
+    // 日期格式
     var dateExp = new RegExp(/^\d{4}(-)\d{1,2}\1\d{1,2}$/);
     if (req2.createget && dateExp.test(req2.createget)) { query['createget'] = req2.createget; }
     if (req2.createlet && dateExp.test(req2.createlet)) { query['createlet'] = req2.createlet; }
+    // 排序
     switch (req2.order) {
         case '2': query['order'] = ['createdAt', 'ASC']; break;
         default: query['order'] = ['createdAt', 'DESC'];
     }
 
+    return query;
+}
+
+router.get('/search', async (ctx)=>{
+    const DocumentCtrl = ctx.controls['document/document'];
+    
+    var req2  = ctx.query;
+    var query = reqCheck(req2); // 提取有效参数
+
     // 允许未登录用户访问， userid可以为0
     var user = ctx.session.user;
     var userid = (user && user.id) ? user.id : 0;
-    var res = await DocumentCtrl.search(ctx, userid, query, page, pageSize);
+    var res = await DocumentCtrl.search(ctx, userid, query);
     ctx.body = {'errorCode': 0, 'message': res};
 })
+
+router.get('/export', async (ctx)=>{
+    const DocumentCtrl = ctx.controls['document/document'];
+
+    var req2  = ctx.query;
+    var query = reqCheck(req2); // 提取有效参数
+
+    // 允许未登录用户访问， userid可以为0
+    var user = ctx.session.user;
+    var userid = (user && user.id) ? user.id : 0;
+    var res = await DocumentCtrl.export2file(ctx, userid, query);
+
+    ctx.body = {'errorCode': 0, 'message': 'Finished!'};
+})
+
 
 module.exports = router;

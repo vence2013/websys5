@@ -1,4 +1,4 @@
-var app = angular.module('indexApp', ['treeControl'])
+var app = angular.module('indexApp', ['treeControl', 'angular-clipboard'])
 
 appConfiguration(app)
 .controller('indexCtrl', indexCtrl);
@@ -98,10 +98,13 @@ function indexCtrl($scope, $http, user) {
         })
     }
 
-    $scope.select = (file)=>{
-        $scope.file = file;      
-        $('.sel').removeClass('sel');
-        $('#'+file.id).addClass('sel');
+    $scope.focus = (file)=>{
+        $scope.file = file;
+        $scope.copyText = file.location;
+    }
+
+    $scope.copySuccess = ()=>{
+        toastr.info('Copy Success!', '', {"positionClass": "toast-bottom-right"});
     }
 
     // 播放视频文件

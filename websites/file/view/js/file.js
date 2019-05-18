@@ -48,8 +48,6 @@ function fileCtrl($rootScope, $scope, $http) {
 
     $scope.select = (file)=>{
         $rootScope.file = file;
-        $('.sel').removeClass('sel');
-        $('#'+file.id).addClass('sel');
     }
 
     // 播放视频文件

@@ -63,7 +63,7 @@ function indexCtrl($scope, $http, user) {
     }
 
     $scope.select = (doc)=>{
-        $scope.doc = doc;      
+        $scope.doc = doc;
         $('.sel').removeClass('sel');
         $('#'+doc.id).addClass('sel');
     }
@@ -86,5 +86,22 @@ function indexCtrl($scope, $http, user) {
             $scope.nodeSelected = sel;
             $scope.predicate = (node)=>{ return (list2.indexOf(node.id)!=-1); };
         });
+    }
+
+    /* 需要所有搜索参数 */
+    $scope.export2file = ()=>{
+        var query = angular.copy($scope.opts);
+        var createget = $scope.opts.createget;
+        var createlet = $scope.opts.createlet;
+        query['createget'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createget)) ? createget : '';
+        query['createlet'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createlet)) ? createlet : '';
+
+        $http
+        .get('/document/export', {params: query})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
+        })
     }
 }

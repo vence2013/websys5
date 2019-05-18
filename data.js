@@ -73,7 +73,8 @@ exports.interfaces = {
         {'method': 'GET',    'url': '/file/category/:fileid', 'group':'/file'},
         // document
         {'method': 'POST',   'url': '/document/:docid', 'group':'/document'},
-        {'method': 'DELETE', 'url': '/document/:docid', 'group':'/document'},        
+        {'method': 'DELETE', 'url': '/document/:docid', 'group':'/document'},
+        {'method': 'GET',    'url': '/document/export', 'group':'/document'},
     ]
 }
 

@@ -9,6 +9,11 @@
  *****************************************************************************/  
 
 
+const fs   = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
+
 exports.edit = async (ctx, userid, docid, content, private, taglist, categoryids)=>{
     const Document = ctx.models['Document'];
     const Tag = ctx.models['Tag'];
@@ -69,7 +74,10 @@ exports.detail = async (ctx, userid, docid)=>{
     return docObj;
 }
 
-exports.search = async (ctx, userid, query, page, pageSize)=>{
+exports.search = search;
+
+async function search(ctx, userid, query) 
+{
     const User = ctx.models['User'];
     const Group = ctx.models['Group'];
     const Tag  = ctx.models['Tag']; 
@@ -116,6 +124,8 @@ exports.search = async (ctx, userid, query, page, pageSize)=>{
         }
     }
 
+    var page     = query.page;
+    var pageSize = query.pageSize;
     // 计算分页数据
     sql = "SELECT COUNT(*) AS num FROM `Documents` "+sqlCond;
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
@@ -134,4 +144,47 @@ exports.search = async (ctx, userid, query, page, pageSize)=>{
     });
 
     return {'total':total, 'page':page, 'pageMaxium':maxpage, 'doclist':doclist};
+}
+
+exports.export2file = async (ctx, userid, query)=>{
+    var ret = await search(ctx, userid, query);
+    
+    // 提取文档中的文件
+    var filelist = [];
+    var docs = ret.doclist;
+    for (var i=0; i<docs.length; i++) {
+        var content = docs[i]['content'].toString();
+        var arr = content.match(/\[[^\]]*\]\([^\)]+\)/g);
+        for (var j=0; arr && j<arr.length; j++) {
+            var url = arr[j].replace(/\[[^\]]*\]\(([^\)]+)\)/, "$1");
+            filelist.push(url);
+            // 替换content中的路径
+            var url2 = 'file/'+url.substr(8);
+            content = content.replace(url, url2);
+        }
+        docs[i]['content'] = content;
+    }
+    // 如果 /export/file/ 不存在，则创建
+    var fileExportDir = '/export/file/';
+    // 复制相关文件
+    for (var i=0; i<filelist.length; i++) {
+        var dst = fileExportDir+filelist[i].substr(8);
+        var obj = path.parse(dst);
+        if (!fs.existsSync(obj.dir)) { mkdirp.sync(obj.dir); }
+
+        var readStream = fs.createReadStream(filelist[i]);
+        var writeStream= fs.createWriteStream(dst, {mode:0777});
+        readStream.pipe(writeStream);
+    }
+
+    // 将文档输出到文件
+    for (var i=0; i<docs.length; i++) {
+        var content = docs[i]['content'];
+
+        var res = content.match(/^#\s*([^\n]+)/);
+        var res2 = content.match(/[\S]+/);
+        var title = res ? res[1] : res2[0];
+        var filename = '/export/'+title+'.md';
+        fs.writeFileSync(filename, content);
+    }
 }

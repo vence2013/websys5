@@ -1,9 +1,0 @@
-.sel { font-weight: bold; font-size: 16px; }
-.taglist>h4 { display: inline; float: left; cursor: pointer; }
-
-.filelist { height: 780px; }
-.filelist>div { line-height: 25px; margin-top: 5px; border-bottom: 1px dashed #000000; }
-.filelist>div>div>span, .filelist>div>div>i { cursor: pointer; }
-
-
-#video-box { display: none; position: fixed; bottom: 10px; right: 10px; }
