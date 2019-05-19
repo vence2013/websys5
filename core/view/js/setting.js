@@ -10,6 +10,7 @@ function settingCtrl($scope, $http, user, locals) {
     $scope.oldPassword = '';
     $scope.newPassword = '';
     $scope.confirmPassword = '';
+    $scope.taglist = '';
 
     function logout () {
         $http
@@ -32,6 +33,20 @@ function settingCtrl($scope, $http, user, locals) {
             if (errorCheck(res)) return ;
             toastr.info("密码修改成功，请重新登录！", '', {"positionClass": "toast-bottom-right"});
             window.setTimeout(logout, 3000);
+        })
+    }
+
+    $scope.searchDocument = ()=>{
+        window.open('/document?taglist='+$scope.taglist, "_blank");
+    }
+
+    $scope.backup = ()=>{
+        $http
+        .get('/backup')
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
         })
     }
 }

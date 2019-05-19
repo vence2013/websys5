@@ -13,6 +13,7 @@ const url       = require('url');
 const path      = require('path');
 const crypto    = require('crypto');
 const glob      = require('glob'); 
+const moment    = require('moment');
 const compose   = require('koa-compose');
 const Sequelize = require('sequelize');
 const StaticServer = require('koa-static-server');
@@ -187,7 +188,7 @@ function installCheck() {
                 // 转化参数类型/格式， 过滤恶意输入
                 var username = req.username;
                 var password = req.password;
-                var now      = sysdata.dateFmt("yyyy-MM-dd hh:mm:ss", new Date());
+                var now      = moment().format("YYYY-MM-DD HH:mm:ss");
 
                 // 添加用户
                 // 获取密码的sha256结果    

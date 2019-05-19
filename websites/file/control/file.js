@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const crypto = require('crypto');
+const moment = require('moment');
 
 
 /* 
@@ -33,7 +34,7 @@ function genPath(name, ext, size) {
     if (size<(100*1024*1024)) { filepath += 'small/'; }         // <100MB
     else if (size<(1024*1024*1024)) { filepath += 'median/';  } // <1GB
     else { filepath += 'big/'; }
-    var datestr = sysdata.dateFmt("yyyyMM", new Date());
+    var datestr =  moment().format("YYYYMMDD");
     filepath += datestr+'/';
     // 如果目录不存在，则创建该目录。
     if (!fs.existsSync(filepath)) { fs.mkdirSync(filepath); }

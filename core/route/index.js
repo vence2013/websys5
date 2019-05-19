@@ -49,6 +49,11 @@ router.get('/', async (ctx)=>{
 })
 
 
+/* 注销请求 */
+router.get('/logout', async (ctx)=>{
+    ctx.session.user = null;    
+    ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
+})
 
 /* 根据用户登录状况返回可访问的导航菜单。
  * 树形结构的接口列表如下：
@@ -84,21 +89,11 @@ router.get('/nav', async (ctx)=>{
     ctx.body = {'errorCode': 0, 'message': {'user': user ? user : null, 'nav': navlist}}
 });
 
+router.get('/backup', async (ctx)=>{
+    const SysCtrl = ctx.controls['sys'];
 
-/* 
- * URL          : /logout
- * Method       : GET
- * Description  : 处理注销请求。
- * Parameter    : none.
- * Return       : none.
- */
-
-router.get('/logout', async (ctx)=>{
-    var jsonResult = {'errorCode': 0, 'message': 'SUCCESS'}
-
-    ctx.session.user = null;    
-    ctx.body = jsonResult;
+    var ret = await SysCtrl.backup();
+    ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
 })
-
 
 module.exports = router;

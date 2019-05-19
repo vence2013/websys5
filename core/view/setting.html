@@ -29,7 +29,7 @@
     <div ng-include="'/view/nav.html'"></div>
     <div class="container-fluid" ng-controller="settingCtrl">
         <div class="row">
-            <div class="col-md-3 mt-2 mx-1 border border-success rounded">
+            <div class="col-md-3 mt-2 mx-1 border border-secondary rounded">
                 <div class="row"><div class="col-md mt-2">
                     <input type="password" class="form-control" ng-model="oldPassword" placeholder="旧密码" />
                 </div></div>
@@ -42,6 +42,29 @@
                 <div class="row"><div class="col-md text-right my-3">
                     <button type="button" class="btn btn-outline-success px-3" ng-click="changePassword();">修改密码</button>
                 </div></div>
+            </div>
+            <div class="col-md-5 mt-2 mx-1 border border-warning rounded" style="line-height: 46px;">
+                <div class="row">
+                    <div class="col-md">数据备份的内容包括：数据库文件， 配置文件(.env), 证书文件； 导出静态文件。</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control mt-2" ng-model="taglist" placeholder="用于过滤选择导出文档的标签列表" />
+                    </div>
+                    <div class="col-md text-right">
+                        <button type="button" class="btn btn-outline-secondary" ng-click="searchDocument();">查看导出文件列表</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        其他信息
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md text-right">
+                        <button type="button" class="btn btn-outline-success px-3" ng-click="backup();">备份</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

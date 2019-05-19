@@ -53,7 +53,10 @@ router.delete('/:docid', async (ctx)=>{
 
 /* 文档搜索页面 */
 router.get('/', async (ctx)=>{
-    await ctx.render('document/view/index.html'); 
+    var req2 = ctx.query;
+    var taglist = req2.taglist;
+    
+    await ctx.render('document/view/index.html', {'taglist':taglist}); 
 });
 
 /* 文档编辑页面 */
