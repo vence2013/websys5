@@ -113,17 +113,22 @@ function indexCtrl($scope, $http, user) {
 
     // 播放视频文件
     $scope.play = (videosrc)=>{
+        // 销毁当前的播放器
+        if ($('#video-box').css('display')=='block') { Player.dispose(); }
+
         $('#video-box')
+        .append('<video id="player" class="video-js" controls autoplay preload="auto" >'+
+            '<source src="'+videosrc+'" type="video/mp4">'+
+            '</video>')
         .css('display', 'block')
-        .append('<video id="player" class="video-js"></video>');
-        var player = videojs('player', { controls: true, width:400, height:200, autoplay:true,
-            sources: [videosrc]
-        });
-        var CloseButton = videojs.getComponent('CloseButton'); //获取关闭按钮的组件
-        videojs.registerComponent('CloseButton', CloseButton); //注册该组件
-        player.addChild('CloseButton');                        //添加关闭按钮到播放器
-        player.getChild('CloseButton').on('close', function() {//监听关闭事件
-            this.player().dispose();                           //释放播放器所占资源
+
+        Player = videojs('player', {width:400, height:200});
+        // 关闭按钮
+        var CloseButton = videojs.getComponent('CloseButton');  //获取关闭按钮的组件
+        videojs.registerComponent('CloseButton', CloseButton);  //注册该组件
+        Player.addChild('CloseButton');                         //添加关闭按钮到播放器
+        Player.getChild('CloseButton').on('close', function() { //监听关闭事件
+            this.player().dispose();                            //释放播放器所占资源
             $('#video-box')
             .css('display', 'block')
         });
