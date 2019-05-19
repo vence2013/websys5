@@ -12,6 +12,7 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const moment = require('moment');
+const mkdirp = require('mkdirp');
 
 
 /* 
@@ -37,7 +38,7 @@ function genPath(name, ext, size) {
     var datestr =  moment().format("YYYYMMDD");
     filepath += datestr+'/';
     // 如果目录不存在，则创建该目录。
-    if (!fs.existsSync(filepath)) { fs.mkdirSync(filepath); }
+    if (!fs.existsSync(filepath)) { mkdirp.sync(filepath); }
 
     // 添加时间戳，修正已上传文件被覆盖的问题
     hash.update(name+datestr);

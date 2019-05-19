@@ -20,7 +20,6 @@ exports.backupProgress = (ctx)=>{ return Progress; };
 exports.backup = async (backupfile)=>{
     // 重新创建临时备份目录
     var tmpdir  = '/upload/backup'; 
-    childProcess.spawnSync('rm', ['-fr', tmpdir]);
     if (!fs.existsSync(tmpdir)) fs.mkdirSync(tmpdir);
 
     // 复制备份文件
@@ -46,4 +45,5 @@ exports.backup = async (backupfile)=>{
 
     tar.c({gzip:true, sync:true, file: '/upload/'+backupfile}, [tmpdir]);
     Progress = 3;
+    childProcess.spawnSync('rm', ['-fr', tmpdir]);
 }

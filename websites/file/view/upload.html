@@ -32,11 +32,10 @@
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div style="height: 770px;">
-                    <div class="row mt-2 mx-1">
-                        <div class="col-md-4">
-                            <div class="row" ng-show="itemSel"><div class="col-md">文件大小（字节）：{{itemSel.file.size/1024/1024|number:2 }} MB</div></div>
-                            <div class="row" ng-show="itemSel"><div class="col-md">最近修改（日期）：{{itemSel.file.lastModifiedDate|datefmt:'yyyy-MM-dd'}}</div></div>
-                            <div class="row" ng-show="itemSel"><div class="col-md" title="{{itemSel.file.type}}">文件类型：{{itemSel.file.type|limitTo:10}}</div></div>
+                    <div class="row mt-2">
+                        <div class="col-md-4" style="line-height: 30px;">
+                            <div ng-show="itemSel">最近修改（日期）：{{itemSel.file.lastModifiedDate|datefmt:'yyyy-MM-dd'}}</div>
+                            <div ng-show="itemSel" title="{{itemSel.file.type}}">文件类型：{{itemSel.file.type|limitTo:20}}</div>
                         </div>
                         <div class="col">
                             <div ng-repeat="item in uploader.queue" ng-show="uploader.isHTML5&&item==itemSel"
@@ -44,12 +43,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="row container-fluid mb-2 ml-1">
+                <div class="row">
                     <div class="col-md">
                         <button type="button" ng-click="uploader.uploadAll()" class="btn btn-outline-success px-3 mx-1">上传</button>
                         <button type="button" ng-click="uploader.cancelAll()" class="btn btn-outline-secondary px-3 mx-1">取消</button>
                     </div>
-                    <div class="custom-file col-md mr-4">
+                    <div class="custom-file col-md mr-2">
                         <input type="file" class="custom-file-input" id="fileSelect" nv-file-select="" uploader="uploader" multiple required />
                         <label class="custom-file-label" for="fileSelect">Choose file...</label>
                     </div>
@@ -62,6 +61,7 @@
                             ng-class="{'sel': item.isUploading||item==itemSel}">
                             <div class="col-md-10" style="cursor: pointer;">{{item.file.name|limitTo:250}}</div>
                             <div class="col-md">
+                                {{item.file.size/1024/1024|number:2 }} MB, 
                                 {{item.progress}}%
                                 <i class="fa fa-close" ng-click="item.remove();" style="float: right; margin-top: 3px; cursor: pointer;"></i>
                             </div>

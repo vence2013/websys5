@@ -101,6 +101,10 @@ function indexCtrl($scope, $http, user) {
     $scope.focus = (file)=>{
         $scope.file = file;
         $scope.copyText = file.location;
+
+        var idx = $scope.filelist.indexOf(file);
+        $('.filesel').removeClass('filesel');
+        $('.filelist>div:eq('+idx+')').addClass('filesel');
     }
 
     $scope.copySuccess = ()=>{

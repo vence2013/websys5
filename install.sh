@@ -137,15 +137,6 @@ echo -e "Path in host system:\n\tdataroot:"${dataroot}
 if [ ! -d "${dataroot}/upload" ]; then
     mkdir -pv ${dataroot}/upload
 fi
-if [ ! -d "${dataroot}/upload/big" ]; then
-    mkdir -pv ${dataroot}/upload/big
-fi
-if [ ! -d "${dataroot}/upload/median" ]; then
-    mkdir -pv ${dataroot}/upload/median
-fi
-if [ ! -d "${dataroot}/upload/small" ]; then
-    mkdir -pv ${dataroot}/upload/small
-fi
 if [ ! -d "${dataroot}/export" ]; then
     mkdir -pv ${dataroot}/export
 fi

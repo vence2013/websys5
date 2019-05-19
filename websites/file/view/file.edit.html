@@ -34,12 +34,14 @@
                     {{detail.size/1024/1024|number:2}} MB, {{detail.createdAt|limitTo:10}}, {{detail.owner}}
                 </div>
             </div>
-            <div class="row" style="height:80px;">
+            <div class="row" style="height:100px;">
                 <div class="col mx-2 border-bottom taglist">
-                    <h4 class="m-2" ng-repeat="x in detail.tagnames"><span class="badge badge-secondary">{{x}}</span></h4>
+                    <h4 class="mx-1 mt-2 float-left" ng-repeat="x in detail.tagnames">
+                        <span class="badge badge-secondary" style="line-height: 25px;">{{x}}</span>
+                    </h4>
                 </div>
             </div>
-            <div class="row" style="height: 340px; overflow: hidden;">
+            <div class="row" style="height: 320px; overflow: hidden;">
                 <div class="col mt-2">
                     <treecontrol class="tree-classic" options="treeOptions" tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
                         filter-expression="predicate" filter-comparator="comparator">

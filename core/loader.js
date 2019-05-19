@@ -206,6 +206,7 @@ function installCheck() {
             } else { // 清理数据库
                 await ctx.sequelize.query("DELETE FROM Users;", {logging: false});
                 await ctx.sequelize.query("DELETE FROM Groups;", {logging: false});
+                await ctx.sequelize.query("DELETE FROM Categories;", {logging: false});
                 ctx.throw(403);
                 await next();
             }

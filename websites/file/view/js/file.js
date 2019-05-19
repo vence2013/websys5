@@ -46,8 +46,12 @@ function fileCtrl($rootScope, $scope, $http) {
         })
     }
 
-    $scope.select = (file)=>{
+    $scope.focus = (file)=>{
         $rootScope.file = file;
+
+        var idx = $scope.filelist.indexOf(file);
+        $('.filesel').removeClass('filesel');
+        $('.filelist>div:eq('+idx+')').addClass('filesel');
     }
 
     // 播放视频文件

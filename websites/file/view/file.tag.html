@@ -1,7 +1,9 @@
 <div class="container-fluid mt-3" ng-controller="tagCtrl">
     <div class="row" style="height: 100px;">        
         <div class="col-md" id="tagsel">
-            <h4 class="mr-2 float-left" style="cursor: pointer;" ng-repeat="x in rellist" ng-click="dettach(x);"><span class="badge badge-secondary">{{x}}</span></h4>
+            <h4 class="mt-2 mx-1 float-left" style="cursor: pointer;" ng-repeat="x in rellist" ng-click="dettach(x);">
+                <span class="badge badge-secondary" style="line-height: 25px;">{{x}}</span>
+            </h4>
         </div>
     </div>
     <div class="row mt-2">
@@ -11,7 +13,9 @@
     </div>
     <div class="row mt-2 h-50">
         <div class="col-md" id="tagres">
-            <h4 class="mr-2 float-left" style="cursor: pointer;" ng-repeat="x in reslist" ng-click="attach(x);"><span class="badge badge-secondary">{{x}}</span></h4>
+            <h4 class="mt-2 mx-1 float-left" style="cursor: pointer;" ng-repeat="x in reslist" ng-click="attach(x);">
+                <span class="badge badge-secondary" style="line-height: 25px;">{{x}}</span>
+            </h4>
         </div>
     </div>
 </div>
