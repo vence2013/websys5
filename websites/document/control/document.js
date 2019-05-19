@@ -154,7 +154,7 @@ exports.export2file = async (ctx, userid, query)=>{
     var docs = ret.doclist;
     for (var i=0; i<docs.length; i++) {
         var content = docs[i]['content'].toString();
-        var arr = content.match(/\[[^\]]*\]\([^\)]+\)/g);
+        var arr = content.match(/\[[^\]]*\]\(\/upload\/[^\)]+\)/g);
         for (var j=0; arr && j<arr.length; j++) {
             var url = arr[j].replace(/\[[^\]]*\]\(([^\)]+)\)/, "$1");
             filelist.push(url);
