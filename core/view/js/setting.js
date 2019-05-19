@@ -4,13 +4,14 @@ appConfiguration(app)
 .controller('settingCtrl', settingCtrl);
 
 
-
 function settingCtrl($scope, $http, user, locals) {
     $scope.user = user;
     $scope.oldPassword = '';
     $scope.newPassword = '';
     $scope.confirmPassword = '';
-    $scope.taglist = '';
+    $scope.tagstr = '';
+    $scope.backupfile = '';
+    $scope.backupmessage = '等待备份';
 
     function logout () {
         $http
@@ -37,16 +38,30 @@ function settingCtrl($scope, $http, user, locals) {
     }
 
     $scope.searchDocument = ()=>{
-        window.open('/document?taglist='+$scope.taglist, "_blank");
+        window.open('/document?taglist='+$scope.tagstr, "_blank");
+    }
+
+    var backupQueryTimer = null;
+    
+    function backupQuery() {
+        $http
+        .get('/backup/progress')
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            $scope.backupmessage = res.data.message;
+            if (res.data.message=='数据备份完成！') window.clearInterval(backupQueryTimer);
+        });
     }
 
     $scope.backup = ()=>{
+        var tagstr = $scope.tagstr;
+
         $http
-        .get('/backup')
+        .get('/backup', {params: {'taglist':tagstr}})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            
-            toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
+            $scope.backupfile = res.data.message;
+            backupQueryTimer = window.setInterval(backupQuery, 1000);            
         })
     }
 }

@@ -43,13 +43,13 @@
                     <button type="button" class="btn btn-outline-success px-3" ng-click="changePassword();">修改密码</button>
                 </div></div>
             </div>
-            <div class="col-md-5 mt-2 mx-1 border border-warning rounded" style="line-height: 46px;">
+            <div class="col-md-5 mt-2 mx-1 border border-warning rounded" style="line-height: 46px;" ng-show="user.username=='root'">
                 <div class="row">
-                    <div class="col-md">数据备份的内容包括：数据库文件， 配置文件(.env), 证书文件； 导出静态文件。</div>
+                    <div class="col-md">备份内容：数据库文件，配置文件，证书文件，导出文档</div>
                 </div>
                 <div class="row">
                     <div class="col-md-8">
-                        <input type="text" class="form-control mt-2" ng-model="taglist" placeholder="用于过滤选择导出文档的标签列表" />
+                        <input type="text" class="form-control mt-2" ng-model="tagstr" placeholder="用于过滤选择导出文档的标签列表" />
                     </div>
                     <div class="col-md text-right">
                         <button type="button" class="btn btn-outline-secondary" ng-click="searchDocument();">查看导出文件列表</button>
@@ -57,10 +57,13 @@
                 </div>
                 <div class="row">
                     <div class="col-md">
-                        其他信息
+                        {{backupmessage}}
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-7">
+                        {{backupfile}}
+                    </div>
                     <div class="col-md text-right">
                         <button type="button" class="btn btn-outline-success px-3" ng-click="backup();">备份</button>
                     </div>

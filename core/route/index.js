@@ -8,6 +8,7 @@
  *  2019/04/03    - 创建文件。
  *****************************************************************************/ 
 
+const moment = require('moment');
 const Router = require('koa-router');
 
 
@@ -89,11 +90,40 @@ router.get('/nav', async (ctx)=>{
     ctx.body = {'errorCode': 0, 'message': {'user': user ? user : null, 'nav': navlist}}
 });
 
+/* 该接口只有root用户可以访问 */
 router.get('/backup', async (ctx)=>{
     const SysCtrl = ctx.controls['sys'];
+    const DocumentCtrl = ctx.controls['document/document'];
 
-    var ret = await SysCtrl.backup();
-    ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
+    var req2 = ctx.query;
+    var taglist = req2.taglist
+        .replace(/[\s]+/, ' ') // 将多个空格替换为一个
+        .replace(/(^\s*)|(\s*$)/g, "") // 删除字符串首尾的空格
+        .split(' ');
+    var query = {'page':1, 'pageSize':1000, 'order':['createdAt', 'DESC']};
+    if (taglist.length) query['tag']=taglist;
+    // 导出文件
+    var user = ctx.session.user;
+    await DocumentCtrl.export2file(ctx, user.id, query);
+    // 执行数据备份
+    var datestr = moment().format("YYYYMMDD");
+    var backupfile = 'backup-'+datestr+'.tgz';
+    SysCtrl.backup(backupfile);
+    ctx.body = {'errorCode':0, 'message':backupfile};
+})
+
+router.get('/backup/progress', async (ctx)=>{
+    const SysCtrl = ctx.controls['sys'];
+    var message = '';
+
+    switch (SysCtrl.backupProgress()) {
+        case 1: message = '完成文件备份， 正在进行数据库导出...'; break;
+        case 2: message = '完成数据库导出，正在打包备份文件...';  break;
+        case 3: message = '数据备份完成！'; break;
+        default: message = '系统备份就绪!';
+    }
+
+    ctx.body = {'errorCode':0, 'message':message};
 })
 
 module.exports = router;
