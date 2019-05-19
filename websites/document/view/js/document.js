@@ -130,7 +130,9 @@ function docCtrl($scope, $http, $interval, user) {
             if (errorCheck(res)) return ;
             // 显示更新成功后，刷新该页面
             toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
-            window.setTimeout(()=>{ location.reload(); }, 1000);
+            window.setTimeout(()=>{ 
+                window.location.href = '/document';    
+            }, 1000);
         });
     }
 

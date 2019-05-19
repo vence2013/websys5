@@ -62,10 +62,12 @@ function indexCtrl($scope, $http, user) {
         })
     }
 
-    $scope.select = (doc)=>{
+    $scope.focus = (doc)=>{
         $scope.doc = doc;
-        $('.sel').removeClass('sel');
-        $('#'+doc.id).addClass('sel');
+
+        var idx = $scope.doclist.indexOf(doc);
+        $('.focus').removeClass('focus');
+        $('.doclist>div:eq('+idx+')').addClass('focus');
     }
 
     function categoryRefresh (categoryids) {
