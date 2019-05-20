@@ -71,13 +71,16 @@ exports.create = async (ctx, userid, file)=>{
     return created;
 }
 
-exports.update = async (ctx, userid, id, name, desc, private)=>{
+exports.update = async (ctx, userid, id, name, desc, private, taglist)=>{
     const File = ctx.models['File'];
+    const Tag  = ctx.models['Tag'];
 
     var fileIns = await File.findOne({logging:false, where: {'id':id, 'ownerId':userid}});
     if (!fileIns) return -1; // 无效的文件， 或该文件不属于当前用户
-    
     await fileIns.update({'name':name, 'desc':desc, 'private':private}, {logging: false});
+    // 更新关联标签
+    var tagInss = await Tag.findAll({logging:false, where:{'name':taglist}});
+    fileIns.setTags(tagInss, {logging: false});
     return 0;
 }
 

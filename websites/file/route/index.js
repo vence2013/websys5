@@ -46,9 +46,10 @@ router.put('/:fileid', async (ctx, next)=>{
     var name    = req.name;
     var desc    = req.desc;
     var private = req.private;
-
+    var taglist = req.taglist;
+    
     var user = ctx.session.user;
-    var ret = await FileCtrl.update(ctx, user.id, fileid, name, desc, private);
+    var ret = await FileCtrl.update(ctx, user.id, fileid, name, desc, private, taglist);
     switch (ret) {
         case -1: ctx.body = {'errorCode':-1, 'message': '无效的文件，或该文件不属于当前用户，无法进行修改'}; break;
         default: ctx.body = {'errorCode': 0, 'message': 'SUCCESS'} ;
