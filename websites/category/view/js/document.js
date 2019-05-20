@@ -1,9 +1,9 @@
-var app = angular.module('indexApp', ['treeControl'])
+var app = angular.module('documentApp', ['treeControl'])
 
 appConfiguration(app)
-.controller('indexCtrl', indexCtrl)
+.controller('documentCtrl', documentCtrl)
 
-function indexCtrl($scope, $http, user, locals) 
+function fileCtrl($scope, $http, user, locals) 
 {
     $scope.user = user;
     // 目录树相关的数据

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="data:;base64,=">  <!-- 禁止加载facon.ico -->
-    <title>category</title>
+    <title>category file</title>
 
     <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
     <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
@@ -26,19 +26,28 @@
     <!-- 自定义 -->   
     <script src="/view/js/library.js" type="text/javascript"></script>
     <link  href="/view/css/all.css" rel="stylesheet" />
-    <script src="/category/view/js/index.js" type="text/javascript"></script>
+    <script src="/category/view/js/file.js" type="text/javascript"></script>
 </head>
-<body ng-app="indexApp">
+<body ng-app="fileApp">
 
     <div ng-include="'/view/nav.html'"></div>
-    <div id="wrapper" class="container-fluid" ng-controller="indexCtrl">
+    <div id="wrapper" class="container-fluid" ng-controller="fileCtrl">
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row">
-                    <div class="col-md" style="height: 400px; overflow: auto;">files</div>
+                    <div class="col-md" style="height: 300px; overflow: auto;">belongs</div>
                 </div>
                 <div class="row">
-                    <div class="col-md" style="height: 400px;">document</div>
+                    <div class="col-md" style="height: 470px;">ss</div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <button type="button" class="btn btn-outline-success px-3 mr-1">加入</button>
+                        <button type="button" class="btn btn-outline-danger px-3">移除</button>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="文件搜索" />
+                    </div>
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1 pt-2" style="overflow: auto;">
