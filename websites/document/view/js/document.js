@@ -18,12 +18,10 @@ function docCtrl($scope, $http, $interval, user) {
     $scope.treeView = [];
     $scope.listView = [];
     $scope.listExpand = [];
-    $scope.treeOptions = { nodeChildren: "children", dirSelectable: true, multiSelection: true,
-        injectClasses: { ul: "a1", li: "a2", liSelected: "a7", iExpanded: "a3", iCollapsed: "a4", iLeaf: "a5", label: "a6", labelSelected: "a8" }
-    };
     // 目录搜索
     $scope.predicate = '';
     $scope.comparator = false;
+    $scope.treeOptions = { dirSelectable: true, multiSelection: true };
 
     var content = '';
     var docid   = $('#wrapper').attr('docid');

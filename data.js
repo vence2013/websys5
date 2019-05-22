@@ -68,12 +68,7 @@ exports.interfaces = {
         {'method': 'POST',   'url': '/file/upload',  'group':'/file'},
         {'method': 'PUT',    'url': '/file/:fileid', 'group':'/file'},
         {'method': 'DELETE', 'url': '/file/:fileid', 'group':'/file'}, 
-        {'method': 'GET',    'url': '/file/last',    'group':'/file'},                
-        {'method': 'POST',   'url': '/file/tag/:fileid',      'group':'/file'},
-        {'method': 'DELETE', 'url': '/file/tag/:fileid',      'group':'/file'},
-        {'method': 'POST',   'url': '/file/category/:fileid', 'group':'/file'},
-        {'method': 'DELETE', 'url': '/file/category/:fileid', 'group':'/file'},
-        {'method': 'GET',    'url': '/file/category/:fileid', 'group':'/file'},
+        {'method': 'GET',    'url': '/file/last',    'group':'/file'},
         // document
         {'method': 'POST',   'url': '/document/:docid', 'group':'/document'},
         {'method': 'DELETE', 'url': '/document/:docid', 'group':'/document'},

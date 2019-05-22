@@ -21,9 +21,6 @@ function fileCtrl($scope, $http, user) {
     $scope.listView = [];
     $scope.listExpand = []; 
     $scope.nodeSelected = [];
-    // 目录搜索    
-    $scope.predicate  = '';
-    $scope.comparator = true;
     $scope.treeOptions = { multiSelection: true };
     // 标签
     $scope.tagstr = '';

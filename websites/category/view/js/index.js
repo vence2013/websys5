@@ -45,4 +45,5 @@ function indexCtrl($scope, $http, user, locals)
             }
         });
     }
+
 }
