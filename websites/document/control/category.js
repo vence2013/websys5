@@ -1,38 +1,38 @@
 /****************************************************************************** 
  * 文件名称 ： category.js
- * 功能说明 ： 文件的目录相关处理
+ * 功能说明 ： 文档的目录相关处理
  * 
- * 创建日期 ： 2019/4/27
+ * 创建日期 ： 2019/5/22
  * 创建者   ： wuxb
  * 修改历史 ： 
- *  2019/4/27    - 创建文件。
+ *  2019/5/22    - 创建文件。
  *****************************************************************************/  
 
-exports.attach = async (ctx, userid, categoryid, fileids)=>{
-    const File  = ctx.models['File'];
+exports.attach = async (ctx, userid, categoryid, ids)=>{
+    const Document = ctx.models['Document'];
     const Category = ctx.models['Category'];
 
     var categoryIns = await Category.findOne({logging:false, where:{'id':categoryid , 'ownerId':userid}});
     if (!categoryIns) reutrn -1; // 无效的目录
 
-    // 获取有效的文件
-    var fileInss = await File.findAll({logging:false, where:{'id':fileids}});
-    if (!fileInss) return -2; // 无效的文件
+    // 获取有效的文档
+    var docInss = await Document.findAll({logging:false, where:{'id':ids}});
+    if (!docInss) return -2; // 无效的文件
 
-    await categoryIns.addFiles(fileInss, {logging:false});
+    await categoryIns.addDocuments(docInss, {logging:false});
     return 0;
 }
 
 exports.dettach = async (ctx, userid, categoryid, fileids)=>{
-    const File  = ctx.models['File'];
+    const Document = ctx.models['Document'];
     const Category = ctx.models['Category'];
 
     var categoryIns = await Category.findOne({logging:false, where:{'id':categoryid , 'ownerId':userid}});
     if (!categoryIns) reutrn -1; // 无效的目录
 
-    // 获取有效的文件
-    var fileInss = await File.findAll({logging:false, where:{'id':fileids}});
-    if (fileInss) await categoryIns.removeFiles(fileInss, {logging:false});
+    // 获取有效的文档
+    var docInss = await Document.findAll({logging:false, where:{'id':fileids}});
+    if (docInss) await categoryIns.removeDocuments(docInss, {logging:false});
     return 0;
 }
 
@@ -40,15 +40,15 @@ exports.dettach = async (ctx, userid, categoryid, fileids)=>{
 exports.get = async (ctx, userid, categoryid, page, pageSize, str)=>{
     const User = ctx.models['User'];
     const Group = ctx.models['Group'];
-    const File  = ctx.models['File'];
+    const Document = ctx.models['Document'];
     const Category = ctx.models['Category'];    
 
     // 获取目录关联的文件
     var ids = [];
     var categoryIns = await Category.findOne({logging:false, where:{'id':categoryid , 'ownerId':userid}});
     if (categoryIns) {
-        var fileInss = await categoryIns.getFiles({logging:false});        
-        ids = fileInss.map((x)=>{ return x.get({plain:true})['id']; });
+        var docInss = await categoryIns.getDocuments({logging:false});        
+        ids = docInss.map((x)=>{ return x.get({plain:true})['id']; });
     }
 
     // 获取未关联文件的分页列表
@@ -77,7 +77,7 @@ exports.get = async (ctx, userid, categoryid, page, pageSize, str)=>{
     // 搜索文件的名称或描述
     if (str && str.length) {
         str.map((x)=>{
-            if (x) sqlCond += " AND (`name` LIKE '%"+x+"%' OR `desc` LIKE '%"+x+"%') ";
+            if (x) sqlCond += " AND `content` LIKE '%"+x+"%' ";
         });
     }
     // 排除已属于该目录的文件
@@ -86,7 +86,7 @@ exports.get = async (ctx, userid, categoryid, page, pageSize, str)=>{
     }
 
     // 计算分页数据
-    sql = "SELECT COUNT(*) AS num FROM `Files` "+sqlCond;
+    sql = "SELECT COUNT(*) AS num FROM `Documents` "+sqlCond;
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
     var total = res[0]['num'];
     var maxpage  = Math.ceil(total/pageSize);
@@ -95,13 +95,15 @@ exports.get = async (ctx, userid, categoryid, page, pageSize, str)=>{
 
     // 查询当前分页的列表数据
     var offset = (page - 1) * pageSize;
-    sql = "SELECT * FROM `Files` "+sqlCond+" ORDER BY `createdAt` DESC LIMIT "+offset+", "+pageSize+" ;";
+    sql = "SELECT * FROM `Documents` "+sqlCond+" ORDER BY `createdAt` DESC LIMIT "+offset+", "+pageSize+" ;";
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
-    var filelist = res.map((x)=>{
-        x['desc'] = x.desc ? x.desc.toString() : '';
+    var doclist = res.map((x)=>{
+        x['content'] = x.content ? x.content.toString() : '';
         return x;
     });
 
-    var filerel = await File.findAll({logging:false, where:{'id':ids}});
-    return {'total':total, 'page': page, 'pageMaxium':maxpage, 'fileres':filelist, 'filerel':filerel}
+    var docrel = await Document.findAll({logging:false, where:{'id':ids}});
+    for (var i=0; i<docrel.length; i++) { docrel[i]['content'] = docrel[i]['content'].toString(); }
+
+    return {'total':total, 'page': page, 'pageMaxium':maxpage, 'docres':doclist, 'docrel':docrel}
 }

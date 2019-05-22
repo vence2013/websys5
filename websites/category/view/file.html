@@ -36,10 +36,10 @@
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row">
                     <div class="col-md filerel" style="height: 300px; overflow: auto;">
-                            <div ng-repeat="x in filerel" style="line-height: 25px; border-bottom: 1px dashed #cccccc;">
-                                <input type="checkbox" class="align-middle" value="{{x.id}}" />
-                                <a href="{{x.location}}" target="_blank">{{x.name}}</a>
-                            </div>
+                        <div ng-repeat="x in filerel" style="line-height: 25px; border-bottom: 1px dashed #cccccc;">
+                            <input type="checkbox" class="align-middle" value="{{x.id}}" />
+                            <a href="{{x.location}}" target="_blank">{{x.name}}</a>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -75,22 +75,6 @@
                     on-selection="select(node, selected)" on-node-toggle="toggle(node, expanded);">
                     <span ng-class="{'privateResource': node.private}" title="{{node.desc}}">{{node.name}} /{{node.id}}</span>
                 </treecontrol>
-            </div>
-        </div>
-        <!--删除确认-->
-        <div class="modal fade" id="deleteConfirmWnd" role="dialog">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">目录节点删除确认</h5>
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
-                    </div>
-                    <div class="modal-body">确认要删除选中的目录节点吗？</div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger px-3" data-dismiss="modal" ng-click="delete();">确认</button>
-                        <button type="button" class="btn btn-secondary px-3" data-dismiss="modal">取消</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
