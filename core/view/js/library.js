@@ -158,51 +158,47 @@ function errorCheck(res) {
     return true;
 }
 
-/* 生成分页项列表， 每项包括以下信息： disable, active, page, name
- * 分页显示方法：
- * 1. 如果总页数<=10,则全部显示
- * 2. 否则显示当前页临近的页码
- *     2.1 当前页<=5, 显示起始5页和末尾5页  (合并到2.2处理)
- *     2.2 当前页<(max-10), 显示当前页之前的5页和末尾5页
- *     2.3 当前页>=(max-10), 显示末尾10页
- */
-function genPagelist(page, max) {
+/* 生成分页项列表， 每项包括以下信息： disable, active, page, name */
+function initPage(page, pageSize, total, display) {
     var pagelist = [];
 
+    var max = Math.ceil(total/pageSize);
+    max     = (max<1) ? 1 : max;
+
     // 首页/上一页
-    pagelist.push({'disable':(page==1),  'active':false, 'page':1, 'name':'First'});
+    pagelist.push({'disable':(page==1),  'active':false, 'page':1, 'name':'First(/'+pageSize+')'});
     var previous = (page>1) ? (page-1) : 1;
     pagelist.push({'disable':(page==1),  'active':false, 'page':previous, 'name':'Previous'});
-    // 分情况处理显示
-    if (max<=10) {        
-        for (var i=1; i<=max; i++) {
+
+    var half = Math.ceil(display/2);
+    if ((max<display) || (page<=half)) {
+        for (var i=1; (i<=max) && (i<display); i++) {
             var item = {'disable':false,  'active':(page==i), 'page':i, 'name':i};
             pagelist.push(item);
         }
-    } else if (page<(max-10)) {
-        var start = (page<=5) ? 1 : (page-4);
-        for (var i=0; i<5; i++) {
-            var cur = start+i;
-            var item = {'disable':false,  'active':(page==cur), 'page':cur, 'name':cur};
-            pagelist.push(item);
+        if (max > display) { // 表示还有页面
+            pagelist.push({'disable':true,  'active':false, 'page':1, 'name':'...'});
         }
+    } else if ((page+half)>max) {
         pagelist.push({'disable':true,  'active':false, 'page':1, 'name':'...'});
-        for (var i=(max-4); i<=max; i++) {
-            var item = {'disable':false,  'active':false, 'page':i, 'name':i};
+        var start = (max>display) ? (max-display) : 1;
+        for (var i=start; i<=max; i++) {
+            var item = {'disable':false,  'active':(page==i), 'page':i, 'name':i};
             pagelist.push(item);
         }
     } else {
         pagelist.push({'disable':true,  'active':false, 'page':1, 'name':'...'});
-        for (var i=max-9; i<=max; i++) {
+        for (var i=(page-half+1); i<=(page+half); i++) {
             var item = {'disable':false,  'active':(page==i), 'page':i, 'name':i};
             pagelist.push(item);
         }
+        pagelist.push({'disable':true,  'active':false, 'page':1, 'name':'...'});
     }
 
     // 下一页/末页
     var next = (page<max) ? (page+1) : max;
     pagelist.push({'disable':(page==next),  'active':false, 'page':next, 'name':'Next'});
-    pagelist.push({'disable':(page==max),  'active':false, 'page':max, 'name':'Last'});
+    pagelist.push({'disable':(page==max),  'active':false, 'page':max, 'name':'Last('+total+')'});
 
     return pagelist;
 }

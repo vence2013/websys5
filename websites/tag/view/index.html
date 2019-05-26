@@ -29,24 +29,34 @@
     <div id="wrapper" class="container-fluid" ng-controller="tagCtrl">
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
-                <div class="row" style="height: 770px; overflow: auto;">
-                    <div class="col-md mt-3" style="line-height: 25px;">
-                        <div ng-repeat="x in doclist" style="border-bottom: 1px dashed #cccccc;">
-                            <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
-                        </div>
-                        <div ng-repeat="x in filelist" style=" border-bottom: 1px dashed #cccccc;">
-                            <a href="{{x.location}}" target="_blank">{{x.name}}</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-md">
-                        <input type="text" class="form-control" ng-model="opts.str" placeholder="请输入标签名称， 回车执行搜索。">
+                        <input type="text" class="form-control" ng-model="opts.str" placeholder="标签搜索或添加">
                     </div>
                     <div class="col-md-3 text-right">
                         <button ng-show="user.username&&tagsel" data-toggle="modal" data-target="#deleteConfirmWnd" type="button" class="btn btn-outline-danger px-3 ml-1">删除</button>
                         <button ng-show="user.username" ng-click="add();" type="button" class="btn btn-outline-success px-3">添加</button>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-md mt-2" style="line-height: 25px; height: 300px;">
+                        <div ng-repeat="x in doclist" style="border-bottom: 1px dashed #cccccc;">
+                            <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" ng-model="docOpts.str" placeholder="文档搜索">
+                    </div>
+                    <nav class="col-md">
+                        <ul class="pagination  justify-content-end" ng-show="doclist">
+                            <li ng-repeat="x in docPages" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="docOpts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>  
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1">
@@ -57,11 +67,10 @@
                         </h4>
                     </div>
                 </div>
-                <div class="row">                    
-                    <div class="col-md" style="line-height: 40px;">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
+                <div class="row">
                     <nav class="col-md">
                         <ul class="pagination  justify-content-end">
-                            <li ng-repeat="x in pagelist" 
+                            <li ng-repeat="x in pages" 
                                 ng-class="{'disabled': x.disable, 'active':x.active}" 
                                 ng-click="opts.page=x.page"
                                 class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>

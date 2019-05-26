@@ -15,20 +15,17 @@ function tagCtrl($scope, $http, user)
     };
     $scope.user = user;
     // 标签
-    $scope.opts = {'str':'', 'page':1, 'pageSize':100, 'order': ['createdAt', 'DESC']};
-    $scope.total   = 0;
-    $scope.pagelist= [];
+    $scope.opts = {'str':'', 'page':1, 'pageSize':100};
+    $scope.pages   = [];
     $scope.taglist = [];
+    // 关联文档
+    $scope.docOpts = {'str':'', 'page':1, 'pageSize':12};
+    $scope.docPages = [];
+    $scope.doclist  = [];
 
     // opts对象更改后刷新标签列表。
     $scope.$watch('opts', get, true);
-    viewReset();
-
-    function viewReset() {
-        $scope.tagsel  = null;
-        $scope.filelist = [];
-        $scope.doclist  = [];
-    }
+    $scope.$watch('docOpts', docRelate, true);
 
     $scope.get = get;
 
@@ -37,13 +34,11 @@ function tagCtrl($scope, $http, user)
         .get('/tag/search', {params: $scope.opts})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            viewReset();
-            var ret = res.data.message;
+            var ret = res.data.message;           
             $scope.taglist = ret.taglist;
-
-            $scope['total']     = ret.total;
+            // 分页
             $scope.opts['page'] = ret.page;
-            $scope.pagelist = genPagelist(ret.page, ret.pageMaxium);
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 10);
         })
     }
 
@@ -73,11 +68,12 @@ function tagCtrl($scope, $http, user)
         $(".badge-danger").removeClass('badge-danger').addClass('badge-secondary');
 
         if (x == $scope.tagsel) {
-            viewReset();
+            
         } else {
             $("h4[id='"+x.id+"']").find('span').removeClass('badge-secondary').addClass('badge-danger');
             $scope.tagsel  = x;
-            
+            docRelate();
+            /*
             $http
             .get('/tag/relate/'+x.id)
             .then((res)=>{
@@ -86,7 +82,27 @@ function tagCtrl($scope, $http, user)
                 var ret = res.data.message;
                 $scope.filelist = ret.filelist;
                 $scope.doclist  = ret.doclist;
+            })*/
+        }
+    }
+
+    function docRelate() {
+        if ($scope.tagsel) {
+            $http
+            .get('/document/tag/'+$scope.tagsel.id, {params: $scope.docOpts})
+            .then((res)=>{
+                if (errorCheck(res)) return ;  
+
+                var ret = res.data.message;
+                $scope.doclist = ret.doclist;
+
+                $scope.docOpts['page'] = ret.page;
+                $scope.docPages = initPage(ret.page, $scope.docOpts.pageSize, ret.total, 6);               
             })
+        } else {
+            $scope.docOpts['str'] = '';
+            $scope.docOpts['page']= 1;
+            $scope.doclist  = [];
         }
     }
 }

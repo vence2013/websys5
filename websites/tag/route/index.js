@@ -20,7 +20,7 @@ router.post('/', async (ctx)=>{
     const TagCtrl = ctx.controls['tag/tag'];
 
     var req = ctx.request.body;
-    // 转换为有效的参数    
+    // 转换为有效的参数
     var name = req.name;
     var ret = await TagCtrl.create(ctx, name);
     ctx.body = ret ? {'errorCode': 0, 'message': 'SUCCESS'}
@@ -46,36 +46,20 @@ router.get('/', async (ctx)=>{
 });
 
 /* 搜索标签列表
- * 参数： {str, [order], page, pageSize }
+ * 参数： {str, page, pageSize }
+ * str - 单个字符串
  */
 router.get('/search', async (ctx)=>{
     const TagCtrl = ctx.controls['tag/tag'];   
 
-    var req2 = ctx.query;
-    // 提取有效的参数， 需要的参数： 搜索字符串， 搜索的最小隐私等级， 当前页码， 每页记录数量， 排序方法
-    var str = req2.str.replace(/^\s*(.*?)\s*$/, "$1"); // 搜索字符串
-    var order = (req2.order && (req2.order.length==2)) ? req2.order : ['createdAt', 'DESC'];
-    var page = parseInt(req2.page) ? parseInt(req2.page) : 1;
-    var pageSize = parseInt(req2.pageSize) ? parseInt(req2.pageSize) : 100;
-    
-    var taglist = await TagCtrl.search(ctx, str, page, pageSize, order);
-    ctx.body = {'errorCode': 0, 'message': taglist};
-})
+    var req = ctx.query;
+    // 提取有效的参数
+    var str = req.str.replace(/^\s*(.*?)\s*$/, "$1"); // 去除首尾空格
+    var page = /^\d+$/.test(req.page) ? parseInt(req.page) : 1;  // 当前的页面
+    var pageSize = /^\d+$/.test(req.pageSize) ? parseInt(req.pageSize) : 100; // 每页的记录条数
 
-// 获取标签关联的文件和文档
-router.get('/relate/:tagid', async (ctx)=>{
-    const FileCtrl = ctx.controls['file/file'];
-    const DocumentCtrl = ctx.controls['document/document'];    
-
-    var req2  = ctx.params;
-    var tagid = req2.tagid;
-
-    // 允许未登录用户访问， userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var doclist = await DocumentCtrl.searchByTag(ctx, userid, tagid);
-    var filelist= await FileCtrl.searchByTag(ctx, userid, tagid);
-    ctx.body = {'errorCode': 0, 'message': {'doclist':doclist, 'filelist':filelist}};
+    var ret = await TagCtrl.search(ctx, str, page, pageSize);
+    ctx.body = {'errorCode': 0, 'message': ret};
 })
 
 module.exports = router;

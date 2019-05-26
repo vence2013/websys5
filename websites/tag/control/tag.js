@@ -50,18 +50,17 @@ exports.search = async (ctx, str, page, pageSize, order)=>{
     var queryCond = {'raw': true, 'logging': false, 'where': {}};
     if (str) { queryCond['where']['name'] = {[Op.like]: '%'+str+'%'}; }
     // 计算分页数据
-    ret['total'] = await Tag.count(queryCond);
-    var maxpage = Math.ceil(ret['total']/pageSize);
+    var total = await Tag.count(queryCond);
+    var maxpage = Math.ceil(total/pageSize);
     maxpage = (maxpage<1) ? 1 : maxpage;
-    ret['page'] = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
-    ret['pageMaxium'] = maxpage;
+    page = (page>maxpage) ? maxpage : (page<1 ? 1 : page); // 更新为有效的页码
 
     // 查询当前分页的列表数据
-    var offset = (ret['page'] - 1) * pageSize;
+    var offset = (page - 1) * pageSize;
     queryCond['offset'] = offset;
     queryCond['limit']  = pageSize;
-    queryCond['order']  = [order];
-    ret['taglist'] = await Tag.findAll(queryCond);
+    queryCond['order']  = [['createdAt', 'DESC']];
+    var taglist = await Tag.findAll(queryCond);
 
-    return ret;
+    return {'total':total, 'page':page, 'taglist':taglist};
 }
