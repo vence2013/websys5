@@ -35,8 +35,9 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/found/filter/apply',      'group':'/'},
         {'method': 'GET', 'url': '/found/filter/detail/:id', 'group':'/'},
         // tag
-        {'method': 'GET', 'url': '/tag',        'group':'/'},
-        {'method': 'GET', 'url': '/tag/search', 'group':'/tag'},
+        {'method': 'GET', 'url': '/tag',               'group':'/'},
+        {'method': 'GET', 'url': '/tag/search',        'group':'/tag'},
+        {'method': 'GET', 'url': '/tag/relate/:tagid', 'group':'/tag'},
         // file        
         {'method': 'GET', 'url': '/file',               'group':'/'},
         {'method': 'GET', 'url': '/file/search',        'group':'/file'},

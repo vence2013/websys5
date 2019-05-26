@@ -21,20 +21,21 @@ router.post('/', async (ctx)=>{
 
     var req = ctx.request.body;
     // 转换为有效的参数    
-    var tagname = req.tagname;
-    var ret = await TagCtrl.create(ctx, tagname);
+    var name = req.name;
+    var ret = await TagCtrl.create(ctx, name);
     ctx.body = ret ? {'errorCode': 0, 'message': 'SUCCESS'}
                    : {'errorCode': -1, 'message': '该标签已经存在！'};
 });
 
 
-router.delete('/:id', async (ctx)=>{
+router.delete('/:tagid', async (ctx)=>{
     const TagCtrl = ctx.controls['tag/tag'];
 
     var req2 = ctx.params;
     // 转换为有效的参数 
-    var id = req2.id;
-    await TagCtrl.delete(ctx, id);
+    var tagid = req2.tagid;
+
+    await TagCtrl.delete(ctx, tagid);
     ctx.body = {'errorCode':  0, 'message': 'SUCCESS'}
 })
 
@@ -59,6 +60,22 @@ router.get('/search', async (ctx)=>{
     
     var taglist = await TagCtrl.search(ctx, str, page, pageSize, order);
     ctx.body = {'errorCode': 0, 'message': taglist};
+})
+
+// 获取标签关联的文件和文档
+router.get('/relate/:tagid', async (ctx)=>{
+    const FileCtrl = ctx.controls['file/file'];
+    const DocumentCtrl = ctx.controls['document/document'];    
+
+    var req2  = ctx.params;
+    var tagid = req2.tagid;
+
+    // 允许未登录用户访问， userid可以为0
+    var user = ctx.session.user;
+    var userid = (user && user.id) ? user.id : 0;
+    var doclist = await DocumentCtrl.searchByTag(ctx, userid, tagid);
+    var filelist= await FileCtrl.searchByTag(ctx, userid, tagid);
+    ctx.body = {'errorCode': 0, 'message': {'doclist':doclist, 'filelist':filelist}};
 })
 
 module.exports = router;

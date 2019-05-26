@@ -21,13 +21,11 @@ exports.create = async (ctx, name)=>{
     return created;
 }
 
-
 exports.delete = async (ctx, id)=>{
     const Tag = ctx.models['Tag'];
 
     await Tag.destroy({logging: false, 'where': {'id': id}});
 }
-
 
 /* 
  * Function     : search

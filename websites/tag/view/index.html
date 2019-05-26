@@ -28,25 +28,28 @@
     <div ng-include="'/view/nav.html'"></div>
     <div id="wrapper" class="container-fluid" ng-controller="tagCtrl">
         <div class="row">
-            <div class="col-md-4 border border-success rounded my-2 mx-1">
-                <div class="row mt-3">
+            <div class="col-md border border-success rounded my-2 mx-1">
+                <div class="row" style="height: 770px; overflow: auto;">
+                    <div class="col-md mt-3" style="line-height: 25px;">
+                        <div ng-repeat="x in doclist" style="border-bottom: 1px dashed #cccccc;">
+                            <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
+                        </div>
+                        <div ng-repeat="x in filelist" style=" border-bottom: 1px dashed #cccccc;">
+                            <a href="{{x.location}}" target="_blank">{{x.name}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md">
-                        <input type="text" class="form-control" ng-model="tagname"  ng-keydown="$event.keyCode == 13 && search();" 
-                            placeholder="请输入标签名称， 回车执行搜索。">
+                        <input type="text" class="form-control" ng-model="opts.str" placeholder="请输入标签名称， 回车执行搜索。">
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md mt-3 pb-2 text-right">
-                        <button ng-click="search();" type="button" class="btn btn-outline-secondary px-4 ml-1">搜索</button>
-                        <button ng-show="user.username" ng-click="add();" type="button" class="btn btn-outline-success ml-1">添加标签</button>                       
-                        <button ng-show="user.username&&tagsel" data-toggle="modal" data-target="#deleteConfirmWnd" type="button" class="btn btn-outline-danger px-4 ml-1">删除选中标签</button>
+                    <div class="col-md-3 text-right">
+                        <button ng-show="user.username&&tagsel" data-toggle="modal" data-target="#deleteConfirmWnd" type="button" class="btn btn-outline-danger px-3 ml-1">删除</button>
+                        <button ng-show="user.username" ng-click="add();" type="button" class="btn btn-outline-success px-3">添加</button>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md mt-2 mx-2 border-top pt-2">该标签相关的文件/文章列表</div>
                 </div>
             </div>
-            <div class="col-md border border-secondary rounded my-2 mr-1">
+            <div class="col-md-7 border border-secondary rounded my-2 mr-1">
                 <div class="row">
                     <div class="col-md taglist" style="height: 780px;">
                         <h4 ng-repeat="x in taglist" id="{{x.id}}" ng-click="select(x);" class="float-left mx-1 mt-2" style="cursor: pointer;">

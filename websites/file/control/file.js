@@ -243,6 +243,49 @@ exports.search2 = async (ctx, userid, query, page, pageSize)=>{
     return {'total':total, 'page':page, 'pageMaxium':maxpage, 'filelist':filelist};
 }
 
+exports.searchByTag = async (ctx, userid, tagid)=>{
+    const User = ctx.models['User'];
+    const Group = ctx.models['Group'];
+    const Tag  = ctx.models['Tag']; 
+    var sql, sqlCond = '';
+    
+    var tagObj = await Tag.findOne({raw: true, logging: false, where: {'id': tagid}});
+    if (!tagObj) return []; // 无效的标签， 没有关联文件
+
+    /* 搜索可读取的文件
+     * 1. 允许其他用户访问的文件
+     * ( 如果是登录用户 )
+     * 2. 创建者为当前用户的文件
+     * 3. 创建者为当前用户所属组对应用户的，且允许组用户访问的，
+     */    
+    sqlCond = " WHERE (`private` LIKE '%OR1%' "; // 其他用户可访问
+    if (userid) {        
+        var res = await User.findAll({logging:false, raw:true, 
+            where: {'id':userid}, 
+            include: [{ model: Group }]
+        });
+        var names = res.map((x)=>{ return x['Groups.name']; })
+        var res2 = await User.findAll({logging: false, raw:true, 
+            where: {'username': names}
+        });
+        var ids = res2.map((x)=>{ return x['id']; });
+        sqlCond += " OR `ownerId`="+userid+" ";
+        if (ids.length) { sqlCond += " OR (`ownerId` IN ("+ids.join(',')+") AND `private` LIKE '%GR1%') "; }
+    }
+    sqlCond += " ) ";
+
+    sqlCond += " AND `id` IN (SELECT `FileId` FROM `FileTag` WHERE `TagId`="+tagid+") "; 
+
+    sql = "SELECT * FROM `Files` "+sqlCond+" ORDER BY `createdAt` DESC;";
+    var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
+    var filelist = res.map((x)=>{
+        x['desc'] = x.desc ? x.desc.toString() : '';
+        return x;
+    });
+
+    return filelist;
+}
+
 exports.getById = async (ctx, id)=>{
     const File = ctx.models['File'];
 
