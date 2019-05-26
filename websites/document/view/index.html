@@ -61,23 +61,23 @@
                     </div>
                 </div>
                 <div class="row" style="height: 170px;">
-                    <div class="col-md">tag search</div>
+                    <div class="col-md">当前页文档相关的标签</div>
                 </div>
                 <div class="row mt-3" style="height: 420px;">
                     <div class="col-md card card-body bg-light mx-3">
                         <div class="row" style="height:40px; line-height: 40px;">
                             <div class="col mx-2 border-bottom" ng-show="detail">
-                                {{detail.id}}, {{detail.createdAt|limitTo:10}}, {{detail.owner}}
+                                {{detail.id}}(id), {{detail.createdAt|limitTo:10}}, {{detail.owner}}
                             </div>
                         </div>
-                        <div class="row" style="height:90px;">
+                        <div class="row" style="height:120px;">
                             <div class="col mx-2 border-bottom">
-                                <h4 ng-repeat="x in detail.tagnames" class="float-left m-1">
+                                <h4 ng-repeat="x in detail.tagnames" class="float-left mx-1 mt-2">
                                     <span class="badge badge-secondary px-3" style="line-height: 25px;">{{x}}</span>
                                 </h4>
                             </div>
                         </div>
-                        <div class="row" style="height: 340px; overflow: hidden;">
+                        <div class="row" style="height: 300px; overflow: hidden;">
                             <div class="col mt-2">
                                 <treecontrol class="tree-classic" options="treeOptions" tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
                                     filter-expression="predicate" filter-comparator="comparator">
@@ -106,10 +106,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
                     <nav class="col-md">
                         <ul class="pagination justify-content-end">
-                            <li ng-repeat="x in pagelist" 
+                            <li ng-repeat="x in pages" 
                                 ng-class="{'disabled': x.disable, 'active':x.active}" 
                                 ng-click="opts.page=x.page"
                                 class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>

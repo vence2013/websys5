@@ -18,7 +18,7 @@ function fileCtrl($scope, $http, user)
     $scope.listView = [];
     $scope.listExpand = []; 
     $scope.nodeSelected = [];
-    $scope.treeOptions = { multiSelection: true };
+    $scope.treeOptions = { dirSelectable: true, multiSelection: true };
     // 文件列表
     $scope.opts = {'str':'', 'page':1, 'pageSize':24};
     $scope.pages    = [];
@@ -101,7 +101,7 @@ function fileCtrl($scope, $http, user)
         $http
         .get('/file/detail/'+file.id)
         .then((res)=>{
-            if (errorCheck(res)) return ;
+            if (errorCheck(res)) return ;            
 
             $scope.detail = res.data.message;
             $scope.tagrel = $scope.detail.tagnames;            
@@ -109,6 +109,7 @@ function fileCtrl($scope, $http, user)
             $scope.otherRead  = ($scope.detail.private.indexOf('OR1')!=-1) ? true : false;
 
             if ($scope.user && $scope.user.username) { categoryRefresh($scope.detail.categoryids); }
+            tagGet();
         })
     }
 
@@ -148,15 +149,14 @@ function fileCtrl($scope, $http, user)
         }); 
     }
 
-
     function tagGet() {
-        var query = {'str':$scope.tagstr, 'page':1, 'pageSize':100, 'order': ['createdAt', 'DESC']};
+        var query = {'str':$scope.tagstr, 'page':1, 'pageSize':20, 'order': ['createdAt', 'DESC']};
         $http
         .get('/tag/search', {params: query})
         .then((res)=>{
             if (errorCheck(res)) return ;
-
             var ret = res.data.message;
+            
             $scope.tagres = [];
             for (var i=0; (i<ret.taglist.length) && ($scope.tagres.length<6); i++) {
                 var name = ret.taglist[i].name;

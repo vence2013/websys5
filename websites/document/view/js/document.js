@@ -3,15 +3,14 @@ var app = angular.module('docApp', ['treeControl'])
 appConfiguration(app)
 .controller('docCtrl', docCtrl);
 
-function docCtrl($scope, $http, $interval, user) {
+function docCtrl($scope, $http, $interval, user) 
+{
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.user = user;
-    // 文档属性
-    $scope.groupRead  = true;
-    $scope.otherRead  = true;
-    // 标签相关数据
-    $scope.tagstr = '';
-    $scope.tagrel = [];
-    $scope.tagres = [];
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -22,9 +21,17 @@ function docCtrl($scope, $http, $interval, user) {
     $scope.predicate = '';
     $scope.comparator = false;
     $scope.treeOptions = { dirSelectable: true, multiSelection: true };
+    // 文档属性
+    $scope.groupRead  = true;
+    $scope.otherRead  = true;
+    // 标签相关数据
+    $scope.tagstr = '';
+    $scope.tagrel = [];
+    $scope.tagres = [];
 
     var content = '';
     var docid   = $('#wrapper').attr('docid');
+    $scope.docid= parseInt(docid);
 
     // 初始化editor.md
     var editor = editormd("editormd", {
@@ -41,21 +48,25 @@ function docCtrl($scope, $http, $interval, user) {
         }    
     });    
 
+    $scope.$watch('tagstr', tagGet);
     // 启动定时解析文章内容    
     $interval(()=>{ content = editor.getMarkdown(); }, 1000);
-    categoryGet();
+    
 
     $scope.tagGet = tagGet;
     function tagGet() {
-        var query = $scope.opts = {'str':$scope.tagstr, 'page':1, 'pageSize':100};
+        var query = {'str':$scope.tagstr, 'page':1, 'pageSize':20, 'order': ['createdAt', 'DESC']};
         $http
         .get('/tag/search', {'params': query})
         .then((res)=>{
             if (errorCheck(res)) return ;
+            var ret = res.data.message;
             
-            // 过滤掉已经关联的标签
-            var tagres = res.data.message.taglist.map((x)=>{ return x.name; });
-            $scope.tagres = tagres.filter((x)=>{ return $scope.tagrel.indexOf(x)==-1; });
+            $scope.tagres = [];
+            for (var i=0; (i<ret.taglist.length) && ($scope.tagres.length<6); i++) {
+                var name = ret.taglist[i].name;
+                if ($scope.tagrel.indexOf(name)==-1) $scope.tagres.push(name);
+            }
         })
     }
 
@@ -67,40 +78,9 @@ function docCtrl($scope, $http, $interval, user) {
     // 将选择的标签移除关联标签列表
     $scope.tagUnselect = (tagname)=>{
         var idx = $scope.tagrel.indexOf(tagname);
-        if (idx!=-1) $scope.tagrel.spice(idx, 1);
+        if (idx!=-1) $scope.tagrel.splice(idx, 1);
         tagGet();
     }
-
-
-    function categoryGet() {
-        $http
-        .get('/category/tree/0', {})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            $scope.treeRoot = res.data.message;
-            $scope.treeView = res.data.message;
-
-            // 获取基础数据
-            var {dir, list} = treeTravel($scope.treeView, 0, 0);
-            $scope.listRoot   = list;
-            $scope.listView   = list;
-        });
-    }
-
-    // 将被选中的所有父级节点都展开， 增加到现有的展开节点中
-    $scope.categoryExpand = categoryExpand;
-    function categoryExpand() {
-        window.setTimeout(()=>{
-            // 被选择节点ID
-            var ids = $scope.nodeSelected.map((x)=>{ return x.id; });
-            var {dir2, list2} = treeSearch($scope.listRoot, ids);
-            // 已经展开节点的ID
-            var ids2 = $scope.listExpand.map((x)=>{ return x.id; });
-            dir2.map((x)=>{ if(ids2.indexOf(x.id)==-1) $scope.listExpand.push(x); });
-        }, 0);
-    }
-
-
 
     /* 组用户读取权限和其他用户读取权限具有包含关系
      * 1. 其他用户可读取时， 组用户一定可读取
@@ -134,6 +114,25 @@ function docCtrl($scope, $http, $interval, user) {
         });
     }
 
+    function categoryRefresh (categoryids) {       
+        $http
+        .get('/category/tree/0', {})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            $scope.treeRoot = res.data.message;
+            $scope.treeView = res.data.message; 
+
+            // 获取基础数据
+            var {dir, list} = treeTravel($scope.treeView, 0, 20);
+            var {dir2, list2} = treeSearch(list, categoryids);  
+            $scope.listExpand = dir2;
+            var sel = [];
+            list.map((x)=>{ if (categoryids.indexOf(x.id)!=-1) sel.push(x); });
+            $scope.nodeSelected = sel;
+            $scope.predicate = (node)=>{ return (list2.indexOf(node.id)!=-1); };
+        });
+    }
 
     // 文件详细信息，包括文件属性， 关联标签， 管理目录节点ID
     function detail() {
@@ -148,14 +147,8 @@ function docCtrl($scope, $http, $interval, user) {
             $scope.otherRead  = (ret.private.indexOf('OR1')!=-1) ? true : false;
             // 关联标签
             $scope.tagrel = ret.tagnames;
-            // 根据ID选择关联节点
-            $scope.nodeSelected = [];
-            for (var i=0; i<$scope.listView.length; i++) {
-                if (!ret.categoryids || (ret.categoryids.indexOf($scope.listView[i].id)==-1)) continue;
-                $scope.nodeSelected.push($scope.listView[i]);
-            }
             tagGet();
-            categoryExpand();
+            if ($scope.user && $scope.user.username) { categoryRefresh(ret.categoryids); }            
         });
     }
 

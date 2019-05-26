@@ -5,13 +5,12 @@ appConfiguration(app)
 
 
 function indexCtrl($scope, $http, user) {
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.user = user;
-    $scope.doc  = null;
-    $scope.detail = null;
-    $scope.opts = {'page':1, 'pageSize':24, 'content':'', 'tag':'', 'order':'1'};
-    $scope.total = 0;
-    $scope.pagelist = [];
-    $scope.doclist  = [];
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -23,6 +22,12 @@ function indexCtrl($scope, $http, user) {
     $scope.predicate  = '';
     $scope.comparator = true;
     $scope.treeOptions = { multiSelection: true };
+    // 文档
+    $scope.doc  = null;
+    $scope.detail = null;
+    $scope.opts = {'page':1, 'pageSize':24, 'content':'', 'tag':'', 'order':'1'};
+    $scope.pages = [];
+    $scope.doclist  = [];
 
     var queryPrevious;
     $scope.$watch('opts', get, true);
@@ -36,6 +41,7 @@ function indexCtrl($scope, $http, user) {
 
             $scope.detail = res.data.message;
             if ($scope.detail.categoryids) categoryRefresh($scope.detail.categoryids);
+            else $scope.treeView = [];
         })
     }, true)
 
@@ -54,11 +60,10 @@ function indexCtrl($scope, $http, user) {
             if (errorCheck(res)) return ;
 
             var ret = res.data.message;
-            $scope['total']     = ret.total;
-            $scope.opts['page'] = ret.page;
-            $scope.pagelist = genPagelist(ret.page, ret.pageMaxium);
-
             $scope.doclist = ret.doclist;
+
+            $scope.opts['page'] = ret.page;
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 10);            
         })
     }
 

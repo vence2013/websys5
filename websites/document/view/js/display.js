@@ -26,7 +26,7 @@ function displayCtrl($scope, $http) {
         .get('/document/detail/'+docid)
         .then((res)=>{
             if (errorCheck(res)) return ;
-            console.log('detail, ', res);
+            
             $scope.detail = res.data.message;
             editor.setMarkdown($scope.detail.content); 
         })

@@ -49,6 +49,7 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/search',         'group':'/document'},  // 搜索接口
         {'method': 'GET', 'url': '/document/display/:docid', 'group':'/document'},  // 显示页面
         {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},  // 显示接口
+        {'method': 'GET', 'url': '/document/tag/:tagid',     'group':'/document'},
     ],
     'private': [
         {'method': 'GET', 'url': '/logout', 'group':'/'},
@@ -77,5 +78,8 @@ exports.interfaces = {
         {'method': 'POST',   'url': '/document/:docid', 'group':'/document'},
         {'method': 'DELETE', 'url': '/document/:docid', 'group':'/document'},
         {'method': 'GET',    'url': '/document/export', 'group':'/document'},
+        {'method': 'POST',   'url': '/document/category/:categoryid', 'group':'/document'},
+        {'method': 'DELETE', 'url': '/document/category/:categoryid', 'group':'/document'},
+        {'method': 'GET',    'url': '/document/category/:categoryid', 'group':'/document'},
     ]
 }
