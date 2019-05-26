@@ -37,6 +37,22 @@ exports.update = async (ctx, userid, categoryid, name , desc)=>{
     return categoryIns ? true : false;
 }
 
+/* 获取某个目录节点的子树数据，并以数组形式给出 */
+async function getListByRoot(ctx, rootid) {
+    const Category = ctx.models['Category'];
+
+    var list = await Category.findAll({raw: true, logging: false, 
+        where: { 'father': rootid} // 只处理树形结构，不管创建者（由调用函数处理）
+    });
+    for (var i=0; i<list.length; i++) {
+        // 将desc从buffer格式转换为字符串
+        list[i]['desc'] = list[i]['desc'] ? list[i]['desc'].toString() : '';
+        var sub = await getListByRoot(ctx, list[i]['id']);
+        list = list.concat(sub);
+    }
+
+    return list;
+}
 
 exports.delete = async (ctx, userid, categoryid)=>{
     var Category = ctx.models['Category'];
@@ -78,29 +94,4 @@ async function getTreeByRoot(ctx, userid, rootid) {
     }
 
     return brothers;
-}
-
-exports.getListByRoot = getListByRoot;
-
-/* 
- * Function     : listByRoot
- * Description  : 获取某个目录节点的子树数据，并以数组形式给出
- * Parameter    : 
- * Return       : 目录实例
- */
-
-async function getListByRoot(ctx, rootid) {
-    const Category = ctx.models['Category'];
-
-    var list = await Category.findAll({raw: true, logging: false, 
-        where: { 'father': rootid} // 只处理树形结构，不管创建者（由调用函数处理）
-    });
-    for (var i=0; i<list.length; i++) {
-        // 将desc从buffer格式转换为字符串
-        list[i]['desc'] = list[i]['desc'] ? list[i]['desc'].toString() : '';
-        var sub = await getListByRoot(ctx, list[i]['id']);
-        list = list.concat(sub);
-    }
-
-    return list;
 }

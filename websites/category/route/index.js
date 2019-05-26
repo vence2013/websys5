@@ -86,7 +86,7 @@ router.get('/tree/:rootid', async (ctx)=>{
 
     var req2 = ctx.params;
     // 获取有效参数
-    var rootid = parseInt(req2.rootid);
+    var rootid = /^\d+$/.test(req2.rootid) ? parseInt(req2.rootid) : 0;
 
     // 获取根节点的子树
     var user = ctx.session.user;

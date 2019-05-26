@@ -62,5 +62,5 @@ exports.relate = async (ctx, userid, tagid, str, page, pageSize)=>{
         });
     }
 
-    return {'total':total, 'page':page, 'pageMaxium':maxpage, 'doclist':doclist};
+    return {'total':total, 'page':page, 'doclist':doclist};
 }

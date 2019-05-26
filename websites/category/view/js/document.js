@@ -11,9 +11,6 @@ function documentCtrl($scope, $http, user, locals)
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
     $scope.user = user;
-    // 分页数据
-    $scope.opts = {'page':1, 'pageSize':16, 'str':''};
-    $scope.pagelist = [];
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -21,12 +18,18 @@ function documentCtrl($scope, $http, user, locals)
     $scope.listView = [];
     $scope.listExpand = [];  
     $scope.treeOptions = { dirSelectable: true };
-    // 文件列表
-    $scope.docres = [];
-    $scope.docrel = [];
-    
+    // 关联文档列表
+    $scope.relOpts = {'str':'', 'page':1, 'pageSize':12, 'isRelate':true};
+    $scope.relPages= [];
+    $scope.rellist = [];
+    // 未关联文档列表
+    $scope.resOpts = {'str':'', 'page':1, 'pageSize':12};
+    $scope.resPages= [];
+    $scope.reslist = [];
+
     $scope.$watch("user", refresh, true);
-    $scope.$watch('opts', get, true);
+    $scope.$watch('relOpts', relate, true);
+    $scope.$watch('resOpts', unrelate, true);
 
     function refresh() {
         if (!$scope.user || !$scope.user.username) return;
@@ -61,23 +64,39 @@ function documentCtrl($scope, $http, user, locals)
 
     $scope.select = (node, sel)=>{ 
         $scope.nodeSelected = sel ? node : null;
-        get();
+        if (sel) {
+            relate();
+            unrelate();
+        } else {
+            $scope.rellist = [];
+            $scope.reslist = [];
+        }
     }
 
-    // 获取目录关联的文档，以及未关联的分页文档列表
-    function get() {
-        var categoryid = $scope.nodeSelected ? $scope.nodeSelected.id : 0;
+    function relate() {
         $http
-        .get('/document/category/'+categoryid, {params: $scope.opts})
+        .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.relOpts})
         .then((res)=>{
-            if (errorCheck(res)) return ;
-            
+            if (errorCheck(res)) return ;            
             var ret = res.data.message;
-            $scope.docrel = ret.docrel;
-            $scope.docres = ret.docres;
-            $scope['total']     = ret.total;
-            $scope.opts['page'] = ret.page;
-            $scope.pagelist = genPagelist(ret.page, ret.pageMaxium);
+            $scope.rellist = ret.doclist;
+
+            $scope.relOpts['page'] = ret.page;
+            $scope.relPages= initPage(ret.page, $scope.relOpts.pageSize, ret.total, 5);
+        })
+    }
+
+    // 获取目录未关联的文档列表
+    function unrelate() {        
+        $http
+        .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.resOpts})
+        .then((res)=>{
+            if (errorCheck(res)) return ;            
+            var ret = res.data.message;
+            $scope.reslist = ret.doclist;
+
+            $scope.resOpts['page'] = ret.page;
+            $scope.resPages= initPage(ret.page, $scope.relOpts.pageSize, ret.total, 5);
         })
     }
 
@@ -97,7 +116,8 @@ function documentCtrl($scope, $http, user, locals)
         .post('/document/category/'+categoryid, {'ids':ids})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            get();
+            relate();
+            unrelate();
         })
     }
 
@@ -115,7 +135,8 @@ function documentCtrl($scope, $http, user, locals)
         .delete('/document/category/'+categoryid, {params:{'ids':ids}})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            get();
+            relate();
+            unrelate();
         })
     }
 }

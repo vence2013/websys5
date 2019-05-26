@@ -59,7 +59,7 @@ exports.interfaces = {
         // tag
         {'method': 'POST',   'url': '/tag',     'group':'/tag'},
         {'method': 'DELETE', 'url': '/tag/:id', 'group':'/tag'},
-        // category        
+        // category
         {'method': 'POST',   'url': '/category',             'group':'/category'},
         {'method': 'PUT',    'url': '/category/:categoryid', 'group':'/category'},
         {'method': 'DELETE', 'url': '/category/:categoryid', 'group':'/category'},
