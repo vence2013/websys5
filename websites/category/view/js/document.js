@@ -71,7 +71,7 @@ function documentCtrl($scope, $http, user, locals)
         .get('/document/category/'+categoryid, {params: $scope.opts})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            console.log(res);
+            
             var ret = res.data.message;
             $scope.docrel = ret.docrel;
             $scope.docres = ret.docres;

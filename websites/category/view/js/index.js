@@ -5,6 +5,11 @@ appConfiguration(app)
 
 function indexCtrl($scope, $http, user, locals) 
 {
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.user = user;
     // 目录树相关的数据
     $scope.treeRoot = [];
@@ -12,11 +17,12 @@ function indexCtrl($scope, $http, user, locals)
     $scope.treeView = [];
     $scope.listView = [];
     $scope.listExpand = [];  
-    $scope.treeOptions = { nodeChildren: "children", dirSelectable: true, 
-        injectClasses: { ul: "a1", li: "a2", liSelected: "a7", iExpanded: "a3", iCollapsed: "a4", iLeaf: "a5", label: "a6", labelSelected: "a8" }
-    };
+    $scope.treeOptions = {dirSelectable: true};
     // 节点编辑信息
     $scope.nodeSel = null;
+    // 文件及关联文档
+    $scope.filerel = [];
+    $scope.docrel = [];
     
     $scope.$watch("user", refresh, true)
 
@@ -46,4 +52,32 @@ function indexCtrl($scope, $http, user, locals)
         });
     }
 
+    $scope.toggle = (node, expanded)=>{
+        var ids = $scope.listExpand.map(node => { return node.id; });
+        locals.setObject('/category/file/expaned/'+$scope.user.username, ids);
+    }
+
+    $scope.select = (node, sel)=>{ 
+        $scope.nodeSelected = sel ? node : null;
+
+        var query = {'page':1, 'pageSize':0, 'str':''};
+        var categoryid = sel ? node.id : 0;
+        $http
+        .get('/file/category/'+categoryid, {params: query})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $scope.filerel = ret.filerel;
+        })
+
+        $http
+        .get('/document/category/'+categoryid, {params: query})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+           
+            var ret = res.data.message;
+            $scope.docrel = ret.docrel;
+        })
+    }
 }
