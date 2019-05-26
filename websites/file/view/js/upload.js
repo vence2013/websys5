@@ -49,6 +49,11 @@ appConfiguration(app)
 .controller('uploadCtrl', uploadCtrl)
 
 function uploadCtrl($scope, FileUploader) {
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.itemSel = null;
 
     var uploader = $scope.uploader = new FileUploader({
@@ -72,7 +77,7 @@ function uploadCtrl($scope, FileUploader) {
                 toastr.info(response.message+'('+fileItem.file.name+')', '', {"positionClass": "toast-bottom-right", "timeOut": 5000}); 
             }
         } else {
-            toastr.info('文件上传错误！', '', {"positionClass": "toast-bottom-right"});
+            toastr.info('文件上传错误！');
             console.log(response);
         }
     };

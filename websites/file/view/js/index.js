@@ -4,13 +4,12 @@ appConfiguration(app)
 .controller('indexCtrl', indexCtrl);
 
 function indexCtrl($scope, $http, user) {
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.user = user;
-    $scope.file = null;
-    $scope.opts = {'page':1, 'pageSize':24, 'name':'', 'desc':'', 'tag':'', 'ext':'', 
-        'createget':'', 'createlet':'', 'sizeget':'', 'sizelet':'', 'order':'4'};
-    $scope.total = 0;
-    $scope.pagelist = [];
-    $scope.filelist = [];
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -22,6 +21,12 @@ function indexCtrl($scope, $http, user) {
     $scope.predicate  = '';
     $scope.comparator = true;
     $scope.treeOptions = { multiSelection: true };
+    // 文件
+    $scope.file = null;
+    $scope.opts = {'page':1, 'pageSize':24, 'name':'', 'desc':'', 'tag':'', 'ext':'', 
+        'createget':'', 'createlet':'', 'sizeget':'', 'sizelet':'', 'order':'4'};
+    $scope.pages    = [];
+    $scope.filelist = [];
 
     $scope.$watch('opts', get, true);
     $scope.$watch('file', (file)=>{
@@ -34,6 +39,7 @@ function indexCtrl($scope, $http, user) {
 
             $scope.detail = res.data.message;
             if ($scope.detail.categoryids) categoryRefresh($scope.detail.categoryids);
+            else $scope.treeView = [];
         })
     }, true)
 
@@ -87,10 +93,7 @@ function indexCtrl($scope, $http, user) {
             } else {
                 $scope.filelist = [];
             }
-
-            $scope['total']     = ret.total;
-            $scope.opts['page'] = ret.page;
-            $scope.pagelist = genPagelist(ret.page, ret.pageMaxium);
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 5);
 
             window.setTimeout(()=>{
                 $('.image-link').magnificPopup({type:'image'});
@@ -108,7 +111,7 @@ function indexCtrl($scope, $http, user) {
     }
 
     $scope.copySuccess = ()=>{
-        toastr.info('Copy Success!', '', {"positionClass": "toast-bottom-right"});
+        toastr.info('Copy Success!');
     }
 
     // 播放视频文件

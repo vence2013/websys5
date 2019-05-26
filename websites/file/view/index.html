@@ -92,7 +92,7 @@
                     <div class="col-md card card-body bg-light mx-3">
                         <div class="row" style="height:40px; line-height: 40px;">
                             <div class="col mx-2 border-bottom" ng-show="detail">
-                                {{detail.id}}, {{detail.size/1024/1024|number:2}} MB, {{detail.createdAt|limitTo:10}}, {{detail.owner}}
+                                {{detail.id}}(id), {{detail.size/1024/1024|number:2}} MB(size), {{detail.createdAt|limitTo:10}}, {{detail.owner}}
                             </div>
                         </div>
                         <div class="row" style="height:100px;">
@@ -130,10 +130,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
                     <nav class="col-md">
                         <ul class="pagination justify-content-end">
-                            <li ng-repeat="x in pagelist" 
+                            <li ng-repeat="x in pages" 
                                 ng-class="{'disabled': x.disable, 'active':x.active}" 
                                 ng-click="opts.page=x.page"
                                 class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>

@@ -121,10 +121,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md" style="line-height: 36px;">共 {{total}} 条， 每页 {{opts.pageSize}} 条</div>
                     <nav class="col-md">
                         <ul class="pagination justify-content-end">
-                            <li ng-repeat="x in pagelist" 
+                            <li ng-repeat="x in pages" 
                                 ng-class="{'disabled': x.disable, 'active':x.active}" 
                                 ng-click="opts.page=x.page"
                                 class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>

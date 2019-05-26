@@ -3,17 +3,14 @@ var app = angular.module('fileApp', ['treeControl'])
 appConfiguration(app)
 .controller('fileCtrl', fileCtrl)
 
-function fileCtrl($scope, $http, user) {
+function fileCtrl($scope, $http, user) 
+{
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
     $scope.user = user;
-    // 文件列表
-    $scope.opts = {'str':'', 'page':1, 'pageSize':24, 'order': ['createdAt', 'DESC']};
-    $scope.total   = 0;
-    $scope.pagelist = [];
-    $scope.filelist = [];
-    // 文件详细信息
-    $scope.detail   = null;
-    $scope.groupRead  = false;
-    $scope.otherRead  = false;
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -22,6 +19,14 @@ function fileCtrl($scope, $http, user) {
     $scope.listExpand = []; 
     $scope.nodeSelected = [];
     $scope.treeOptions = { multiSelection: true };
+    // 文件列表
+    $scope.opts = {'str':'', 'page':1, 'pageSize':24};
+    $scope.pages    = [];
+    $scope.filelist = [];
+    // 文件详细信息
+    $scope.detail   = null;
+    $scope.groupRead  = false;
+    $scope.otherRead  = false;
     // 标签
     $scope.tagstr = '';
     $scope.tagres = []; // 有效标签列表。搜索结果过滤tagrel
@@ -48,6 +53,8 @@ function fileCtrl($scope, $http, user) {
             var ret = res.data.message;
 
             $scope.detail   = null;
+            $scope.groupRead  = false;
+            $scope.otherRead  = false;
             $scope.tagrel   = [];
             $scope.filelist = ret.filelist.map((x)=>{
                 var image = ['jpg', 'jpeg', 'png', 'gif'];
@@ -58,16 +65,13 @@ function fileCtrl($scope, $http, user) {
                 else if (video.indexOf(ext)!=-1) { x['media'] = 'video'; }
                 return x;
             });
-            $scope['total']     = ret.total;
-            $scope.opts['page'] = ret.page;
-            $scope.pagelist = genPagelist(ret.page, ret.pageMaxium);
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 5);
 
             window.setTimeout(()=>{
                 $('.image-link').magnificPopup({type:'image'});
             }, 0);
         })
     }
-
 
     function categoryRefresh (categoryids) {       
         $http
