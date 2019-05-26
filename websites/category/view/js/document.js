@@ -74,6 +74,8 @@ function documentCtrl($scope, $http, user, locals)
     }
 
     function relate() {
+        if (!$scope.nodeSelected) return ;
+
         $http
         .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.relOpts})
         .then((res)=>{
@@ -87,7 +89,9 @@ function documentCtrl($scope, $http, user, locals)
     }
 
     // 获取目录未关联的文档列表
-    function unrelate() {        
+    function unrelate() {     
+        if (!$scope.nodeSelected) return ;
+           
         $http
         .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.resOpts})
         .then((res)=>{
