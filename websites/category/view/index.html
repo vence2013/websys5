@@ -34,19 +34,47 @@
     <div id="wrapper" class="container-fluid" ng-controller="indexCtrl">
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
-                <div class="row">
-                    <div class="col-md" style="height: 400px; overflow: auto;">
-                        <div ng-repeat="x in filerel" style="line-height: 25px; border-bottom: 1px dashed #cccccc;">
-                            <a href="{{x.location}}" target="_blank">{{x.name}}</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md" style="height: 400px;">
-                        <div ng-repeat="x in docrel" style="line-height: 25px; border-bottom: 1px dashed #cccccc;">
+                <div class="row" style="height: 360px;">
+                    <div class="col-md" style="line-height: 25px;">
+                        <div ng-repeat="x in doclist" style="border-bottom: 1px dashed #cccccc;">
+                            <input type="checkbox" class="align-middle" value="{{x.id}}" />
                             <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
                         </div>
                     </div>
+                </div>
+                <div class="row" style="height: 40px;">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" ng-model="docOpts.str" placeholder="关联文档搜索" />
+                    </div>
+                    <nav class="col-md" ng-show="doclist.length">
+                        <ul class="pagination justify-content-end">
+                            <li ng-repeat="x in docPages" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="docOpts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="row" style="height: 360px;">
+                    <div class="col-md" style="line-height: 25px;">
+                        <div ng-repeat="x in filelist" style="border-bottom: 1px dashed #cccccc;">
+                            <input type="checkbox" class="align-middle" value="{{x.id}}" />
+                            <a href="{{x.location}}" target="_blank">{{x.name|limitTo:40}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="height: 40px;">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" ng-model="fileOpts.str" placeholder="关联文件搜索" />
+                    </div>
+                    <nav class="col-md" ng-show="filelist.length">
+                        <ul class="pagination justify-content-end">
+                            <li ng-repeat="x in filePages" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="fileOpts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1 pt-2" style="overflow: auto;">

@@ -20,11 +20,18 @@ function indexCtrl($scope, $http, user, locals)
     $scope.treeOptions = {dirSelectable: true};
     // 节点编辑信息
     $scope.nodeSel = null;
-    // 文件及关联文档
-    $scope.filerel = [];
-    $scope.docrel = [];
+    // 关联文档列表
+    $scope.docOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
+    $scope.docPages= [];
+    $scope.doclist = [];
+    // 关联文件列表
+    $scope.fileOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
+    $scope.filePages= [];
+    $scope.filelist = [];
     
-    $scope.$watch("user", refresh, true)
+    $scope.$watch("user", refresh, true);
+    $scope.$watch('docOpts', docRelate, true);
+    $scope.$watch('fileOpts', fileRelate, true);
 
     function refresh() {
         if (!$scope.user || !$scope.user.username) return;
@@ -54,30 +61,47 @@ function indexCtrl($scope, $http, user, locals)
 
     $scope.toggle = (node, expanded)=>{
         var ids = $scope.listExpand.map(node => { return node.id; });
-        locals.setObject('/category/file/expaned/'+$scope.user.username, ids);
+        locals.setObject('/category/expaned/'+$scope.user.username, ids);
+    }
+
+    function docRelate() {
+        if (!$scope.nodeSelected) return ;
+
+        $http
+        .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.docOpts})
+        .then((res)=>{
+            if (errorCheck(res)) return ;            
+            var ret = res.data.message;
+            $scope.doclist = ret.doclist;
+
+            $scope.docOpts['page'] = ret.page;
+            $scope.docPages= initPage(ret.page, $scope.docOpts.pageSize, ret.total, 5);
+        })
+    }
+
+    function fileRelate() {
+        if (!$scope.nodeSelected) return ; 
+
+        $http
+        .get('/file/category/'+$scope.nodeSelected.id, {params: $scope.fileOpts})
+        .then((res)=>{
+            if (errorCheck(res)) return ;            
+            var ret = res.data.message;
+            $scope.filelist = ret.filelist;
+
+            $scope.fileOpts['page'] = ret.page;
+            $scope.filePages= initPage(ret.page, $scope.fileOpts.pageSize, ret.total, 5);
+        })
     }
 
     $scope.select = (node, sel)=>{ 
         $scope.nodeSelected = sel ? node : null;
-
-        var query = {'page':1, 'pageSize':0, 'str':''};
-        var categoryid = sel ? node.id : 0;
-        $http
-        .get('/file/category/'+categoryid, {params: query})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-
-            var ret = res.data.message;
-            $scope.filerel = ret.filerel;
-        })
-
-        $http
-        .get('/document/category/'+categoryid, {params: query})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-           
-            var ret = res.data.message;
-            $scope.docrel = ret.docrel;
-        })
+        if (sel) {
+            docRelate();
+            fileRelate();
+        } else {
+            $scope.doclist  = [];
+            $scope.filelist = [];
+        }
     }
 }
