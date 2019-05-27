@@ -50,6 +50,8 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/display/:docid', 'group':'/document'},  // 显示页面
         {'method': 'GET', 'url': '/document/detail/:docid',  'group':'/document'},  // 显示接口
         {'method': 'GET', 'url': '/document/tag/:tagid',     'group':'/document'},
+        // chip
+        {'method': 'GET', 'url': '/chip',               'group':'/chip'},
     ],
     'private': [
         {'method': 'GET', 'url': '/logout', 'group':'/'},

@@ -49,7 +49,7 @@ async function model(sequelize, dirlist, models)
     // 导入数据模型的关系
     for (var i=0; i<dirlist.length; i++) {
         let file = dirlist[i]+'/Relations.js';
-        if (fs.existsSync(file)) { await require(file).link(models); }
+        if (fs.existsSync(file)) { await require(file).link(models, sequelize); }
     }
 }
 
