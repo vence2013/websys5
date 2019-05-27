@@ -81,6 +81,7 @@ async function search(ctx, userid, query)
     const User = ctx.models['User'];
     const Group = ctx.models['Group'];
     const Tag  = ctx.models['Tag']; 
+    const Document  = ctx.models['Document']; 
     var sql, sqlCond = '';
 
     /* 搜索可读取的文件
@@ -90,7 +91,7 @@ async function search(ctx, userid, query)
      * 3. 创建者为当前用户所属组对应用户的，且允许组用户访问的，
      */    
     sqlCond = " WHERE (`private` LIKE '%OR1%' "; // 其他用户可访问
-    if (userid) {        
+    if (userid) {
         var res = await User.findAll({logging:false, raw:true, 
             where: {'id':userid}, 
             include: [{ model: Group }]
@@ -134,16 +135,37 @@ async function search(ctx, userid, query)
     maxpage = (maxpage<1) ? 1 : maxpage;
     page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
 
+    // 获取创建者的用户名称
+    var userlist = await User.findAll({raw:true, logging:false, attributes:['id', 'username']});
     // 查询当前分页的列表数据
+    var docids = [];
     var offset = (page - 1) * pageSize;
     sql = "SELECT * FROM `Documents` "+sqlCond+" ORDER BY "+query.order.join(' ')+" LIMIT "+offset+", "+pageSize+" ;";
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
     var doclist = res.map((x)=>{
+        docids.push(x.id);
+        // 将buffer转换为字符串
         x['content'] = x.content ? x.content.toString() : '';
+        // 查找创建者的用户名
+        for (var i=0; i<userlist.length; i++) {
+            if (userlist[i]['id']!=x.ownerId) continue;
+            x['owner'] = userlist[i]['username'];
+            break;
+        }
         return x;
     });
 
-    return {'total':total, 'page':page, 'pageMaxium':maxpage, 'doclist':doclist};
+    // 查找当页文件的标签
+    var tagObjs = await Tag.findAll({raw:true, logging:false,
+        include: [{
+            model: Document,
+            where: {'id':docids}
+        }]
+    });
+    var taglist = [];
+    tagObjs.map((x)=>{ taglist.push(x.name); });
+
+    return {'total':total, 'page':page, 'pageMaxium':maxpage, 'doclist':doclist, 'taglist':taglist};
 }
 
 
@@ -188,4 +210,6 @@ exports.export2file = async (ctx, userid, query)=>{
         var filename = '/export/'+title+'.md';
         fs.writeFileSync(filename, content);
     }
+
+    fs.chmodSync('/export/file', 0777);
 }

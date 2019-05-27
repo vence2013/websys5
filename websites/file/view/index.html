@@ -89,19 +89,15 @@
                     </div>
                 </div>
                 <div class="row mt-3" style="height: 460px;">
-                    <div class="col-md card card-body bg-light mx-3">
-                        <div class="row" style="height:40px; line-height: 40px;">
-                            <div class="col mx-2 border-bottom" ng-show="detail">
-                                {{detail.id}}(id), {{detail.size/1024/1024|number:2}} MB(size), {{detail.createdAt|limitTo:10}}, {{detail.owner}}
-                            </div>
-                        </div>
+                    <div class="col-md card card-body bg-light mx-2 p-0">
                         <div class="row" style="height:100px;">
-                            <div class="col mt-2 mx-1 border-bottom taglist">
+                            <div class="col mt-2 mx-1 taglist">
                                 <h4 class="mr-2 float-left" style="cursor: pointer;" ng-repeat="x in detail.tagnames">
                                     <span class="badge badge-secondary" style="line-height: 25px;">{{x}}</span>
                                 </h4>
                             </div>
                         </div>
+                        <hr />
                         <div class="row" style="height: 320px; overflow: hidden;">
                             <div class="col mt-2">
                                 <treecontrol class="tree-classic" options="treeOptions" tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
@@ -123,7 +119,7 @@
                                 <i ng-if="x.media=='video'" style="cursor: pointer;" class="fa fa-file-video-o ml-2" ng-click="play(x.location);"></i>
                                 <a href="#"><i clipboard class="fa fa-copy ml-2" text="copyText" on-copied="copySuccess()"></i></a>
                                 <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">
-                                    {{x.size/1024/1024|number:2 }} MB, {{x.createdAt|limitTo:10}}
+                                    {{x.createdAt|limitTo:10}}, {{x.size/1024/1024|number:2 }} MB, {{x.owner}}
                                 </span>
                             </div>
                         </div>

@@ -27,7 +27,8 @@ function indexCtrl($scope, $http, user) {
     $scope.detail = null;
     $scope.opts = {'page':1, 'pageSize':24, 'content':'', 'tag':'', 'order':'1'};
     $scope.pages = [];
-    $scope.doclist  = [];
+    $scope.doclist = [];
+    $scope.taglist = [];
 
     var queryPrevious;
     $scope.$watch('opts', get, true);
@@ -61,6 +62,7 @@ function indexCtrl($scope, $http, user) {
 
             var ret = res.data.message;
             $scope.doclist = ret.doclist;
+            $scope.taglist = ret.taglist.slice(0, 20);
 
             $scope.opts['page'] = ret.page;
             $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 10);            
@@ -108,7 +110,7 @@ function indexCtrl($scope, $http, user) {
         .then((res)=>{
             if (errorCheck(res)) return ;
             
-            toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
+            toastr.info(res.data.message);
         })
     }
 }

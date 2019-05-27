@@ -231,12 +231,20 @@ exports.search2 = async (ctx, userid, query, page, pageSize)=>{
     maxpage = (maxpage<1) ? 1 : maxpage;
     page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
 
+    // 获取创建者的用户名称
+    var userlist = await User.findAll({raw:true, logging:false, attributes:['id', 'username']});
     // 查询当前分页的列表数据
     var offset = (page - 1) * pageSize;
     sql = "SELECT * FROM `Files` "+sqlCond+" ORDER BY "+query.order.join(' ')+" LIMIT "+offset+", "+pageSize+" ;";
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
     var filelist = res.map((x)=>{
         x['desc'] = x.desc ? x.desc.toString() : '';
+        // 查找创建者的用户名
+        for (var i=0; i<userlist.length; i++) {
+            if (userlist[i]['id']!=x.ownerId) continue;
+            x['owner'] = userlist[i]['username'];
+            break;
+        }
         return x;
     });
 

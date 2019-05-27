@@ -61,22 +61,22 @@
                     </div>
                 </div>
                 <div class="row" style="height: 170px;">
-                    <div class="col-md">当前页文档相关的标签</div>
+                    <div class="col-md">
+                        <h4 ng-repeat="x in taglist" class="float-left m-1" style="cursor: pointer;">
+                            <span class="badge badge-secondary px-3" style="line-height: 25px;">{{x}}</span>
+                        </h4>
+                    </div>
                 </div>
                 <div class="row mt-3" style="height: 420px;">
-                    <div class="col-md card card-body bg-light mx-3">
-                        <div class="row" style="height:40px; line-height: 40px;">
-                            <div class="col mx-2 border-bottom" ng-show="detail">
-                                {{detail.id}}(id), {{detail.createdAt|limitTo:10}}, {{detail.owner}}
-                            </div>
-                        </div>
+                    <div class="col-md card card-body bg-light mx-2 p-0">
                         <div class="row" style="height:120px;">
-                            <div class="col mx-2 border-bottom">
+                            <div class="col-md mx-2">
                                 <h4 ng-repeat="x in detail.tagnames" class="float-left mx-1 mt-2">
                                     <span class="badge badge-secondary px-3" style="line-height: 25px;">{{x}}</span>
                                 </h4>
                             </div>
                         </div>
+                        <hr />
                         <div class="row" style="height: 300px; overflow: hidden;">
                             <div class="col mt-2">
                                 <treecontrol class="tree-classic" options="treeOptions" tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
@@ -99,8 +99,8 @@
                         <div class="row mx-1" style="border-bottom: 1px dashed #000000;" ng-repeat="x in doclist" ng-mouseenter="focus(x);">
                             <div class="col-md">
                                 <a href="/document/display/{{x.id}}">{{x.content|limitTo:60}}</a>
-                                <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}</span>
-                                <a href="/document/edit/{{x.id}}" target="_blank" class="ml-2"><i class="fa fa-edit"></i></a>
+                                <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}, {{x.owner}}</span>
+                                <a href="/document/edit/{{x.id}}" class="ml-2"><i class="fa fa-edit"></i></a>
                             </div>
                         </div>
                     </div>
