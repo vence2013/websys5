@@ -39,6 +39,7 @@
                         <div ng-repeat="x in rellist" style="border-bottom: 1px dashed #cccccc;">
                             <input type="checkbox" class="align-middle" value="{{x.id}}" />
                             <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
+                            <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}, {{x.owner}}</span>
                         </div>
                     </div>
                 </div>
@@ -60,6 +61,7 @@
                         <div ng-repeat="x in reslist" style="border-bottom: 1px dashed #cccccc;">
                             <input type="checkbox" class="align-middle" value="{{x.id}}" />
                             <a href="/document/display/{{x.id}}" target="_blank">{{x.content|limitTo:40}}</a>
+                            <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}, {{x.owner}}</span>
                         </div>
                     </div>
                 </div>
