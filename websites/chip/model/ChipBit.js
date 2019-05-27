@@ -18,11 +18,11 @@ module.exports = function(sequelize, DataTypes) {
         fullname: {
             type: DataTypes.STRING,  
         },
-        bitlist: {
+        bitlist: {  /* 位序号列表， 比如"1,2,3"  */
             type: DataTypes.STRING, 
             allowNull: false,
         },
-        valuelist: {
+        valuelist: {  /* 复位值列表， 比如"1,0,1,1,1,0,0" */
             type: DataTypes.STRING, 
         },
         rw: {  /* 读写权限 */

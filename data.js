@@ -16,7 +16,9 @@ exports.navigation = [
     {'name':'upload',        'father':'File',              'url':'/file/view/upload.html','access':'user'},
     {'name':'Document',      'father':null,                'url':'/document',            'access':'any'},
     {'name':'edit',          'father':'Document',          'url':'/document/edit/0',     'access':'user'},
-    {'name':'Chip',          'father':null,                'url':'/chip',                'access':'any'},
+    {'name':'Chip',          'father':null,                'url':'/chip',                    'access':'any'},
+    {'name':'document',      'father':'Chip',              'url':'/chip/view/document.html', 'access':'any'},
+    {'name':'edit',          'father':'Chip',              'url':'/chip/view/edit.html',     'access':'any'},
 ];
 
 /* 接口列表
