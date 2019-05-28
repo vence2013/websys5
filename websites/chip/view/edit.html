@@ -49,8 +49,11 @@
                             <span style="font-size: 12px; color: #888888;">/{{x.fullname|limitTo:6}}</span>
                         </div>
                     </div>
-                    <div class="col-md bg-light">
-                        <div>CTRL REG</div>
+                    <div class="col-md px-1 bg-light registerContainer">
+                        <div class="pl-1" ng-repeat="x in registerlist" ng-click="registerSelect(x);">
+                            <b>{{x.name}}</b>
+                            <span style="font-size: 12px; color: #888888;">/{{x.address}}</span>
+                        </div>
                     </div>
                     <div class="col-md">
                         <div>CTRL BIT</div>
@@ -95,27 +98,27 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-2">
-                                <input type="text" class="form-control" placeholder="寄存器名称">
+                                <input type="text" class="form-control" ng-model="register.name" placeholder="寄存器名称">
                             </div>
                             <div class="col-md">
-                                <input type="text" class="form-control" placeholder="全称">
+                                <input type="text" class="form-control" ng-model="register.fullname" placeholder="全称">
                             </div>
                             <div class="col-md-2">
-                                <input type="text" class="form-control" placeholder="地址">
+                                <input type="text" class="form-control" ng-model="register.address" placeholder="地址">
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md">
-                                <textarea class="form-control" rows="6" placeholder="寄存器描述"></textarea>
+                                <textarea class="form-control" rows="6" ng-model="register.desc" placeholder="寄存器描述"></textarea>
                             </div>
                         </div>                        
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3">创建</button>
+                        <button type="button" class="btn btn-outline-danger px-3" ng-show="register.id" data-toggle="modal" data-target="#registerDeleteConfirmWnd">删除</button>
+                        <button type="button" class="btn btn-outline-success px-3" ng-show="register.id" ng-click="registerSubmit();">编辑</button>
+                        <button type="button" class="btn btn-outline-success px-3" ng-show="module.id && !register.id" ng-click="registerSubmit();">创建</button>
                     </div>
                 </div>
                 <!-- 位组 -->
@@ -191,6 +194,26 @@
                         </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="moduleDelete();">删除</button>
+                        <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- register 删除确认 -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="registerDeleteConfirmWnd">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">寄存器删除确认</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                        <div class="modal-body">
+                            <p>该操作将删除与该寄存器相关的位组。确认要删除吗？</p>
+                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="registerDelete();">删除</button>
                         <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
                     </div>
                 </div>
