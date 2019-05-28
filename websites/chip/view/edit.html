@@ -43,9 +43,11 @@
                             <span style="font-size: 12px; color: #888888;">/{{x.width}}</span>
                         </div>
                     </div>
-                    <div class="col-md">
-                        <div>SPI</div>
-                        <div>USART</div>
+                    <div class="col-md px-1 moduleContainer">
+                        <div class="pl-1" ng-repeat="x in modulelist" ng-click="moduleSelect(x);">
+                            <b>{{x.name}}</b>
+                            <span style="font-size: 12px; color: #888888;">/{{x.fullname|limitTo:6}}</span>
+                        </div>
                     </div>
                     <div class="col-md bg-light">
                         <div>CTRL REG</div>
@@ -75,17 +77,17 @@
                 <!-- 芯片模块 -->
                 <div class="row mt-4">
                     <div class="col-md">
-                        <input type="text" class="form-control" placeholder="模块名称">
+                        <input type="text" class="form-control" ng-model="module.name" placeholder="模块名称">
                     </div>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" placeholder="全称">
+                        <input type="text" class="form-control" ng-model="module.fullname" placeholder="模块全称">
                     </div>
                 </div>
-                <div class="row mt-2">
+                <div class="row mt-2" style="height: 40px;">
                     <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3">创建</button>
+                        <button type="button" class="btn btn-outline-danger px-3" ng-show="module.id" data-toggle="modal" data-target="#moduleDeleteConfirmWnd">删除</button>
+                        <button type="button" class="btn btn-outline-success px-3" ng-show="module.id" ng-click="moduleSubmit();">编辑</button>
+                        <button type="button" class="btn btn-outline-success px-3" ng-show="chip.id && !module.id" ng-click="moduleSubmit();">创建</button>
                     </div>
                 </div>
                 <!-- 寄存器 -->
@@ -154,7 +156,7 @@
                 </div>
             </div>
         </div>
-        <!-- chip删除确认 -->
+        <!-- chip 删除确认 -->
         <div class="modal fade" tabindex="-1" role="dialog" id="chipDeleteConfirmWnd">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -165,10 +167,30 @@
                         </button>
                     </div>
                         <div class="modal-body">
-                            <p>该操作将删除与该芯片相关的所有信息，包括芯片模块/寄存器/位组，以及关联的文章。确认要删除吗？</p>
+                            <p>该操作将删除与该芯片相关的所有信息，包括芯片模块/寄存器/位组，以及芯片和芯片模块关联的文章。确认要删除吗？</p>
                         </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="chipDelete();">删除</button>
+                        <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- module 删除确认 -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="moduleDeleteConfirmWnd">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">模块删除确认</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                        <div class="modal-body">
+                            <p>该操作将删除与该模块相关的所有信息，包括寄存器/位组，以及关联的文章。确认要删除吗？</p>
+                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="moduleDelete();">删除</button>
                         <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
                     </div>
                 </div>

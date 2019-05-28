@@ -12,13 +12,62 @@ function editCtrl($scope, $http) {
     };
     // 应用数据
     $scope.chiplist = [];
+    $scope.modulelist = [];
 
-    chipReset();
+    $scope.chip = {'id':0, 'name':'', 'width':''};
+    $scope.module = {'id':0, 'name':'', 'fullname':''};
+
     chipGet();
 
-    function chipReset() {
-        $scope.chip = {'id':0, 'name':'', 'width':''};
+
+    function moduleGet() {
+        if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
+
+        $http
+        .get('/chip/module/'+$scope.chip.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            var ret = res.data.message;
+            $scope.modulelist = ret;
+        })
     }
+
+    $scope.moduleSelect = (module)=>{
+        $(".sel").removeClass('sel');
+        var idx = $scope.modulelist.indexOf(module);
+        $(".moduleContainer>div:eq("+idx+")").addClass('sel');
+        $scope.module = module;
+    }
+
+    $scope.moduleSubmit = ()=>{
+        if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
+        if (!$scope.module.name) return toastr.warning('请输入有效的模块名称！');
+
+        $http
+        .post('/chip/module/'+$scope.chip.id, $scope.module)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            
+            moduleGet();
+            toastr.success(res.data.message);
+        });
+    }
+
+    $scope.moduleDelete = ()=>{
+        if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请选择要删除的模块！');
+
+        $http
+        .delete('/chip/module/'+$scope.module.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            
+            moduleGet();
+            toastr.success(res.data.message);
+        });
+    }
+
+
+    // chip
 
     function chipGet() {
         $http
@@ -32,13 +81,11 @@ function editCtrl($scope, $http) {
 
     $scope.chipSelect = (chip)=>{
         $(".sel").removeClass('sel');
-        
-        if (chip.id == $scope.chip.id) { chipReset(); }
-        else {
-            var idx = $scope.chiplist.indexOf(chip);
-            $(".chipContainer>div:eq("+idx+")").addClass('sel');
-            $scope.chip = chip;
-        }
+        var idx = $scope.chiplist.indexOf(chip);
+        $(".chipContainer>div:eq("+idx+")").addClass('sel');
+        $scope.chip = chip;
+
+        moduleGet();
     }
 
     $scope.chipSubmit = ()=>{
