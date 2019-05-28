@@ -17,8 +17,8 @@ exports.navigation = [
     {'name':'Document',      'father':null,                'url':'/document',            'access':'any'},
     {'name':'edit',          'father':'Document',          'url':'/document/edit/0',     'access':'user'},
     {'name':'Chip',          'father':null,                'url':'/chip',                    'access':'any'},
-    {'name':'document',      'father':'Chip',              'url':'/chip/view/document.html', 'access':'any'},
-    {'name':'edit',          'father':'Chip',              'url':'/chip/view/edit.html',     'access':'any'},
+    {'name':'document',      'father':'Chip',              'url':'/chip/view/document.html', 'access':'user'},
+    {'name':'edit',          'father':'Chip',              'url':'/chip/view/edit.html',     'access':'user'},
 ];
 
 /* 接口列表
@@ -54,6 +54,7 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/tag/:tagid',     'group':'/document'},
         // chip
         {'method': 'GET', 'url': '/chip',               'group':'/chip'},
+        {'method': 'GET', 'url': '/chip',               'group':'/chip'},
     ],
     'private': [
         {'method': 'GET', 'url': '/logout', 'group':'/'},
@@ -85,5 +86,7 @@ exports.interfaces = {
         {'method': 'POST',   'url': '/document/category/:categoryid', 'group':'/document'},
         {'method': 'DELETE', 'url': '/document/category/:categoryid', 'group':'/document'},
         {'method': 'GET',    'url': '/document/category/:categoryid', 'group':'/document'},
+        // chip
+        {'method': 'POST', 'url': '/chip/:chipid',               'group':'/chip'},
     ]
 }
