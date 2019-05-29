@@ -155,7 +155,7 @@
                 </div>
                 <div class="row mt-2">
                     <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="bits.id">删除</button>
+                        <button type="button" class="btn btn-outline-danger px-3" ng-show="bits.id" data-toggle="modal" data-target="#bitsDeleteConfirmWnd">删除</button>
                         <button type="button" class="btn btn-outline-success px-3" ng-show="bits.id" ng-click="bitsSubmit();">编辑</button>
                         <button type="button" class="btn btn-outline-success px-3" ng-show="register.id && !bits.id" ng-click="bitsSubmit();">创建</button>
                     </div>
@@ -217,6 +217,26 @@
                         </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="registerDelete();">删除</button>
+                        <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- bits 删除确认 -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="bitsDeleteConfirmWnd">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">位组删除确认</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                        <div class="modal-body">
+                            <p>该操作将删除该位组。确认要删除吗？</p>
+                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger px-4" data-dismiss="modal" ng-click="bitsDelete();">删除</button>
                         <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">取消</button>
                     </div>
                 </div>

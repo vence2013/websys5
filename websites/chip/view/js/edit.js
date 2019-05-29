@@ -4,7 +4,8 @@ appConfiguration(app)
 .controller('editCtrl', editCtrl);
 
 
-function editCtrl($scope, $http) {
+function editCtrl($scope, $http) 
+{
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
         onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
@@ -96,6 +97,19 @@ function editCtrl($scope, $http) {
             if (errorCheck(res)) return ; 
             $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
 
+            bitsGet();
+            toastr.success(res.data.message);
+        });
+    }
+
+    $scope.bitsDelete = ()=>{
+        if (!/^\d+$/.test($scope.bits.id)) return toastr.warning('请选择要删除的寄存器！');
+
+        $http
+        .delete('/chip/bits/'+$scope.bits.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            
             bitsGet();
             toastr.success(res.data.message);
         });

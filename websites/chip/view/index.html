@@ -23,13 +23,39 @@
     <script src="/view/js/library.js" type="text/javascript"></script>
     <link  href="/view/css/all.css" rel="stylesheet" />
     <script src="/chip/view/js/index.js" type="text/javascript"></script>
+    <style>
+    .item>div { height: 812px; }
+    .item>div>div { line-height: 30px; border-bottom: 1px dashed #cccccc; cursor: pointer; }
+
+    .chipsel { color: #5F9EA0; }
+    .modulesel { color: #ff0000; }
+    </style>
 </head>
 <body ng-app="indexApp">
 
     <div ng-include="'/view/nav.html'"></div>
     <div id="wrapper" class="container-fluid" ng-controller="indexCtrl">
-        chip
-
+        <div class="row">
+            <div class="col-md border border-success rounded my-2 mx-1">
+                <div class="row item mt-1">
+                    <div class="col-md px-1 bg-light chipContainer">
+                        <div class="pl-1" ng-repeat="x in chiplist" ng-click="chipSelect(x);">
+                            <b>{{x.name}}</b>
+                            <span style="font-size: 12px; color: #888888;">/{{x.width}}</span>
+                        </div>
+                    </div>
+                    <div class="col-md px-1 moduleContainer">
+                        <div class="pl-1" ng-repeat="x in modulelist" ng-click="moduleSelect(x);">
+                            <b>{{x.name}}</b>
+                            <span style="font-size: 12px; color: #888888;">/{{x.fullname|limitTo:6}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-10 border border-secondary rounded my-2 mr-1">
+                <div style="line-height: 25px; margin-top: 5px; border-bottom: 1px dashed #cccccc;">doclist</div>
+            </div>
+        </div>
     </div>
 
 </body>
