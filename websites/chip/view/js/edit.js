@@ -14,19 +14,74 @@ function editCtrl($scope, $http) {
     $scope.chiplist = [];
     $scope.modulelist = [];
     $scope.registerlist = [];
+    $scope.bitslist = [];
 
     $scope.chip = {'id':0, 'name':'', 'width':''};
     $scope.module = {'id':0, 'name':'', 'fullname':''};
     $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+    $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
 
     chipGet();
 
+
+    $scope.bitsSelect = (bits)=>{
+        $(".sel").removeClass('sel');
+        var idx = $scope.bitslist.indexOf(bits);
+        $(".bitsContainer>div:eq("+idx+")").addClass('sel');
+        $scope.bits = bits;
+    }
+
+    function bitsGet() {
+        if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
+
+        $http
+        .get('/chip/bits/'+$scope.register.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            var ret = res.data.message;
+            $scope.bitslist = ret;
+        })
+    }
+
+    $scope.bitsSubmit = ()=>{
+        var name = $scope.bits.name;
+        var rw   = $scope.bits.rw;
+        var bitlist   = $scope.bits.bitlist;
+        var valuelist = $scope.bits.valuelist;        
+        if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
+        if (!name || !rw || !/^(\d+,)*\d+$/.test(bitlist) || !/^(\d+,)*\d+$/.test(valuelist)) return toastr.warning('请输入有效的位组参数！');
+        var arr1 = bitlist.split(',');
+        var arr2 = valuelist.split(',');
+        if (arr1.length!=arr2.length) return toastr.warning('位组的位序号和值数量不一样，请确认！');
+        var i;
+        // 检查位组序号的有效性
+        var chipWidth = parseInt($scope.chip.width);            
+        for (i=0; (i<arr1.length) && (parseInt(arr1[i])<chipWidth); i++) ;
+        if (i<arr1.length) return toastr.warning('位组的序号应小于芯片位宽度， 请输入有效位组序号！');
+        // 检查位组值的有效性
+        for (i=0; (i<arr2.length) && (parseInt(arr2[i])<=1); i++) ;
+        if (i<arr2.length) return toastr.warning('位的值只能为0或1,请输入有效的值！');
+
+        $http
+        .post('/chip/bits/'+$scope.register.id, $scope.bits)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+
+            bitsGet();
+            toastr.success(res.data.message);
+        });
+    }
+
+
+    // register 
 
     $scope.registerSelect = (register)=>{
         $(".sel").removeClass('sel');
         var idx = $scope.registerlist.indexOf(register);
         $(".registerContainer>div:eq("+idx+")").addClass('sel');
         $scope.register = register;
+        bitsGet();
     }
 
     function registerGet() {

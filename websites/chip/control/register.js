@@ -24,8 +24,8 @@ exports.edit = async (ctx, moduleid, registerid, name, fullname, address, desc)=
         if (!moduleIns) return -2;
 
         var [registerIns, created] = await ChipRegister.findOrCreate({logging:false, 
-            where:{'name':name, 'address':address, 'ChipModuleId':moduleid}, 
-            defaults:{'fullname':fullname, 'desc':desc}
+            where:{'name':name, 'ChipModuleId':moduleid}, 
+            defaults:{'address':address, 'fullname':fullname, 'desc':desc}
         });
         return created ? 0 : -3;
     }
