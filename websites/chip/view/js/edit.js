@@ -24,11 +24,26 @@ function editCtrl($scope, $http) {
     chipGet();
 
 
-    $scope.bitsSelect = (bits)=>{
-        $(".sel").removeClass('sel');
-        var idx = $scope.bitslist.indexOf(bits);
-        $(".bitsContainer>div:eq("+idx+")").addClass('sel');
-        $scope.bits = bits;
+    // bits
+
+    function bitsUnselect()
+    {
+        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+    }
+
+    $scope.bitsSelect = bitsSelect;
+    function bitsSelect(bits)
+    {
+        $(".bitsContainer>.sel").removeClass('sel');
+        if ($scope.bits == bits) {
+            bitsUnselect();
+        } else {
+            $scope.bits = bits;
+            window.setTimeout(()=>{            
+                var idx = $scope.bitslist.indexOf(bits);
+                $(".bitsContainer>div:eq("+idx+")").addClass('sel');
+            }, 0);
+        }
     }
 
     function bitsGet() {
@@ -40,6 +55,19 @@ function editCtrl($scope, $http) {
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.bitslist = ret;
+            //如果没有数据，则清空后续数据
+            if (!ret.length) {
+                bitsUnselect();
+            } else {
+                // 默认选择第一个
+                var bits = ret[0];
+                // 查看之前的选择是否还有效
+                if ($scope.bits.id) { 
+                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.bits.id); i++) ;
+                    if (i<ret.length) bits = ret[i];
+                }            
+                bitsSelect(bits);
+            }
         })
     }
 
@@ -76,12 +104,28 @@ function editCtrl($scope, $http) {
 
     // register 
 
-    $scope.registerSelect = (register)=>{
-        $(".sel").removeClass('sel');
-        var idx = $scope.registerlist.indexOf(register);
-        $(".registerContainer>div:eq("+idx+")").addClass('sel');
-        $scope.register = register;
-        bitsGet();
+    function registerUnselect()
+    {
+        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+        
+        $scope.bitslist = [];
+    }
+
+    $scope.registerSelect = registerSelect;
+    function registerSelect(register)
+    {
+        $(".registerContainer>.sel").removeClass('sel');
+        if ($scope.register == register) {
+            registerUnselect();
+        } else {
+            $scope.register = register;
+            bitsGet();
+            window.setTimeout(()=>{            
+                var idx = $scope.registerlist.indexOf(register);
+                $(".registerContainer>div:eq("+idx+")").addClass('sel');
+            }, 0);
+        }
     }
 
     function registerGet() {
@@ -93,6 +137,19 @@ function editCtrl($scope, $http) {
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.registerlist = ret;
+            //如果没有数据，则清空后续数据
+            if (!ret.length) {
+                registerUnselect();
+            } else {
+                // 默认选择第一个
+                var register = ret[0];
+                // 查看之前的选择是否还有效
+                if ($scope.register.id) { 
+                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.register.id); i++) ;
+                    if (i<ret.length) register = ret[i];
+                }            
+                registerSelect(register);
+            }
         })
     }
 
@@ -128,6 +185,32 @@ function editCtrl($scope, $http) {
 
     // module
 
+    function moduleUnselect() 
+    {
+        $scope.module = {'id':0, 'name':'', 'fullname':''};
+        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+        
+        $scope.registerlist = [];
+        $scope.bitslist = [];
+    }
+
+    $scope.moduleSelect = moduleSelect;
+    function moduleSelect(module) 
+    {
+        $(".moduleContainer>.sel").removeClass('sel');
+        if ($scope.module == module) {
+            moduleUnselect();
+        } else {
+            $scope.module = module;
+            registerGet();
+            window.setTimeout(()=>{            
+                var idx = $scope.modulelist.indexOf(module);
+                $(".moduleContainer>div:eq("+idx+")").addClass('sel');
+            }, 0);
+        }
+    }
+
     function moduleGet() {
         if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
 
@@ -137,16 +220,20 @@ function editCtrl($scope, $http) {
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.modulelist = ret;
+            //如果没有数据，则清空后续数据
+            if (!ret.length) {
+                moduleUnselect();
+            } else {
+                // 默认选择第一个
+                var module = ret[0];
+                // 查看之前的选择是否还有效
+                if ($scope.module.id) { 
+                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.module.id); i++) ;
+                    if (i<ret.length) module = ret[i];
+                }            
+                moduleSelect(module);
+            }
         })
-    }
-
-    $scope.moduleSelect = (module)=>{
-        $(".sel").removeClass('sel');
-        var idx = $scope.modulelist.indexOf(module);
-        $(".moduleContainer>div:eq("+idx+")").addClass('sel');
-        $scope.module = module;
-        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-        registerGet();
     }
 
     $scope.moduleSubmit = ()=>{
@@ -179,6 +266,34 @@ function editCtrl($scope, $http) {
 
     // chip
 
+    function chipUnselect() 
+    {
+        $scope.chip = {'id':0, 'name':'', 'width':''};
+        $scope.module = {'id':0, 'name':'', 'fullname':''};
+        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+        
+        $scope.modulelist = [];
+        $scope.registerlist = [];
+        $scope.bitslist = [];
+    }
+
+    $scope.chipSelect = chipSelect;
+    function chipSelect(chip)
+    {
+        $(".chipContainer>.sel").removeClass('sel');
+        if ($scope.chip.id == chip.id) {
+            chipUnselect();
+        } else {
+            $scope.chip = chip;
+            moduleGet();
+            window.setTimeout(()=>{
+                var idx = $scope.chiplist.indexOf(chip);
+                $(".chipContainer>div:eq("+idx+")").addClass('sel');
+            }, 0);
+        }
+    }
+
     function chipGet() {
         $http
         .get('/chip/chip')
@@ -186,16 +301,20 @@ function editCtrl($scope, $http) {
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.chiplist = ret;
+            //如果没有数据，则清空后续数据
+            if (!ret.length) {
+                chipUnselect();
+            } else {
+                // 默认选择第一个
+                var chip = ret[0];
+                // 查看之前的选择是否还有效
+                if ($scope.chip.id) { 
+                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.chip.id); i++) ;
+                    if (i<ret.length) chip = ret[i];
+                }            
+                chipSelect(chip);
+            }
         })
-    }
-
-    $scope.chipSelect = (chip)=>{
-        $(".sel").removeClass('sel');
-        var idx = $scope.chiplist.indexOf(chip);
-        $(".chipContainer>div:eq("+idx+")").addClass('sel');
-        $scope.chip = chip;
-        $scope.module = {'id':0, 'name':'', 'fullname':''};
-        moduleGet();
     }
 
     $scope.chipSubmit = ()=>{
