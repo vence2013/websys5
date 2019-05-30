@@ -49,3 +49,24 @@ exports.get = async (ctx, moduleid)=>{
     });
     return registerlist;
 }
+
+exports.map = async (ctx, moduleid)=>{
+    const ChipRegister = ctx.models['ChipRegister'];
+    const ChipBit = ctx.models['ChipBit'];
+    var registerlist = [];
+    
+    var ret = await ChipRegister.findAll({logging: false, raw: true, where: {'ChipModuleId': moduleid}});
+    console.log('b', ret);
+    for (var i=0; i<ret.length; i++) {
+        var bitid = ret[i]['id'];
+        var ret2 = await ChipBit.findAll({logging: false, raw: true, where: {'ChipRegisterId': bitid}});
+        var bitlist = ret2.map((y)=>{
+            y['desc'] = y['desc'].toString();
+            return y;
+        });
+        ret[i]['bitlist'] = bitlist;  
+        ret[i]['desc']    = ret[i]['desc'].toString();
+    }
+
+    return ret;
+}

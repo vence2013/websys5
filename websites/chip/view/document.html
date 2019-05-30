@@ -29,6 +29,12 @@
 
     .chipsel { color: #5F9EA0; }
     .modulesel { color: #ff0000; }
+
+    .reg { display: inline; float: left; width: 100px; margin-left: 1px; margin-top: 5px; overflow: hidden;
+        background-color: #cccccc; }
+    .reg>div { padding: 0px 3px; cursor: pointer; }
+    .regname { background-color: #5F9EA0; font-weight: bold; text-align: center; height: 30px; line-height: 30px; }
+    .bit { height: 24px; line-height: 24px; border-bottom: 1px dashed #ffffff; }
     </style>
 </head>
 <body ng-app="documentApp">
@@ -39,22 +45,56 @@
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row mt-1">
                     <div class="col-md item chipContainer">
-                        <div ng-repeat="x in chiplist" ng-click="chipSelect(x);" class="pt-1">
-                            <b>{{x.name}}</b>
+                        <div ng-repeat="x in chiplist" ng-click="chipSelect(x);" class="pt-1" title="{{x.name}}">
+                            <b>{{x.name|limitTo:10}}</b>
                         </div>
                     </div>                    
                 </div>
                 <hr/>
                 <div class="row">
                     <div class="col-md item moduleContainer">
-                        <div ng-repeat="x in modulelist" ng-click="moduleSelect(x);" class="pt-1">
-                            <b>{{x.name}}</b>
+                        <div ng-repeat="x in modulelist" ng-click="moduleSelect(x);" class="pt-1" title="{{x.fullname}}">
+                            <b>{{x.name|limitTo:10}}</b>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1">
-                register map
+                <div class="reg" ng-repeat="x in registerlist">
+                    <div class="regname" title="{{x.fullname}}">{{x.name|limitTo:10}}</div>
+                    <div class="bit">b01234567890</div>
+                    <div class="bit">b1</div>
+                    <div class="bit">b2</div>
+                    <div class="bit">b3</div>
+                    <div class="bit">b4</div>
+                    <div class="bit">b5</div>
+                    <div class="bit">b6</div>
+                    <div class="bit">b7</div>
+                    <div class="bit">b0</div>
+                    <div class="bit">b1</div>
+                    <div class="bit">b2</div>
+                    <div class="bit">b3</div>
+                    <div class="bit">b4</div>
+                    <div class="bit">b5</div>
+                    <div class="bit">b6</div>
+                    <div class="bit">b7</div>
+                    <div class="bit">b0</div>
+                    <div class="bit">b1</div>
+                    <div class="bit">b2</div>
+                    <div class="bit">b3</div>
+                    <div class="bit">b4</div>
+                    <div class="bit">b5</div>
+                    <div class="bit">b6</div>
+                    <div class="bit">b7</div>
+                    <div class="bit">b0</div>
+                    <div class="bit">b1</div>
+                    <div class="bit">b2</div>
+                    <div class="bit">b3</div>
+                    <div class="bit">b4</div>
+                    <div class="bit">b5</div>
+                    <div class="bit">b6</div>
+                    <div class="bit">b7</div>
+                </div>
             </div>
         </div>
     </div>

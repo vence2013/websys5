@@ -78,7 +78,6 @@ function editCtrl($scope, $http)
         var bitlist   = $scope.bits.bitlist;
         var valuelist = $scope.bits.valuelist;        
         if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
-        console.log(!/^(.,)*.$/.test(valuelist));
         if (!name || !rw || !/^(\d+,)*\d+$/.test(bitlist) || !/^(.,)*.$/.test(valuelist)) return toastr.warning('请输入有效的位组参数！');
         var arr1 = bitlist.split(',');
         var arr2 = valuelist.split(',');
@@ -169,7 +168,7 @@ function editCtrl($scope, $http)
         var name = $scope.register.name;
         var address = $scope.register.address;
         if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请先选择一个模块！');
-        if (!name || !address) return toastr.warning('请输入有效的寄存器名称以及地址！');
+        if (!name || !/0[xX]{1}[0-9a-fA-F]+/.test(address)) return toastr.warning('请输入有效的寄存器名称以及地址！');
 
         $http
         .post('/chip/register/'+$scope.module.id, $scope.register)
