@@ -47,7 +47,7 @@ function editCtrl($scope, $http)
         }
     }
 
-    function bitsGet() {
+    function bitsGet(sel) {
         if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
 
         $http
@@ -57,7 +57,7 @@ function editCtrl($scope, $http)
             var ret = res.data.message;
             $scope.bitslist = ret;
             //如果没有数据，则清空后续数据
-            if (!ret.length) {
+            if (!ret.length || (sel<0)) {
                 bitsUnselect();
             } else {
                 // 默认选择第一个
@@ -78,7 +78,8 @@ function editCtrl($scope, $http)
         var bitlist   = $scope.bits.bitlist;
         var valuelist = $scope.bits.valuelist;        
         if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
-        if (!name || !rw || !/^(\d+,)*\d+$/.test(bitlist) || !/^(\d+,)*\d+$/.test(valuelist)) return toastr.warning('请输入有效的位组参数！');
+        console.log(!/^(.,)*.$/.test(valuelist));
+        if (!name || !rw || !/^(\d+,)*\d+$/.test(bitlist) || !/^(.,)*.$/.test(valuelist)) return toastr.warning('请输入有效的位组参数！');
         var arr1 = bitlist.split(',');
         var arr2 = valuelist.split(',');
         if (arr1.length!=arr2.length) return toastr.warning('位组的位序号和值数量不一样，请确认！');
@@ -87,17 +88,14 @@ function editCtrl($scope, $http)
         var chipWidth = parseInt($scope.chip.width);            
         for (i=0; (i<arr1.length) && (parseInt(arr1[i])<chipWidth); i++) ;
         if (i<arr1.length) return toastr.warning('位组的序号应小于芯片位宽度， 请输入有效位组序号！');
-        // 检查位组值的有效性
-        for (i=0; (i<arr2.length) && (parseInt(arr2[i])<=1); i++) ;
-        if (i<arr2.length) return toastr.warning('位的值只能为0或1,请输入有效的值！');
+        // 复位之可以为0/1/x
 
         $http
         .post('/chip/bits/'+$scope.register.id, $scope.bits)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-            $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
 
-            bitsGet();
+            bitsGet(-1);
             toastr.success(res.data.message);
         });
     }
@@ -142,7 +140,7 @@ function editCtrl($scope, $http)
         }
     }
 
-    function registerGet() {
+    function registerGet(sel) {
         if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请先选择一款模块！');
 
         $http
@@ -152,7 +150,7 @@ function editCtrl($scope, $http)
             var ret = res.data.message;
             $scope.registerlist = ret;
             //如果没有数据，则清空后续数据
-            if (!ret.length) {
+            if (!ret.length || (sel<0)) {
                 registerUnselect();
             } else {
                 // 默认选择第一个
@@ -177,8 +175,8 @@ function editCtrl($scope, $http)
         .post('/chip/register/'+$scope.module.id, $scope.register)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-            if (!$scope.register.id) $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-            registerGet();
+
+            registerGet(-1);
             toastr.success(res.data.message);
         });
     }
@@ -225,7 +223,7 @@ function editCtrl($scope, $http)
         }
     }
 
-    function moduleGet() {
+    function moduleGet(sel) {
         if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
 
         $http
@@ -235,7 +233,7 @@ function editCtrl($scope, $http)
             var ret = res.data.message;
             $scope.modulelist = ret;
             //如果没有数据，则清空后续数据
-            if (!ret.length) {
+            if (!ret.length || (sel<0)) {
                 moduleUnselect();
             } else {
                 // 默认选择第一个
@@ -259,7 +257,7 @@ function editCtrl($scope, $http)
         .then((res)=>{
             if (errorCheck(res)) return ; 
             
-            moduleGet();
+            moduleGet(-1);
             toastr.success(res.data.message);
         });
     }
@@ -308,7 +306,8 @@ function editCtrl($scope, $http)
         }
     }
 
-    function chipGet() {
+    // sel - 默认选择
+    function chipGet(sel) {
         $http
         .get('/chip/chip')
         .then((res)=>{
@@ -316,7 +315,7 @@ function editCtrl($scope, $http)
             var ret = res.data.message;
             $scope.chiplist = ret;
             //如果没有数据，则清空后续数据
-            if (!ret.length) {
+            if (!ret.length || (sel<0)) {
                 chipUnselect();
             } else {
                 // 默认选择第一个
@@ -342,7 +341,7 @@ function editCtrl($scope, $http)
         .then((res)=>{
             if (errorCheck(res)) return ; 
             
-            chipGet();
+            chipGet(-1);
             toastr.success(res.data.message);
         });
     }

@@ -38,26 +38,26 @@
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row item mt-1">
                     <div class="col-md px-1 bg-light chipContainer">
-                        <div class="pl-1" ng-repeat="x in chiplist" ng-click="chipSelect(x);">
-                            <b>{{x.name}}</b>
+                        <div class="pl-1" ng-repeat="x in chiplist" ng-click="chipSelect(x);" title="{{x.name}}">
+                            <b>{{x.name|limitTo:20}}</b>
                             <span style="font-size: 12px; color: #888888;">/{{x.width}}</span>
                         </div>
                     </div>
                     <div class="col-md px-1 moduleContainer">
-                        <div class="pl-1" ng-repeat="x in modulelist" ng-click="moduleSelect(x);">
-                            <b>{{x.name}}</b>
-                            <span style="font-size: 12px; color: #888888;">/{{x.fullname|limitTo:6}}</span>
+                        <div class="pl-1" ng-repeat="x in modulelist" ng-click="moduleSelect(x);" title="{{x.fullname}}">
+                            <b>{{x.name|limitTo:10}}</b>
+                            <span style="font-size: 12px; color: #888888;">/{{x.fullname|limitTo:10}}</span>
                         </div>
                     </div>
                     <div class="col-md px-1 bg-light registerContainer">
-                        <div class="pl-1" ng-repeat="x in registerlist" ng-click="registerSelect(x);">
-                            <b>{{x.name}}</b>
+                        <div class="pl-1" ng-repeat="x in registerlist" ng-click="registerSelect(x);" title="{{x.fullname}}">
+                            <b>{{x.name|limitTo:20}}</b>
                             <span style="font-size: 12px; color: #888888;">/{{x.address}}</span>
                         </div>
                     </div>
                     <div class="col-md bitsContainer">
-                        <div class="pl-1" ng-repeat="x in bitslist" ng-click="bitsSelect(x);">
-                            <b>{{x.name}}</b>
+                        <div class="pl-1" ng-repeat="x in bitslist" ng-click="bitsSelect(x);" title="{{x.fullname}}">
+                            <b>{{x.name|limitTo:20}}</b>
                             <span style="font-size: 12px; color: #888888;">/{{x.rw}}</span>
                         </div>
                     </div>

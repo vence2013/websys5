@@ -12,11 +12,11 @@ function indexCtrl($scope, $http, user)
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
     // 应用数据
-    $scope.chip = null;
-    $scope.module = null;
     $scope.chiplist = [];
     $scope.modulelist = [];
-
+    $scope.chip = null;
+    $scope.module = null;
+    
     chipGet();
 
 
