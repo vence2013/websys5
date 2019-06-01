@@ -17,7 +17,8 @@ function documentCtrl($scope, $http, user)
     $scope.registerlist = [];
     $scope.chip = null;
     $scope.module = null;
-    
+    $scope.bitindex = []; // 位映射的索引
+
     chipGet();
 
 
@@ -25,6 +26,11 @@ function documentCtrl($scope, $http, user)
 
     function map() 
     {
+        var width = $scope.chip.width;
+
+        $scope.bitindex = new Array(width);
+        for (var i=0; i<width; i++) $scope.bitindex[i] = i;
+
         $http
         .get('/chip/register/map/'+$scope.module.id)
         .then((res)=>{
@@ -35,8 +41,9 @@ function documentCtrl($scope, $http, user)
                 return x;
             });
             // 根据寄存器地址顺序排列
-            $scope.registerlist = reglist.sort(function(a,b){ return a.address-b.address; });
-            /* 重新构建位组序列
+            reglist = reglist.sort(function(a,b){ return a.address-b.address; });
+            
+            /* 重新构建位组序列，需求是：
              * 1. 同一位组的连续位，合并后重新计算行高
              * 
              * 操作步骤
@@ -45,8 +52,43 @@ function documentCtrl($scope, $http, user)
              * 3. 顺序变量数组，取出cnt不为0的元素
              * 4. 按序取出bits对象，并关联cnt数据
              */
-            
-            console.log(res, reglist);
+            for (var i=0; i<reglist.length; i++) {
+                var reg = reglist[i];
+
+                var bits = new Array(width);
+                // 构建寄存器位与所属位组的关系
+                for (var j=0; j<reg.bitlist.length; j++) {
+                    var bits2 = reg.bitlist[j];
+                    bits2.bitlist.split(',').map((x)=>{
+                        var idx = parseInt(x);
+                        bits[idx] = {'id':bits2.id, 'cnt':1};
+                    });
+                }
+                // 合并连续的位组
+                for (j=width-2; j>=0; j--) {
+                    if (!bits[j] || !bits[j+1] || (bits[j].id!=bits[j+1].id)) continue;
+                    bits[j]['cnt']  += bits[j+1]['cnt'];
+                    bits[j+1]['cnt'] = 0;
+                }
+                // 取出有效的位组，并关联位组数据
+                var skip = 0;
+                var bitlist = [];
+                for (j=0; j<width; j++) {
+                    if (skip && --skip) continue;
+
+                    if (!bits[j] || !bits[j].cnt) {
+                        bitlist.push({'id':0, 'name':''});
+                    } else {
+                        var k = 0;
+                        for (; (k<reg.bitlist.length) && (bits[j].id!=reg.bitlist[k].id); k++) ;
+                        var tmp = reg.bitlist[k];
+                        tmp['cnt'] = skip = bits[j].cnt;
+                        bitlist.push(tmp);
+                    }
+                }
+                reglist[i]['bitlist2'] = bitlist;
+            }
+            $scope.registerlist = reglist;
         })
     }
 
