@@ -21,6 +21,25 @@ function documentCtrl($scope, $http, user)
 
     chipGet();
 
+    // 当前只能有一个在聚焦
+    $scope.bitFocus = (bitid)=>{
+        if (!bitid) return ;
+
+        $('.bitFocus').removeClass('bitFocus');
+        $('.bg'+bitid).addClass('bitFocus');
+    }
+
+    // 允许多选
+    $scope.bitSelect = (bitid)=>{
+        if (!bitid) return ;
+
+        if ($('.bg'+bitid).hasClass('bitSelect')) {
+            $('.bg'+bitid).removeClass('bitSelect');
+        } else {
+            $('.bg'+bitid).addClass('bitSelect');
+        }
+    }
+
 
     // map
 
@@ -53,17 +72,21 @@ function documentCtrl($scope, $http, user)
              * 4. 按序取出bits对象，并关联cnt数据
              */
             for (var i=0; i<reglist.length; i++) {
+                var j;
+
                 var reg = reglist[i];
 
-                var bits = new Array(width);
+                var bits = [];
+                for (j=0; j<width; j++) bits[j] = {'id':0, 'cnt':1};
                 // 构建寄存器位与所属位组的关系
-                for (var j=0; j<reg.bitlist.length; j++) {
+                for (j=0; j<reg.bitlist.length; j++) {
                     var bits2 = reg.bitlist[j];
                     bits2.bitlist.split(',').map((x)=>{
                         var idx = parseInt(x);
-                        bits[idx] = {'id':bits2.id, 'cnt':1};
+                        bits[idx]['id'] = bits2.id; //{'id':bits2.id, 'cnt':1};
                     });
                 }
+                
                 // 合并连续的位组
                 for (j=width-2; j>=0; j--) {
                     if (!bits[j] || !bits[j+1] || (bits[j].id!=bits[j+1].id)) continue;
@@ -75,13 +98,13 @@ function documentCtrl($scope, $http, user)
                 var bitlist = [];
                 for (j=0; j<width; j++) {
                     if (skip && --skip) continue;
-
-                    if (!bits[j] || !bits[j].cnt) {
-                        bitlist.push({'id':0, 'name':''});
+                    
+                    if (!bits[j] || !bits[j].id) {
+                        if (bits[j].cnt) bitlist.push({'id':0, 'name':'Reserved', 'cnt':bits[j].cnt});
                     } else {
                         var k = 0;
                         for (; (k<reg.bitlist.length) && (bits[j].id!=reg.bitlist[k].id); k++) ;
-                        var tmp = reg.bitlist[k];
+                        var tmp = angular.copy(reg.bitlist[k]);
                         tmp['cnt'] = skip = bits[j].cnt;
                         bitlist.push(tmp);
                     }
@@ -94,6 +117,12 @@ function documentCtrl($scope, $http, user)
 
 
     // module
+
+    function moduleUnselect() 
+    {
+        $scope.module = null;
+        $scope.registerlist = [];
+    }
 
     $scope.moduleSelect = moduleSelect;
     function moduleSelect(module) 

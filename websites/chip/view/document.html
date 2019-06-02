@@ -34,8 +34,11 @@
     .reg { display: inline; float: left; width: 100px; margin-left: 1px; margin-top: 5px; overflow: hidden;
         background-color: #cccccc; }
     .reg>div { padding: 0px 3px; cursor: pointer; }
-    .regname { background-color: #5F9EA0; font-weight: bold; text-align: center; height: 30px; line-height: 30px; }
+    .regname { background-color: #CD5C5C; font-weight: bold; text-align: center; height: 30px; line-height: 30px; }
     .bit { border-bottom: 1px dashed #ffffff; }
+    .bitValid { background-color: #20B2AA; }
+    .bitFocus { background-color: #CD853F; }
+    .bitSelect { color: #ff0000; }
 
     .bh, .bh1 { height: 24px; line-height: 24px; }
     .bh2 { height: 48px; line-height: 48px; } /* 25*2-1 */
@@ -100,7 +103,10 @@
                 </div>
                 <div class="reg" ng-repeat="x in registerlist">
                     <div class="regname" title="{{x.fullname}}">{{x.name|limitTo:10}}</div>
-                    <div class="bit bh{{y.cnt}}" ng-repeat="y in x.bitlist2">{{y.name}}</div>
+                    <div ng-repeat="y in x.bitlist2 track by $index" class="bit bh{{y.cnt}} bg{{y.id}}" 
+                        ng-class="{'validbit':y.id}" ng-mouseenter="bitFocus(y.id);" ng-click="bitSelect(y.id);">
+                        {{y.name}}
+                    </div>
                 </div>
             </div>
         </div>

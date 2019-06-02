@@ -56,7 +56,7 @@ exports.map = async (ctx, moduleid)=>{
     var registerlist = [];
     
     var ret = await ChipRegister.findAll({logging: false, raw: true, where: {'ChipModuleId': moduleid}});
-    console.log('b', ret);
+    
     for (var i=0; i<ret.length; i++) {
         var bitid = ret[i]['id'];
         var ret2 = await ChipBit.findAll({logging: false, raw: true, where: {'ChipRegisterId': bitid}});
