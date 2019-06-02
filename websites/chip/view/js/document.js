@@ -4,7 +4,7 @@ appConfiguration(app)
 .controller('documentCtrl', documentCtrl);
 
 
-function documentCtrl($scope, $http, user) 
+function documentCtrl($scope, $http, $interval, user) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -19,7 +19,31 @@ function documentCtrl($scope, $http, user)
     $scope.module = null;
     $scope.bitindex = []; // 位映射的索引
 
+    var content = '';
+    var docid   = $('#wrapper').attr('docid');
+    $scope.docid= parseInt(docid);
+    // 初始化editor.md
+    var editor = editormd("editormd", {
+        path : '/node_modules/editor.md/lib/',
+        width: '100%',
+        height: 330,
+        toolbarIcons : function() {
+            return editormd.toolbarModes['simple']; // full, simple, mini
+        },    
+        onload : function() {
+            /*
+            // 获取编辑标签的内容
+            if (docid!='0') { detail(); }
+            else { tagGet(); }*/
+        }    
+    });   
+    // 启动定时解析文章内容    
+    $interval(()=>{ content = editor.getMarkdown(); }, 1000);
+
     chipGet();
+
+
+
 
     // 当前只能有一个在聚焦
     $scope.bitFocus = (bitid)=>{

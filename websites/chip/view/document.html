@@ -18,14 +18,17 @@
     <link  href="/node_modules/toastr/build/toastr.min.css" rel="stylesheet" /> 
     <!-- font-awesome -->
     <link  href="/node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet" />  
-    
+    <!-- editor.md -->
+    <link rel="stylesheet" href="/node_modules/editor.md/css/editormd.css" />    
+    <script type="text/javascript" src="/node_modules/editor.md/editormd.js"></script>
+
     <!-- 自定义 -->   
     <script src="/view/js/library.js" type="text/javascript"></script>
     <link  href="/view/css/all.css" rel="stylesheet" />
     <script src="/chip/view/js/document.js" type="text/javascript"></script>
     <style>
     .item>div { display: inline; float: left; height: 100px; writing-mode: vertical-lr; 
-        line-height: 30px; cursor: pointer; border-left: 1px dashed #cccccc; }
+        line-height: 25px; cursor: pointer; border-left: 1px dashed #cccccc; }
 
     .chipsel { color: #5F9EA0; }
     .modulesel { color: #ff0000; }
@@ -77,10 +80,10 @@
 <body ng-app="documentApp">
 
     <div ng-include="'/view/nav.html'"></div>
-    <div id="wrapper" class="container-fluid" ng-controller="documentCtrl">
+    <div id="wrapper" class="container-fluid" ng-controller="documentCtrl" docid="<%=id%>">
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
-                <div class="row mt-1">
+                <div class="row mt-1" style="height: 100px;">
                     <div class="col-md item chipContainer">
                         <div ng-repeat="x in chiplist" ng-click="chipSelect(x);" class="pt-1" title="{{x.name}}">
                             <b>{{x.name|limitTo:10}}</b>
@@ -88,11 +91,44 @@
                     </div>                    
                 </div>
                 <hr/>
-                <div class="row">
+                <div class="row" style="height: 100px;">
                     <div class="col-md item moduleContainer">
                         <div ng-repeat="x in modulelist" ng-click="moduleSelect(x);" class="pt-1" title="{{x.fullname}}">
                             <b>{{x.name|limitTo:10}}</b>
                         </div>
+                    </div>
+                </div>
+                <div class="row mt-2" style="height: 40px;">
+                    <div class="col-md">
+                        <input type="text" class="form-control" placeholder="标签搜索">
+                    </div>
+                    <div class="col-md">
+                        <h4 class="float-left mx-1" style="cursor: pointer;">
+                            <span class="badge badge-secondary px-3" style="line-height: 25px;">taglist</span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row" style="height: 150px;">
+                    <div class="col-md">
+                        <h4 class="float-left m-1" style="cursor: pointer;">
+                            <span class="badge badge-secondary px-3" style="line-height: 25px;">tagrelate</span>
+                        </h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div id="editormd" style="z-index: 999;"><textarea style="display:none;" ng-model="mdContent"></textarea></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md ml-3 form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                        <label class="form-check-label" for="inlineCheckbox1">只显示选中的寄存器</label>
+                    </div>
+                    <div class="col-md text-right">
+                        <button type="button" class="btn btn-outline-success px-3">创建</button>
+                        <button type="button" class="btn btn-outline-success px-3">修改</button>
+                        <button type="button" class="btn btn-outline-danger px-3">删除</button>
                     </div>
                 </div>
             </div>
@@ -104,7 +140,7 @@
                 <div class="reg" ng-repeat="x in registerlist">
                     <div class="regname" title="{{x.fullname}}">{{x.name|limitTo:10}}</div>
                     <div ng-repeat="y in x.bitlist2 track by $index" class="bit bh{{y.cnt}} bg{{y.id}}" 
-                        ng-class="{'validbit':y.id}" ng-mouseenter="bitFocus(y.id);" ng-click="bitSelect(y.id);">
+                        ng-class="{'bitValid':y.id}" ng-mouseenter="bitFocus(y.id);" ng-click="bitSelect(y.id);">
                         {{y.name}}
                     </div>
                 </div>
