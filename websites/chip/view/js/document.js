@@ -26,24 +26,86 @@ function documentCtrl($scope, $http, $interval, user)
     var editor = editormd("editormd", {
         path : '/node_modules/editor.md/lib/',
         width: '100%',
-        height: 330,
+        height: 510,
         toolbarIcons : function() {
             return editormd.toolbarModes['simple']; // full, simple, mini
         },    
         onload : function() {
-            /*
             // 获取编辑标签的内容
             if (docid!='0') { detail(); }
-            else { tagGet(); }*/
         }    
     });   
+
     // 启动定时解析文章内容    
     $interval(()=>{ content = editor.getMarkdown(); }, 1000);
 
     chipGet();
 
 
+    $scope.edit = ()=>{
+        // 文档， 标签， 关联的芯片或(关联的模块, 关联寄存器)
+        var ids = [];
 
+        var moduleid = 0;        
+        if ($scope.module) {
+            moduleid = $scope.module.id;
+            for (var i=0; i<$('.bitSelect').length; i++) {
+                var id = $('.bitSelect:eq('+i+')').attr('bitsid');
+                if (ids.indexOf(id)!=-1) continue;
+                ids.push(id);
+            }
+        }
+        if (!content) toastr.warning('请输入有效的内容！');
+
+        $http
+        .post('/chip/document/'+docid, {'content':content, 'chipid':$scope.chip.id, 'moduleid':moduleid, 'bitsids':ids })
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            window.location.href = '/chip';
+        });
+    }
+
+    $scope.delete = ()=>{
+        $http
+        .delete('/chip/document/'+docid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            window.location.href = '/chip';
+        });
+    }
+
+    $scope.detail = detail;
+    function detail() {
+        $http
+        .get('/chip/document/detail/'+docid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            editor.setMarkdown(ret.content); 
+
+            // 选择chip
+            for (var i=0; (i<$scope.chiplist.length) && ($scope.chiplist[i].id!=ret.ChipId); i++) ;
+            if (i>=$scope.chiplist.length) return;
+            if ($scope.chip != $scope.chiplist[i]) chipSelect($scope.chiplist[i]);
+            // 选择module
+            for (var i=0; (i<$scope.modulelist.length) && ($scope.modulelist[i].id!=ret.ChipModuleId); i++) ;
+            if (i>=$scope.modulelist.length) return;
+            if ($scope.module != $scope.modulelist[i]) moduleSelect($scope.modulelist[i]);
+            // 选择位组
+            var bits = ret.bitslist ? ret.bitslist.split(',') : [];
+            window.setTimeout(()=>{
+                bits.map((x)=>{ $('.bg'+x).addClass('bitSelect'); });
+            }, 100);
+        });
+    }
+
+
+    // bit 
+
+    $scope.bitUnfocus = ()=>{
+        $('.bitFocus').removeClass('bitFocus');
+    }
 
     // 当前只能有一个在聚焦
     $scope.bitFocus = (bitid)=>{
@@ -151,14 +213,18 @@ function documentCtrl($scope, $http, $interval, user)
     $scope.moduleSelect = moduleSelect;
     function moduleSelect(module) 
     {
-        $scope.module = module;
-        $(".modulesel").removeClass('modulesel');
-        window.setTimeout(()=>{            
-            var idx = $scope.modulelist.indexOf(module);
-            $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
-        }, 0);
-
-        map();
+        if ($scope.module==module) {
+            moduleUnselect();
+        } else {
+            $scope.module = module;
+            $(".modulesel").removeClass('modulesel');
+            window.setTimeout(()=>{            
+                var idx = $scope.modulelist.indexOf(module);
+                $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
+            }, 0);
+    
+            map();
+        }
     }
 
     function moduleGet() {
@@ -170,13 +236,6 @@ function documentCtrl($scope, $http, $interval, user)
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.modulelist = ret;
-
-            //如果没有数据，则清空后续数据
-            if (!ret.length) {
-                moduleUnselect();
-            } else {
-                moduleSelect(ret[0]);
-            }
         })
     }
 

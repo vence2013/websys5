@@ -98,50 +98,48 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-2" style="height: 40px;">
-                    <div class="col-md">
-                        <input type="text" class="form-control" placeholder="标签搜索">
-                    </div>
-                    <div class="col-md">
-                        <h4 class="float-left mx-1" style="cursor: pointer;">
-                            <span class="badge badge-secondary px-3" style="line-height: 25px;">taglist</span>
-                        </h4>
-                    </div>
-                </div>
-                <div class="row" style="height: 150px;">
-                    <div class="col-md">
-                        <h4 class="float-left m-1" style="cursor: pointer;">
-                            <span class="badge badge-secondary px-3" style="line-height: 25px;">tagrelate</span>
-                        </h4>
-                    </div>
-                </div>
-                <div class="row">
+                <div class="row mt-3">
                     <div class="col-md">
                         <div id="editormd" style="z-index: 999;"><textarea style="display:none;" ng-model="mdContent"></textarea></div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md ml-3 form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                        <label class="form-check-label" for="inlineCheckbox1">只显示选中的寄存器</label>
-                    </div>
                     <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-success px-3">创建</button>
-                        <button type="button" class="btn btn-outline-success px-3">修改</button>
-                        <button type="button" class="btn btn-outline-danger px-3">删除</button>
+                        <button type="button" class="btn btn-outline-success px-3" ng-click="edit();">编辑</button>
+                        <button type="button" class="btn btn-outline-danger px-3" ng-show="docid" data-toggle="modal" data-target="#docDeleteConfirmWnd">删除</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1">
-                <div class="reg header">
+                <div class="reg header" ng-show="module">
                     <div class="regname">Register</div>
                     <div ng-repeat="x in bitindex" class="bit bh">{{x}}</div>
                 </div>
                 <div class="reg" ng-repeat="x in registerlist">
                     <div class="regname" title="{{x.fullname}}">{{x.name|limitTo:10}}</div>
-                    <div ng-repeat="y in x.bitlist2 track by $index" class="bit bh{{y.cnt}} bg{{y.id}}" 
-                        ng-class="{'bitValid':y.id}" ng-mouseenter="bitFocus(y.id);" ng-click="bitSelect(y.id);">
+                    <div ng-repeat="y in x.bitlist2 track by $index" class="bit bh{{y.cnt}} bg{{y.id}}" bitsid="{{y.id}}"
+                        ng-class="{'bitValid':y.id}" ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(y.id);">
                         {{y.name}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 文档删除确认窗口 -->
+        <div class="modal fade" id="docDeleteConfirmWnd" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">文档删除确认</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        您确认要删除该文档吗？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger px-3" data-dismiss="modal" ng-click="delete();">删除</button>
+                        <button type="button" class="btn btn-secondary px-3" data-dismiss="modal">取消</button>
                     </div>
                 </div>
             </div>

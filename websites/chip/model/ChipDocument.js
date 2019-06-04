@@ -8,11 +8,18 @@
  *  2019/5/28    - 创建文件。
  *****************************************************************************/ 
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
     return sequelize.define('ChipDocument', {
-        bitgrouplist: {
+        content: {
+            type: DataTypes.BLOB, 
+            allowNull: false, 
+        },
+        bitslist: {
             type: DataTypes.STRING,
-        }
+        },
+        ChipModuleId: {
+            type: DataTypes.INTEGER,
+        }, 
     }, {
         charset: 'utf8',
         collate: 'utf8_general_ci'        

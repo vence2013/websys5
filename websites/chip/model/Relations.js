@@ -15,14 +15,5 @@ exports.link = async (models)=>{
     models['ChipRegister'].belongsTo(models['ChipModule'], {onDelete: 'CASCADE'});    
     models['ChipBit'].belongsTo(models['ChipRegister'], {onDelete: 'CASCADE'}); 
 
-    /* 芯片 - 文档
-     * 在关系中描述文档与位组的关系， 通过位组ID列表来描述
-     */
-    ChipDocument = models['ChipDocument'];
-    models['Chip'].belongsToMany(models['Document'], {through: ChipDocument});
-    models['Document'].belongsToMany(models['Chip'], {through: ChipDocument});    
-    // 芯片模块 - 文档
-    ChipModuleDocument = models['ChipModuleDocument'];
-    models['ChipModule'].belongsToMany(models['Document'], {through: ChipModuleDocument});
-    models['Document'].belongsToMany(models['ChipModule'], {through: ChipModuleDocument});
+    models['Chip'].hasMany(models['ChipDocument']);
 }

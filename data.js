@@ -17,7 +17,7 @@ exports.navigation = [
     {'name':'Document',      'father':null,                'url':'/document',            'access':'any'},
     {'name':'edit',          'father':'Document',          'url':'/document/edit/0',     'access':'user'},
     {'name':'Chip',          'father':null,                'url':'/chip',                    'access':'any'},
-    {'name':'document',      'father':'Chip',              'url':'/chip/view/document.html', 'access':'user'},
+    {'name':'document',      'father':'Chip',              'url':'/chip/document/edit/0',    'access':'user'},
     {'name':'edit',          'father':'Chip',              'url':'/chip/view/edit.html',     'access':'user'},
 ];
 
