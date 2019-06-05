@@ -75,6 +75,10 @@
     .bh30 { height: 720px; line-height: 720px; }
     .bh31 { height: 744px; line-height: 744px; }
     .bh32 { height: 768px; line-height: 768px; }
+
+    .modulename { color: #20B2AA; }
+    .registername { color: #CD5C5C; }
+    .registerlist>span { margin: 0px 3px; }
     </style>
 </head>
 <body ng-app="documentApp">
@@ -98,7 +102,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3">
+                <div class="row mt-2">
+                    <div class="col-md" style="height: 320px;">
+                        <div ng-repeat="x in modulelistsel">
+                            <div class="modulename">{{x.name}}</div>
+                            <div class="registerlist" ng-repeat="y in x.registerlist">
+                                <span class="registername">{{y.name}}</span>
+                                <span ng-repeat="z in y.bitslist">{{z.name}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md">
                         <div id="editormd" style="z-index: 999;"><textarea style="display:none;" ng-model="mdContent"></textarea></div>
                     </div>
@@ -118,7 +133,7 @@
                 <div class="reg" ng-repeat="x in registerlist">
                     <div class="regname" title="{{x.fullname}}">{{x.name|limitTo:10}}</div>
                     <div ng-repeat="y in x.bitlist2 track by $index" class="bit bh{{y.cnt}} bg{{y.id}}" bitsid="{{y.id}}"
-                        ng-class="{'bitValid':y.id}" ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(y.id);">
+                        ng-class="{'bitValid':y.id}" ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(x.id, y.id);">
                         {{y.name}}
                     </div>
                 </div>

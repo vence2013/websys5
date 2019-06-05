@@ -12,25 +12,67 @@ function indexCtrl($scope, $http, user)
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
     // 应用数据
-    $scope.chiplist = [];
-    $scope.modulelist = [];
     $scope.chip = null;
     $scope.module = null;
+    $scope.chiplist = [];
+    $scope.modulelist = [];
+    // 文档
+    $scope.opts = {'page':1, 'pageSize':24, 'content':'', 'createdget':'', 'createlet':'', 'order':'1', 'chipId':0, 'moduleId':0};
+    $scope.pages = [];
+    $scope.doclist = [];
     
     chipGet();
+
+    $scope.$watch('opts', get, true);
+
+    var queryPrevious;
+    function get() {
+        var query = angular.copy($scope.opts);
+        var createget = $scope.opts.createget;
+        var createlet = $scope.opts.createlet;
+        query['createget'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createget)) ? createget : '';
+        query['createlet'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createlet)) ? createlet : '';
+        if (angular.equals(query, queryPrevious)) return;
+        queryPrevious = query;
+
+        $http
+        .get('/chip/document/search', {params: query})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $scope.doclist = ret.doclist;
+
+            $scope.opts['page'] = ret.page;
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 10);        
+        })
+    }
 
 
     // module
 
+
+    function moduleUnselect() 
+    {
+        $scope.module = null;
+        $scope.registerlist = [];
+        $scope.opts.ModuleId = 0;
+    }
+
     $scope.moduleSelect = moduleSelect;
     function moduleSelect(module) 
     {
-        $scope.module = module;
-        $(".modulesel").removeClass('modulesel');
-        window.setTimeout(()=>{            
-            var idx = $scope.modulelist.indexOf(module);
-            $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
-        }, 0);
+        if ($scope.module==module) {
+            moduleUnselect();
+        } else {
+            $scope.module = module;
+            $scope.opts.ModuleId = module.id;
+            $(".modulesel").removeClass('modulesel');
+            window.setTimeout(()=>{            
+                var idx = $scope.modulelist.indexOf(module);
+                $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
+            }, 0);
+        }
     }
 
     function moduleGet() {
@@ -64,6 +106,7 @@ function indexCtrl($scope, $http, user)
             chipUnselect();
         } else {
             $scope.chip = chip;
+            $scope.opts.ChipId = chip.id;
             moduleGet();
             window.setTimeout(()=>{
                 var idx = $scope.chiplist.indexOf(chip);

@@ -17,9 +17,6 @@ module.exports = (sequelize, DataTypes) => {
         bitslist: {
             type: DataTypes.STRING,
         },
-        ChipModuleId: {
-            type: DataTypes.INTEGER,
-        }, 
     }, {
         charset: 'utf8',
         collate: 'utf8_general_ci'        
