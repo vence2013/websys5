@@ -51,7 +51,7 @@ function editCtrl($scope, $http)
         if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
 
         $http
-        .get('/chip/bits/'+$scope.register.id)
+        .get('/chip/bits/register/'+$scope.register.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;
@@ -143,7 +143,7 @@ function editCtrl($scope, $http)
         if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请先选择一款模块！');
 
         $http
-        .get('/chip/register/'+$scope.module.id)
+        .get('/chip/register/module/'+$scope.module.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;

@@ -18,12 +18,16 @@ function documentCtrl($scope, $http, $interval, user)
     $scope.chip = null;
     $scope.module = null;
     $scope.bitindex = []; // 位映射的索引
+
+    var docid   = $('#wrapper').attr('docid');
+    $scope.docid= /^\d+$/.test(docid) ? parseInt(docid) : 0;    
     // 选中的位组所属的寄存器列表
     $scope.modulelistsel = []; // module: id, name, registerlist:[ id, name, bitslist:[(id, name)] ]
+    // 用于通过ID查找数据
+    var registerall = [];
+    var bitsall     = [];
 
     var content = '';
-    var docid   = $('#wrapper').attr('docid');
-    $scope.docid= parseInt(docid);
     // 初始化editor.md
     var editor = editormd("editormd", {
         path : '/node_modules/editor.md/lib/',
@@ -34,10 +38,9 @@ function documentCtrl($scope, $http, $interval, user)
         },    
         onload : function() {
             // 获取编辑标签的内容
-            if (docid!='0') { detail(); }
+            if ($scope.docid) { detail(); }
         }    
-    });   
-
+    });  
     // 启动定时解析文章内容    
     $interval(()=>{ content = editor.getMarkdown(); }, 1000);
 
@@ -46,19 +49,20 @@ function documentCtrl($scope, $http, $interval, user)
 
     $scope.edit = ()=>{
         // 文档， 标签， 关联的芯片或(关联的模块, 关联寄存器)
-        var bitsids = [], moduleids = [];
+        var moduleids=[], bitsids=[];
         for (var i=0; i<$scope.modulelistsel.length; i++) {
-            if (moduleids.indexOf($scope.modulelistsel[i]['id'])==-1) moduleids.push($scope.modulelistsel[i]['id']);
-        }
-        for (var i=0; i<$('.bitSelect').length; i++) {
-            var id = $('.bitSelect:eq('+i+')').attr('bitsid');
-            if (bitsids.indexOf(id)!=-1) continue;
-            bitsids.push(id);
+            moduleids.push($scope.modulelistsel[i]['id']);
+            var registerlist = $scope.modulelistsel[i]['registerlist'];
+            for (var j=0; j<registerlist.length; j++) {
+                for (var k=0; k<registerlist[j]['bitslist'].length; k++) {
+                    bitsids.push(registerlist[j]['bitslist'][k].id);
+                }
+            }
         }
         if (!content) toastr.warning('请输入有效的内容！');
 
         $http
-        .post('/chip/document/'+docid, {'content':content, 'chipid':$scope.chip.id, 'moduleids':moduleids, 'bitsids':bitsids })
+        .post('/chip/document/'+$scope.docid, {'content':content, 'chipid':$scope.chip.id, 'moduleids':moduleids, 'bitsids':bitsids })
         .then((res)=>{
             if (errorCheck(res)) return ;
             window.location.href = '/chip';
@@ -67,7 +71,7 @@ function documentCtrl($scope, $http, $interval, user)
 
     $scope.delete = ()=>{
         $http
-        .delete('/chip/document/'+docid)
+        .delete('/chip/document/'+$scope.docid)
         .then((res)=>{
             if (errorCheck(res)) return ;
             window.location.href = '/chip';
@@ -77,13 +81,13 @@ function documentCtrl($scope, $http, $interval, user)
     $scope.detail = detail;
     function detail() {
         $http
-        .get('/chip/document/detail/'+docid)
+        .get('/chip/document/detail/'+$scope.docid)
         .then((res)=>{
             if (errorCheck(res)) return ;
-
+            
             var ret = res.data.message;
             editor.setMarkdown(ret.content); 
-
+            $scope.modulelistsel = ret.modulelistsel;
             // 选择chip
             for (var i=0; (i<$scope.chiplist.length) && ($scope.chiplist[i].id!=ret.ChipId); i++) ;
             if (i>=$scope.chiplist.length) return;
@@ -96,66 +100,87 @@ function documentCtrl($scope, $http, $interval, user)
 
     $scope.bitUnfocus = ()=>{
         $('.bitFocus').removeClass('bitFocus');
+        $('#bitsInfo').css('display', 'none');
     }
 
     // 当前只能有一个在聚焦
-    $scope.bitFocus = (bitid)=>{
-        if (!bitid) return ;
-
-        $('.bitFocus').removeClass('bitFocus');
-        $('.bg'+bitid).addClass('bitFocus');
-    }
-
-    // 允许多选
-    $scope.bitSelect = (regid, bitsid)=>{
+    $scope.bitFocus = (bitsid)=>{
         if (!bitsid) return ;
 
-        // 通过寄存器ID查找寄存器数据， 查找位组数据， 查找模块数据
-        for (var i=0; (i<$scope.registerlist.length) && (regid!=$scope.registerlist[i].id); i++) ;
-        var register = angular.copy($scope.registerlist[i]);
-        // 位组
-        for (var t=0; (t<register['bitlist2'].length) && (bitsid!=register['bitlist2'][t]['id']); t++) ;
-        var bits = angular.copy(register['bitlist2'][t]);
-        // 模块
-        for (var j=0; (j<$scope.modulelist.length) && (register['ChipModuleId']!=$scope.modulelist[j]['id']); j++) ;
-        var module = angular.copy($scope.modulelist[j]);
+        $('.bitFocus').removeClass('bitFocus');
+        $('.bg'+bitsid).addClass('bitFocus');
 
-        if ($('.bg'+bitsid).hasClass('bitSelect')) {
+        $http
+        .get('/chip/bits/'+bitsid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $('#bitsInfo').html(ret.fullname+'<br/>'+ret.desc).css('display', 'block');
+        });
+    }
+
+    function bitsRefresh() 
+    {        
+        for (var i=0; (i<$scope.modulelistsel.length) && ($scope.module.id!=$scope.modulelistsel[i].id); i++) ;
+        if (i>=$scope.modulelistsel.length) return;        
+        var registerlist = $scope.modulelistsel[i]['registerlist'];
+        for (var j=0; j<registerlist.length; j++) {
+            var bitslist = registerlist[j]['bitslist'];
+            for (var k=0; k<bitslist.length; k++) {
+                $('.bg'+bitslist[k].id).addClass('bitSelect');
+            }
+        }
+    }
+
+    // 构建树形结构 modulelistsel
+    $scope.bitSelect = (bitsid)=>{
+        for (var i=0; (i<bitsall.length) && (bitsid!=bitsall[i]['id']); i++) ;
+        var bits = angular.copy(bitsall[i]);
+        for (var i=0; (i<registerall.length) && (bits.ChipRegisterId!=registerall[i].id); i++) ;
+        var register = angular.copy(registerall[i]);
+
+        if ($('.bg'+bitsid).hasClass('bitSelect')) { // 删除节点
             $('.bg'+bitsid).removeClass('bitSelect');
 
-            for (var i=0; (i<$scope.modulelistsel.length) && (module.id!=$scope.modulelistsel[i]['id']); i++) ;
+            var moduleid = $scope.module.id;
+            for (var i=0; (i<$scope.modulelistsel.length) && (moduleid!=$scope.modulelistsel[i]['id']); i++) ;
             if (i<$scope.modulelistsel.length) {
-                var register2 = $scope.modulelistsel[i]['registerlist'];
-                for (var j=0; (j<register2.length) && (register.id!=register2[j].id); j++) ;
-                if (j<register2.length) {
-                    var bits2 = register2[j]['bitslist'];
-                    for (var k=0; (k<bits2.length) && (bits.id!=bits2[k].id); k++) ;
-                    if (k<bits2.length) { $scope.modulelistsel[i]['registerlist'][j]['bitslist'].splice(k, 1); }
-                    if (!$scope.modulelistsel[i]['registerlist'][j]['bitslist'].length) $scope.modulelistsel[i]['registerlist'].splice(j, 1);
-                    if (!$scope.modulelistsel[i]['registerlist'].length) $scope.modulelistsel.splice(i, 1);
+                var module2 = $scope.modulelistsel[i];
+                for (var j=0; (j<module2['registerlist'].length) && (register.id!=module2['registerlist'][j].id); j++) ;
+                if (j<module2['registerlist'].length) {
+                    var register2 = module2['registerlist'][j];
+                    for (var k=0; (k<register2['bitslist'].length) && (bits.id!=register2['bitslist'][k].id); k++) ;
+                    if (k<register2['bitslist'].length) {
+                        $scope.modulelistsel[i]['registerlist'][j]['bitslist'].splice(k, 1);
+                        if (!$scope.modulelistsel[i]['registerlist'][j]['bitslist'].length) $scope.modulelistsel[i]['registerlist'].splice(j, 1);
+                        if (!$scope.modulelistsel[i]['registerlist'].length) $scope.modulelistsel.splice(i, 1); 
+                    }
                 }
-            }
-        } else {
+            }  
+        } else { // 新增节点
             $('.bg'+bitsid).addClass('bitSelect');
 
-            var bits3  = {'id':bits.id, 'name':bits.name};
-            for (var i=0; (i<$scope.modulelistsel.length) && (module.id!=$scope.modulelistsel[i]['id']); i++) ;
-            if (i<$scope.modulelistsel.length) {
-                var register2 = $scope.modulelistsel[i]['registerlist'];
-                for (var j=0; (j<register2.length) && (register.id!=register2[j].id); j++) ;
-                if (j<register2.length) {
-                    var bits2 = register2[j]['bitslist'];
-                    for (var k=0; (k<bits2.length) && (bits.id!=bits2[k].id); k++) ;
-                    $scope.modulelistsel[i]['registerlist'][j]['bitslist'].push(bits3);
-                } else {
-                    var register3 = {'id':register.id, 'name':register.name, 'bitslist':[ bits3 ]};
-                    $scope.modulelistsel[i]['registerlist'].push(register3);
-                }
-            } else {                
-                var register3 = {'id':register.id, 'name':register.name, 'bitslist':[ bits3 ]};
-                var module3   = {'id':module.id, 'name':module.name, 'registerlist':[ register3 ]};
-                $scope.modulelistsel.push(module3);
+            var moduleid = $scope.module.id;
+            for (var i=0; (i<$scope.modulelistsel.length) && (moduleid!=$scope.modulelistsel[i]['id']); i++) ;
+            var module2;
+            if (i>=$scope.modulelistsel.length) {
+                module2 = {'id':$scope.module.id, 'name':$scope.module.name, 'registerlist':[]};
+                $scope.modulelistsel.push(module2);
+            } else {
+                module2 = $scope.modulelistsel[i];
             }
+            // 寄存器
+            for (var i=0; (i<module2['registerlist'].length) && (register.id!=module2['registerlist'][i].id); i++) ;
+            var register2;
+            if (i>=module2['registerlist'].length) {
+                register2 = {'id':register.id, 'name':register.name, 'bitslist':[]};
+                module2['registerlist'].push(register2);
+            } else {
+                register2 = module2['registerlist'][i];
+            }
+            for (var i=0; (i<register2['bitslist'].length) && (bits.id!=register2['bitslist'][i].id); i++) ;
+            if (i>=register2['bitslist'].length) register2['bitslist'].push(bits);
         }
     }
 
@@ -231,7 +256,29 @@ function documentCtrl($scope, $http, $interval, user)
                 reglist[i]['bitlist2'] = bitlist;
             }
             $scope.registerlist = reglist;
+
+            window.setTimeout(bitsRefresh, 10);
         })
+    }
+
+    // register
+
+    $scope.registerUnfocus = ()=>{
+        $('#bitsInfo').css('display', 'none');
+    }
+
+    // 当前只能有一个在聚焦
+    $scope.registerFocus = (registerid)=>{
+        if (!registerid) return ;
+
+        $http
+        .get('/chip/register/'+registerid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $('#bitsInfo').html(ret.fullname+'<br/>'+ret.desc).css('display', 'block');
+        });
     }
 
 
@@ -253,10 +300,10 @@ function documentCtrl($scope, $http, $interval, user)
             $(".modulesel").removeClass('modulesel');
             window.setTimeout(()=>{            
                 var idx = $scope.modulelist.indexOf(module);
-                $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
+                $(".moduleContainer>a:eq("+idx+")").addClass('modulesel');
             }, 0);
     
-            map();
+            map();            
         }
     }
 
@@ -295,9 +342,19 @@ function documentCtrl($scope, $http, $interval, user)
             moduleGet();
             window.setTimeout(()=>{
                 var idx = $scope.chiplist.indexOf(chip);
-                $(".chipContainer>div:eq("+idx+")").addClass('chipsel');
+                $(".chipContainer>a:eq("+idx+")").addClass('chipsel');
             }, 0);
         }
+
+        $http
+        .get('/chip/all/'+chip.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            registerall = ret.registerlist;
+            bitsall     = ret.bitslist;
+        })
     }
 
     function chipGet() {

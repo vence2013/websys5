@@ -70,19 +70,32 @@ router.get('/map/:moduleid', async (ctx)=>{
 })
 
 
-router.get('/:moduleid', async(ctx, next)=>{
+router.get('/:registerid', async(ctx, next)=>{
     const RegisterCtrl = ctx.controls['chip/register'];
     
     var req2 = ctx.params;
-    var moduleid = /^\d+$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
+    var registerid = /^\d+$/.test(req2.registerid) ? parseInt(req2.registerid) : 0;
 
-    if (moduleid) {
-        var ret = await RegisterCtrl.get(ctx, moduleid);
+    if (registerid) {
+        var ret = await RegisterCtrl.get(ctx, registerid);
         ctx.body = {'errorCode': 0, 'message': ret};
     } else {
         ctx.body = {'errorCode': -1, 'message': '无效的模块参数！'};
     }
 });
 
+router.get('/module/:moduleid', async(ctx, next)=>{
+    const RegisterCtrl = ctx.controls['chip/register'];
+    
+    var req2 = ctx.params;
+    var moduleid = /^\d+$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
+
+    if (moduleid) {
+        var ret = await RegisterCtrl.list(ctx, moduleid);
+        ctx.body = {'errorCode': 0, 'message': ret};
+    } else {
+        ctx.body = {'errorCode': -1, 'message': '无效的模块参数！'};
+    }
+});
 
 module.exports = router;

@@ -39,3 +39,25 @@ exports.get = async (ctx)=>{
 
     return await Chip.findAll({logging: false, raw: true});
 }
+
+// 获取芯片相关的所有寄存器，位组
+exports.all = async (ctx, chipid)=>{
+    const ChipModule = ctx.models['ChipModule'];
+    const ChipRegister = ctx.models['ChipRegister'];
+    const ChipBit = ctx.models['ChipBit'];
+    var ret = {'registerlist':[], 'bitslist':[]};
+
+    var moduleObjs = await ChipModule.findAll({logging:false, raw:true, where:{'ChipId':chipid}});
+    if (moduleObjs.length) {
+        var moduleids = moduleObjs.map((x)=>{ return x.id; });        
+        var registerObjs = await ChipRegister.findAll({logging:false, raw:true, where:{'ChipModuleId':moduleids}});
+        ret['registerlist'] = registerObjs;
+
+        var registerids = registerObjs.map((x)=>{ return x.id; });
+        if (registerids.length) {
+            var bitsObjs = await ChipBit.findAll({logging:false, raw:true, where:{'ChipRegisterId':registerids}});
+            ret['bitslist'] = bitsObjs;
+        }
+    }
+    return ret;
+}

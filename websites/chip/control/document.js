@@ -56,16 +56,45 @@ exports.detail = async (ctx, docid)=>{
         docObj['chip'] = chipObj['name'];
 
         // 根据位组列表，逆向构建'模块列表/寄存器列表/位组列表'树形结构
-        /*
-        // 获取模块名称
-        if (docObj.ChipModuleId) {
-            var moduleObj = await ChipModule.findOne({logging:false, raw:true, where:{'id':docObj.ChipModuleId}});
-            if (moduleObj) docObj['module'] = moduleObj['name'];
+        var bitsids = [];
+        if (docObj['bitslist']) {
+            var bitsObjs=[], registerObjs=[], moduleObjs=[];
+            // 搜索相关元素的数据
+            var arr = docObj['bitslist'].split(',');
+            arr.map((x)=>{
+                if (/^\d+$/.test(x)) bitsids.push(parseInt(x));
+            });
+            bitsObjs = await ChipBit.findAll({logging:false, raw:true, where: {'id':bitsids}});
+            if (bitsObjs.length) {               
+                var registerids = bitsObjs.map((x)=>{ return x['ChipRegisterId']; });
+                registerObjs = await ChipRegister.findAll({logging:false, raw:true, where: {'id':registerids}});
+                if (registerObjs.length) {
+                    var moduleids = registerObjs.map((x)=>{ return x['ChipModuleId']; });
+                    moduleObjs = await ChipModule.findAll({logging:false, raw:true, where: {'id':moduleids}});
+                }
+            }
+
+            // 重构数据结构
+            var modulelist=[], registerlist=[];
+            registerObjs.map((x)=>{ 
+                var obj = {'id':x.id, 'name':x.name, 'ChipModuleId':x.ChipModuleId, 'bitslist':[]};
+                for (var i=0; i<bitsObjs.length; i++) {
+                    if (bitsObjs[i]['ChipRegisterId']!=obj.id) continue;
+                    var bits = {'id':bitsObjs[i]['id'], 'name':bitsObjs[i]['name']};
+                    obj['bitslist'].push(bits);
+                }
+                registerlist.push(obj); 
+            });
+            moduleObjs.map((x)=>{
+                var obj = {'id':x.id, 'name':x.name, 'registerlist':[]};
+                for (var i=0; i<registerlist.length; i++) {
+                    if (registerlist[i]['ChipModuleId']!=obj.id) continue;
+                    obj['registerlist'].push(registerlist[i]);
+                }
+                modulelist.push(obj);
+            });
+            docObj['modulelistsel'] = modulelist;
         }
-        // 获取位组及寄存器名称数据
-        if (docObj.bitslist) {
-            
-        }*/
     }
 
     return docObj;

@@ -82,8 +82,10 @@ router.get('/nav', async (ctx)=>{
             nav[name] = src[i];
         }
     }
+
     // 将二级菜单关联到一级菜单
     for (x in navSub) { nav[x]['children'] = navSub[x]; }
+    // 将对象转换为数组
     var navlist = [];
     for (x in nav) { navlist.push(nav[x]); }
     

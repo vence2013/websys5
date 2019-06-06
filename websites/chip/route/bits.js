@@ -57,14 +57,28 @@ router.delete('/:bitsid', async(ctx, next)=>{
 });
 
 
-router.get('/:registerid', async(ctx, next)=>{
+router.get('/register/:registerid', async(ctx, next)=>{
     const BitsCtrl = ctx.controls['chip/bits'];
     
     var req2 = ctx.params;
     var registerid = /^\d+$/.test(req2.registerid) ? parseInt(req2.registerid) : 0;
 
     if (registerid) {
-        var ret = await BitsCtrl.get(ctx, registerid);
+        var ret = await BitsCtrl.list(ctx, registerid);
+        ctx.body = {'errorCode': 0, 'message': ret};
+    } else {
+        ctx.body = {'errorCode': -1, 'message': '无效的模块参数！'};
+    }
+});
+
+router.get('/:bitsid', async(ctx, next)=>{
+    const BitsCtrl = ctx.controls['chip/bits'];
+    
+    var req2 = ctx.params;
+    var bitsid = /^\d+$/.test(req2.bitsid) ? parseInt(req2.bitsid) : 0;
+
+    if (bitsid) {
+        var ret = await BitsCtrl.get(ctx, bitsid);
         ctx.body = {'errorCode': 0, 'message': ret};
     } else {
         ctx.body = {'errorCode': -1, 'message': '无效的模块参数！'};

@@ -39,8 +39,15 @@ exports.delete = async (ctx, bitsid)=>{
     await ChipBit.destroy({logging: false, where: {'id': bitsid}});
 }
 
+exports.get = async (ctx, bitsid)=>{
+    const ChipBit = ctx.models['ChipBit'];
 
-exports.get = async (ctx, registerid)=>{
+    var ret = await ChipBit.findOne({logging: false, raw: true, where: {'id': bitsid}});
+    ret['desc'] = ret['desc'].toString();
+    return ret;
+}
+
+exports.list = async (ctx, registerid)=>{
     const ChipBit = ctx.models['ChipBit'];
 
     var ret = await ChipBit.findAll({logging: false, raw: true, where: {'ChipRegisterId': registerid}});

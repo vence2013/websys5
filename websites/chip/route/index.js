@@ -39,7 +39,7 @@ router.delete('/:chipid', async(ctx, next)=>{
     const ChipCtrl = ctx.controls['chip/chip'];
     
     var req2 = ctx.params;
-    var chipid = req2.chipid;
+    var chipid = /^\d+$/.test(req2.chipid) ? parseInt(req2.chipid) : 0;
     
     await ChipCtrl.delete(ctx, chipid);
     ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
@@ -59,5 +59,15 @@ router.get('/chip', async(ctx, next)=>{
     ctx.body = {'errorCode': 0, 'message': ret};
 });
 
+// 获取芯片的所有寄存器和位组
+router.get('/all/:chipid', async(ctx)=>{
+    const ChipCtrl = ctx.controls['chip/chip'];
+    
+    var req2 = ctx.params;
+    var chipid = /^\d+$/.test(req2.chipid) ? parseInt(req2.chipid) : 0;
+    
+    var ret = await ChipCtrl.all(ctx, chipid);
+    ctx.body = {'errorCode':0, 'message':ret};
+})
 
 module.exports = router;

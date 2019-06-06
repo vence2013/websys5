@@ -1,0 +1,52 @@
+/* chip map */
+.item { border-bottom: 1px dashed #cccccc; }
+.item>a { margin: 0px 5px; padding: 0px 5px; line-height: 30px; }
+
+.chipsel  { background-color: #cccccc; }
+.modulesel { background-color: #cccccc; }
+
+.header { text-align: center; color: #666666; }
+.reg { display: inline; float: left; width: 100px; margin-left: 1px; margin-top: 5px; overflow: hidden;
+    background-color: #cccccc; }
+.reg>div { padding: 0px 3px; cursor: pointer; }
+.regname { background-color: #CD5C5C; font-weight: bold; text-align: center; height: 30px; line-height: 30px; }
+.bit { border-bottom: 1px dashed #ffffff; }
+.bitValid { background-color: #20B2AA; }
+.bitFocus { background-color: #CD853F; }
+.bitSelect { color: #ff0000; }
+
+.bh, .bh1 { height: 24px; line-height: 24px; }
+.bh2 { height: 48px; line-height: 48px; } /* 25*2-1 */
+.bh3 { height: 72px; line-height: 72px; }
+.bh4 { height: 96px; line-height: 96px; }
+.bh5 { height: 120px; line-height: 120px; }
+.bh6 { height: 144px; line-height: 144px; }
+.bh7 { height: 168px; line-height: 168px; }
+.bh8 { height: 192px; line-height: 192px; }
+.bh9 { height: 216px; line-height: 216px; }
+.bh10 { height: 240px; line-height: 240px; }
+.bh11 { height: 264px; line-height: 264px; }
+.bh12 { height: 288px; line-height: 288px; }
+.bh13 { height: 312px; line-height: 312px; }
+.bh14 { height: 336px; line-height: 336px; }
+.bh15 { height: 360px; line-height: 360px; }
+.bh16 { height: 384px; line-height: 384px; }
+.bh17 { height: 408px; line-height: 408px; }
+.bh18 { height: 432px; line-height: 432px; }
+.bh19 { height: 456px; line-height: 456px; }
+.bh20 { height: 480px; line-height: 480px; }
+.bh21 { height: 504px; line-height: 504px; }
+.bh22 { height: 528px; line-height: 528px; }
+.bh23 { height: 552px; line-height: 552px; }
+.bh24 { height: 576px; line-height: 576px; }
+.bh25 { height: 600px; line-height: 600px; }
+.bh26 { height: 624px; line-height: 624px; }
+.bh27 { height: 648px; line-height: 648px; }
+.bh28 { height: 672px; line-height: 672px; }
+.bh29 { height: 696px; line-height: 696px; }
+.bh30 { height: 720px; line-height: 720px; }
+.bh31 { height: 744px; line-height: 744px; }
+.bh32 { height: 768px; line-height: 768px; }
+
+#bitsInfo { display: none; position: absolute; top: 50px; left: 10px; width: 40%; min-height: 70px; 
+    opacity: 0.8; z-index: 999; border-radius: 5px; background-color: #F5ECCE; }

@@ -39,7 +39,15 @@ exports.delete = async (ctx, registerid)=>{
 }
 
 
-exports.get = async (ctx, moduleid)=>{
+exports.get = async (ctx, registerid)=>{
+    const ChipRegister = ctx.models['ChipRegister'];
+
+    var ret = await ChipRegister.findOne({logging: false, raw: true, where: {'id': registerid}});
+    ret['desc'] = ret['desc'].toString();
+    return ret;
+}
+
+exports.list = async (ctx, moduleid)=>{
     const ChipRegister = ctx.models['ChipRegister'];
 
     var ret = await ChipRegister.findAll({logging: false, raw: true, where: {'ChipModuleId': moduleid}});
