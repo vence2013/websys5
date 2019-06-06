@@ -10,7 +10,7 @@
 
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('FinancePay', {
-        total: {
+        money: {
             type: DataTypes.FLOAT,  
             allowNull: false,
         }, 

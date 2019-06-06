@@ -14,16 +14,16 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.FLOAT,  
             allowNull: false,
         }, 
-        modify: {
+        money: {
             type: DataTypes.FLOAT, 
             allowNull: false,
         },
         type: {
-            type: DataTypes.ENUM('get', 'pay', 'reset'),
+            type: DataTypes.ENUM('get', 'pay', 'property'),
             allowNull: false,
         },
         date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.DATE,
             allowNull: false,
         },
         desc: {
