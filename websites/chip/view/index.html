@@ -23,13 +23,7 @@
     <script src="/view/js/library.js" type="text/javascript"></script>
     <link  href="/view/css/all.css" rel="stylesheet" />
     <script src="/chip/view/js/index.js" type="text/javascript"></script>
-    <style>
-    .item>div { display: inline; float: left; height: 100px; writing-mode: vertical-lr; 
-        line-height: 25px; cursor: pointer; border-left: 1px dashed #cccccc; }
-
-    .chipsel { color: #5F9EA0; }
-    .modulesel { color: #ff0000; }
-    </style>
+    <link  href="/chip/view/css/chip.css" rel="stylesheet" />
 </head>
 <body ng-app="indexApp">
 
@@ -39,17 +33,15 @@
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row mt-1" style="height: 100px;">
                     <div class="col-md item chipContainer">
-                        <div ng-repeat="x in chiplist" ng-click="chipSelect(x);" class="pt-1" title="{{x.name}}">
-                            <b>{{x.name|limitTo:10}}</b>
-                        </div>
+                        <a href="#" style="color: #FF8000;" ng-repeat="x in chiplist" 
+                            ng-click="chipSelect(x);" title="{{x.fullname}}">{{x.name}}</a>
                     </div>                    
                 </div>
                 <hr/>
                 <div class="row" style="height: 100px;">
                     <div class="col-md item moduleContainer">
-                        <div ng-repeat="x in modulelist" ng-click="moduleSelect(x);" class="pt-1" title="{{x.fullname}}">
-                            <b>{{x.name|limitTo:10}}</b>
-                        </div>
+                        <a href="#" style="color: #0489B1;" ng-repeat="x in modulelist" 
+                            ng-click="moduleSelect(x);" title="{{x.fullname}}">{{x.name}}</a>
                     </div>
                 </div>
                 <div class="card mt-3">
@@ -82,7 +74,7 @@
                         <div class="row mx-1" style="border-bottom: 1px dashed #000000;" ng-repeat="x in doclist" ng-mouseenter="focus(x);">
                             <a href="/chip/document/display/{{x.id}}">{{x.content|limitTo:60}}</a>
                             <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}</span>
-                            <a href="/chip/document/edit/{{x.id}}" class="ml-2"><i class="fa fa-edit"></i></a>
+                            <a href="/chip/document/edit/{{x.id}}" class="ml-2" ng-show="user.id"><i class="fa fa-edit"></i></a>
                         </div>
                     </div>
                 </div>

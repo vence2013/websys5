@@ -103,10 +103,9 @@ exports.detail = async (ctx, docid)=>{
 exports.search = async (ctx, ChipId, ModuleId, content, createget, createlet, order, page, pageSize)=>{
     var sql, sqlCond = '';
 
+    sqlCond = " WHERE `ChipId`='"+ChipId+"' ";
     if (ModuleId) {
-        sqlCond = " WHERE `id`IN (SELECT `ChipDocumentId` FROM `ChipDocumentModule` WHERE `ChipModuleId`='"+ModuleId+"') ";
-    } else {
-        sqlCond = " WHERE `ChipId`='"+ChipId+"' ";
+        sqlCond += " AND `id` IN (SELECT `ChipDocumentId` FROM `ChipDocumentModule` WHERE `ChipModuleId`='"+ModuleId+"') ";
     }
 
     // 根据搜索条件构建SQL条件

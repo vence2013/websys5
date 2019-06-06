@@ -11,6 +11,7 @@ function indexCtrl($scope, $http, user)
         onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
+    $scope.user = user;
     // 应用数据
     $scope.chip = null;
     $scope.module = null;
@@ -26,15 +27,15 @@ function indexCtrl($scope, $http, user)
     $scope.$watch('opts', get, true);
 
     var queryPrevious;
-    function get() {
+    function get() {        
         var query = angular.copy($scope.opts);
         var createget = $scope.opts.createget;
         var createlet = $scope.opts.createlet;
         query['createget'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createget)) ? createget : '';
         query['createlet'] = (/^\d{4}(\-|\/|\.)\d{1,2}\1\d{1,2}$/.test(createlet)) ? createlet : '';
         if (angular.equals(query, queryPrevious)) return;
-        queryPrevious = query;
-
+        queryPrevious = angular.copy(query);
+        
         $http
         .get('/chip/document/search', {params: query})
         .then((res)=>{
@@ -42,7 +43,7 @@ function indexCtrl($scope, $http, user)
 
             var ret = res.data.message;
             $scope.doclist = ret.doclist;
-
+            
             $scope.opts['page'] = ret.page;
             $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 10);        
         })
@@ -79,7 +80,7 @@ function indexCtrl($scope, $http, user)
         if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
 
         $http
-        .get('/chip/module/'+$scope.chip.id)
+        .get('/chip/module/chip/'+$scope.chip.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;

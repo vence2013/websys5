@@ -54,7 +54,18 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/document/tag/:tagid',     'group':'/document'},
         // chip
         {'method': 'GET', 'url': '/chip',               'group':'/chip'},
-        {'method': 'GET', 'url': '/chip',               'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/chip',          'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/all/:chipid',   'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/module/chip/:chipid',   'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/module/:moduleid',      'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/register/module/:moduleid',  'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/register/:registerid',       'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/bits/register/:registerid',  'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/bits/:bitsid',               'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/document/edit/:docid',       'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/document/display/:docid',    'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/document/detail/:docid',     'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/document/search',            'group':'/chip'},
     ],
     'private': [
         {'method': 'GET', 'url': '/logout', 'group':'/'},
@@ -87,6 +98,15 @@ exports.interfaces = {
         {'method': 'DELETE', 'url': '/document/category/:categoryid', 'group':'/document'},
         {'method': 'GET',    'url': '/document/category/:categoryid', 'group':'/document'},
         // chip
-        {'method': 'POST', 'url': '/chip/:chipid',               'group':'/chip'},
+        {'method': 'POST',   'url': '/chip/:chipid',               'group':'/chip'},
+        {'method': 'DELETE', 'url': '/chip/:chipid',               'group':'/chip'},
+        {'method': 'POST',   'url': '/chip/module/:chipid',        'group':'/chip'},
+        {'method': 'DELETE', 'url': '/chip/module/:moduleid',      'group':'/chip'},      
+        {'method': 'POST',   'url': '/chip/register/:moduleid',    'group':'/chip'},
+        {'method': 'DELETE', 'url': '/chip/register/:registerid',  'group':'/chip'},  
+        {'method': 'POST',   'url': '/chip/bits/:registerid',      'group':'/chip'},
+        {'method': 'DELETE', 'url': '/chip/bits/:bitsid',          'group':'/chip'},     
+        {'method': 'POST',   'url': '/chip/document/:docid',       'group':'/chip'},
+        {'method': 'DELETE', 'url': '/chip/document/:docid',       'group':'/chip'},                         
     ]
 }
