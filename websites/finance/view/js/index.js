@@ -13,11 +13,32 @@ function indexCtrl($scope, $http, user)
     };
     $scope.user = user;
     // 功能变量
+    $scope.opts = {'str':'', 'page':1, 'pageSize':10};
+    $scope.pages = [];
+    $scope.financelist = [];
     $scope.money = '';
     $scope.date  = '';
     $scope.desc  = '';
     $scope.type  = 'pay';
+
+    $scope.$watch('opts', get, true);
     
+    $scope.get = get;
+    function get() 
+    {
+        $http
+        .get('/finance/search', {params:$scope.opts})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            var ret = res.data.message;
+            $scope.financelist = ret.financelist;
+
+            $scope.opts['page'] = ret.page;
+            $scope.pages = initPage(ret.page, $scope.opts.pageSize, ret.total, 16);  
+        })
+    }
+
     $scope.create = ()=>{
         var money = $scope.money;
         var date  = $scope.date;
@@ -34,7 +55,9 @@ function indexCtrl($scope, $http, user)
         .post('/finance', {'money':money, 'date':date, 'desc':desc, 'type':type})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            console.log(res);
+            get();
         })
     }
+
+
 }

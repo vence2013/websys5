@@ -66,6 +66,29 @@
                         <button type="button" class="btn btn-outline-success px-3" ng-click="create();">创建</button>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md mt-2" style="height: 540px;">
+                        <div ng-repeat="x in financelist" style="line-height: 25px; margin-top: 5px; border-bottom: 1px dashed #cccccc; cursor: pointer;">
+                            <span>{{x.date|limitTo:10}}</span>
+                            <span>{{x.money}}/{{x.type}}</span>
+                            <span>{{x.total}}</span>
+                            <span style="font-style: italic; font-size: 12px; color: #888888;">{{x.desc|limitTo:50}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" ng-model="opts.str" placeholder="描述搜索">
+                    </div>
+                    <nav class="col-md">
+                        <ul class="pagination justify-content-end">
+                            <li ng-repeat="x in pages" 
+                                ng-class="{'disabled': x.disable, 'active':x.active}" 
+                                ng-click="opts.page=x.page"
+                                class="page-item"><a class="page-link" href="#">{{x.name}}</a></li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1">
             </div>

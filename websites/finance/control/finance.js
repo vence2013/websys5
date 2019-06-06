@@ -8,6 +8,10 @@
  *  2019/6/6    - 创建文件。
  *****************************************************************************/  
 
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
+
 exports.create = async (ctx, money, date, desc, type)=>{
     const Finance = ctx.models['Finance'];
     const FinancePay = ctx.models['FinancePay'];
@@ -30,4 +34,21 @@ exports.create = async (ctx, money, date, desc, type)=>{
         });
     }
     return created ? 0 : -1;
+}
+
+exports.search = async (ctx, str, page, pageSize)=>{
+    const Finance = ctx.models['Finance'];
+
+    var total = await Finance.count({logging:false, where:{'desc':{[Op.like]: '%'+str+'%'}}});
+    var maxpage  = Math.ceil(total/pageSize);
+    maxpage = (maxpage<1) ? 1 : maxpage;
+    page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
+
+    var offset = (page - 1) * pageSize;
+    var ret = await Finance.findAll({logging:false, raw:true, where:{'desc':{[Op.like]: '%'+str+'%'}}, offset:offset, limit:pageSize});
+    console.log(ret);
+    for (var i=0; i<ret.length; i++) {
+        ret[i]['desc'] = ret[i]['desc'].toString();
+    }
+    return {'total':total, 'page':page, 'financelist':ret};
 }
