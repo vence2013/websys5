@@ -53,19 +53,32 @@ router.delete('/:moduleid', async(ctx, next)=>{
 });
 
 
-router.get('/:chipid', async(ctx, next)=>{
+router.get('/chip/:chipid', async(ctx, next)=>{
     const ModuleCtrl = ctx.controls['chip/module'];
     
     var req2 = ctx.params;
     var chipid = /^\d+$/.test(req2.chipid) ? parseInt(req2.chipid) : 0;
 
     if (chipid) {
-        var ret = await ModuleCtrl.get(ctx, chipid);
+        var ret = await ModuleCtrl.list(ctx, chipid);
         ctx.body = {'errorCode': 0, 'message': ret};
     } else {
         ctx.body = {'errorCode': -1, 'message': '无效的芯片参数！'};
     }
 });
 
+router.get('/:moduleid', async(ctx, next)=>{
+    const ModuleCtrl = ctx.controls['chip/module'];
+    
+    var req2 = ctx.params;
+    var moduleid = /^\d+$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
+
+    if (moduleid) {
+        var ret = await ModuleCtrl.get(ctx, moduleid);
+        ctx.body = {'errorCode': 0, 'message': ret};
+    } else {
+        ctx.body = {'errorCode': -1, 'message': '无效的芯片参数！'};
+    }
+});
 
 module.exports = router;

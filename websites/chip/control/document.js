@@ -86,7 +86,7 @@ exports.detail = async (ctx, docid)=>{
                 registerlist.push(obj); 
             });
             moduleObjs.map((x)=>{
-                var obj = {'id':x.id, 'name':x.name, 'registerlist':[]};
+                var obj = {'id':x.id, 'name':x.name, 'fullname':x.fullname, 'registerlist':[]};
                 for (var i=0; i<registerlist.length; i++) {
                     if (registerlist[i]['ChipModuleId']!=obj.id) continue;
                     obj['registerlist'].push(registerlist[i]);

@@ -72,7 +72,7 @@
                     <div class="regname">Register</div>
                     <div ng-repeat="x in bitindex" class="bit bh">{{x}}</div>
                 </div>
-                <div class="reg" ng-repeat="x in registerlist">
+                <div class="reg" ng-repeat="x in registerlist" ng-show="module">
                     <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
                         {{x.name|limitTo:10}}
                     </div>

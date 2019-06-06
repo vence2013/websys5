@@ -226,7 +226,7 @@ function editCtrl($scope, $http)
         if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
 
         $http
-        .get('/chip/module/'+$scope.chip.id)
+        .get('/chip/module/chip/'+$scope.chip.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;

@@ -5,6 +5,7 @@ appConfiguration(app)
 
 function displayCtrl($scope, $http) {
     $scope.detail = null;
+    $scope.modulelistsel = [];
 
     var docid   = $('#wrapper').attr('docid');
 
@@ -29,6 +30,37 @@ function displayCtrl($scope, $http) {
             
             $scope.detail = res.data.message;
             editor.setMarkdown($scope.detail.content); 
+            $scope.modulelistsel = $scope.detail['modulelistsel'];
         })
+    }
+
+    $scope.registerUnfocus = ()=>{
+        $('#info').css('display', 'none');
+    }
+
+    $scope.registerFocus = (registerid)=>{        
+        $http
+        .get('/chip/register/'+registerid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $('#info').html(ret.fullname+'<br/>'+ret.desc).css('display', 'block');
+        });
+    }
+
+    $scope.bitsUnfocus = ()=>{
+        $('#info').css('display', 'none');
+    }
+
+    $scope.bitsFocus = (bitsid)=>{
+        $http
+        .get('/chip/bits/'+bitsid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            $('#info').html(ret.fullname+'<br/>'+ret.desc).css('display', 'block');
+        });        
     }
 }

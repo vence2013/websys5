@@ -293,11 +293,11 @@ function documentCtrl($scope, $http, $interval, user)
     $scope.moduleSelect = moduleSelect;
     function moduleSelect(module) 
     {
+        $(".modulesel").removeClass('modulesel');
         if ($scope.module==module) {
             moduleUnselect();
         } else {
             $scope.module = module;
-            $(".modulesel").removeClass('modulesel');
             window.setTimeout(()=>{            
                 var idx = $scope.modulelist.indexOf(module);
                 $(".moduleContainer>a:eq("+idx+")").addClass('modulesel');
@@ -311,10 +311,11 @@ function documentCtrl($scope, $http, $interval, user)
         if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
 
         $http
-        .get('/chip/module/'+$scope.chip.id)
+        .get('/chip/module/chip/'+$scope.chip.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;
+            $scope.module = null;
             $scope.modulelist = ret;
         })
     }
