@@ -59,6 +59,17 @@ exports.detail = async (ctx, financeid)=>{
     return ret;
 }
 
+exports.draw = async (ctx)=>{
+    const Finance = ctx.models['Finance'];
+
+    var ret = await Finance.findAll({logging:false, raw:true, 
+        order: [['date', 'DESC'], ['id', 'DESC']], limit:100
+    });
+    console.log(ret);
+    for (var i=0; i<ret.length; i++) { ret[i]['desc'] = ret[i]['desc'].toString(); }
+    return ret;
+}
+
 exports.pay = async (ctx)=>{
     const FinancePay = ctx.models['FinancePay'];
 

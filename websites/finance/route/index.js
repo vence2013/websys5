@@ -45,7 +45,7 @@ router.get('/', async (ctx)=>{
     await ctx.render('finance/view/index.html'); 
 });
 
-router.get('/search', async(ctx)=>{
+router.get('/search', async (ctx)=>{
     const FinanceCtrl = ctx.controls['finance/finance'];
 
     var req = ctx.query;
@@ -56,6 +56,13 @@ router.get('/search', async(ctx)=>{
 
     var ret = await FinanceCtrl.search(ctx, str, page, pageSize);
     
+    ctx.body = {'errorCode': 0, 'message':ret}
+})
+
+router.get('/draw', async (ctx)=>{
+    const FinanceCtrl = ctx.controls['finance/finance'];
+
+    var ret = await FinanceCtrl.draw(ctx);    
     ctx.body = {'errorCode': 0, 'message':ret}
 })
 

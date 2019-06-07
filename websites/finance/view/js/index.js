@@ -108,5 +108,36 @@ function indexCtrl($scope, $http, user)
     {
         var width = $('#myChart').parent().width();
         $('#myChart').css({'width':Math.ceil(width), 'height':400});
+        
+        $http
+        .get('/finance/draw')
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            var ret = res.data.message;
+            var datelist=[], totalist=[];
+            for (var i=ret.length-1; i>=0; i--) {
+                datelist.push(moment(ret[i].date).format('YYYY-MM-DD'));
+                totalist.push(ret[i].total);
+            }
+
+            var ctx = $('#myChart');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datelist,
+                    datasets: [{
+                        label: "finance",
+                        fillColor: "rgba(220,220,220,0.2)",
+                        strokeColor: "rgba(220,220,220,1)",
+                        pointColor: "rgba(220,220,220,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(220,220,220,1)",
+                        data: totalist
+                    }]
+                }
+            });
+        })
     }
 }
