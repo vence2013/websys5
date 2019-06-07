@@ -20,7 +20,10 @@ function indexCtrl($scope, $http, user)
     $scope.date  = '';
     $scope.desc  = '';
     $scope.type  = 'pay';
+    $scope.descShow = '';
 
+    draw();
+    financePay();
     $scope.$watch('opts', get, true);
     
     $scope.get = get;
@@ -55,9 +58,55 @@ function indexCtrl($scope, $http, user)
         .post('/finance', {'money':money, 'date':date, 'desc':desc, 'type':type})
         .then((res)=>{
             if (errorCheck(res)) return ;
+            $scope.money = '';
+            $scope.date  = '';
+            $scope.desc  = '';
+            $scope.type  = 'pay';
             get();
+            financePay();
         })
     }
 
+    function financePay()
+    {
+        $http
+        .get('/finance/pay')
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            $scope.paylist = res.data.message;
+        })
+    }
 
+    $scope.detailPay = (payid)=>{
+        $http
+        .get('/finance/pay/'+payid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            var ret = res.data.message;
+            $scope.descShow = ret.desc;
+        })
+    }
+
+    $scope.detail = (payid)=>{
+        $http
+        .get('/finance/'+payid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            var ret = res.data.message;
+            $scope.descShow = ret.desc;
+        })
+    }
+
+    $scope.clear = ()=>{
+        $scope.descShow = '';
+    }
+
+    function draw() 
+    {
+        var width = $('#myChart').parent().width();
+        $('#myChart').css({'width':Math.ceil(width), 'height':400});
+    }
 }

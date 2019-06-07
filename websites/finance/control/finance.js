@@ -46,9 +46,31 @@ exports.search = async (ctx, str, page, pageSize)=>{
 
     var offset = (page - 1) * pageSize;
     var ret = await Finance.findAll({logging:false, raw:true, where:{'desc':{[Op.like]: '%'+str+'%'}}, offset:offset, limit:pageSize});
-    console.log(ret);
-    for (var i=0; i<ret.length; i++) {
-        ret[i]['desc'] = ret[i]['desc'].toString();
-    }
+    
+    for (var i=0; i<ret.length; i++) { ret[i]['desc'] = ret[i]['desc'].toString(); }
     return {'total':total, 'page':page, 'financelist':ret};
+}
+
+exports.detail = async (ctx, financeid)=>{
+    const Finance = ctx.models['Finance'];
+
+    var ret = await Finance.findOne({logging:false, raw:true, where:{'id':financeid}});
+    ret['desc'] = ret['desc'].toString();
+    return ret;
+}
+
+exports.pay = async (ctx)=>{
+    const FinancePay = ctx.models['FinancePay'];
+
+    var ret = await FinancePay.findAll({logging:false, raw:true});
+    for (var i=0; i<ret.length; i++) { ret[i]['desc'] = ret[i]['desc'].toString(); }
+    return ret;
+}
+
+exports.detailPay = async (ctx, payid)=>{
+    const FinancePay = ctx.models['FinancePay'];
+
+    var ret = await FinancePay.findOne({logging:false, raw:true, where:{'id':payid}});
+    ret['desc'] = ret['desc'].toString();
+    return ret;
 }

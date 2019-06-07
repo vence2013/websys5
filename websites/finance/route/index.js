@@ -59,4 +59,31 @@ router.get('/search', async(ctx)=>{
     ctx.body = {'errorCode': 0, 'message':ret}
 })
 
+router.get('/pay', async(ctx)=>{
+    const FinanceCtrl = ctx.controls['finance/finance'];
+
+    var ret = await FinanceCtrl.pay(ctx);    
+    ctx.body = {'errorCode': 0, 'message':ret}
+})
+
+router.get('/pay/:payid', async(ctx)=>{
+    const FinanceCtrl = ctx.controls['finance/finance'];
+
+    var req2 = ctx.params;
+    var payid = /^\d+$/.test(req2.payid) ? parseInt(req2.payid) : 0;
+
+    var ret = await FinanceCtrl.detailPay(ctx, payid);    
+    ctx.body = {'errorCode': 0, 'message':ret}
+})
+
+router.get('/:financeid', async(ctx)=>{
+    const FinanceCtrl = ctx.controls['finance/finance'];
+
+    var req2 = ctx.params;
+    var financeid = /^\d+$/.test(req2.financeid) ? parseInt(req2.financeid) : 0;
+
+    var ret = await FinanceCtrl.detail(ctx, financeid);    
+    ctx.body = {'errorCode': 0, 'message':ret}
+})
+
 module.exports = router;
