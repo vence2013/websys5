@@ -75,5 +75,5 @@ app
 .use(require('./core/loader')(app, webdir, config));
 
 // 监听服务器
-https.createServer(options, app.callback()).listen(443);
+https.createServer(options, app.callback()).listen(7000);
 console.log('^_^  websys serve in https now!');
