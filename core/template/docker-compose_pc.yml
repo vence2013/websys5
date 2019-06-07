@@ -28,4 +28,4 @@ services:
     links:
       - mysql
     ports:
-      - "443:443" 
+      - "7000:7000" 
