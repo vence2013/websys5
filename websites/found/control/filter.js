@@ -144,7 +144,7 @@ exports.apply = async (ctx, query)=>{
         } else {
             havingSub = Sequelize.literal(`count(code)<=${query.valueMinLT}`);
         }
-        var valueObj2 = await FoundValue.findAll({raw: true, //logging: false, 
+        var valueObj2 = await FoundValue.findAll({raw: true, logging: false, 
             attributes: ['code'],
             group: 'code',
             having: havingSub,
