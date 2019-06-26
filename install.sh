@@ -72,7 +72,7 @@ if [ ${VerDocker:0:6} != "Docker" ]; then
     exit_with_message "Error> Docker not installed."
 fi
 VerDockerSub=$(echo $VerDocker | sed 's/[^0-9]*\([0-9\.]*\).*/\1/' | cut -d \. -f 1)
-if [ ${VerDockerSub} -lt 18 ]; then
+if [ ${VerDockerSub} -lt 17 ]; then
     exit_with_message "Error> docker(>=18.x) version too old!";
 fi
 # DockerCompose
