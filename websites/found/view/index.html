@@ -136,7 +136,8 @@
                         <button type="button" class="btn btn-outline-danger" ng-show="filterid" data-toggle="modal" data-target="#filterDelteConfirmWnd">删除</button>  
                     </div>
                     <div class="col-md-3 text-right">
-                        <button type="button" class="btn btn-outline-success" ng-click="apply();">应用筛选</button>
+                        <button type="button" class="btn btn-outline-success" ng-click="apply();"
+                            id="applyFilter" data-toggle="popover" title="过滤器应用请求" data-content="服务器正在处理，请等待一段时间！">应用筛选</button>
                     </div>
                 </div>
 
@@ -151,13 +152,17 @@
             <div class="col-md border border-secondary rounded my-2 mr-1" style=" line-height: 20px;">
                 <div class="row">
                     <div class="col-md mt-1 mx-1" style="height: 240px; overflow: auto">
-                        <a href="#" style="margin: 2px 3px 0px;" ng-repeat="x in companylist" ng-mouseenter="select('company', x.code);" title="{{x.name}}">{{x.name|limitTo:6}}</a>
+                        <a ng-repeat="x in companylist" ng-mouseenter="select('company', x.code);" 
+                            href="http://fund.eastmoney.com/Company/{{x.code}}.html" target="_blank" title="{{x.name}}" 
+                            style="margin: 2px 3px 0px;">{{x.name|limitTo:6}}</a>
                     </div>
                 </div>
                 <hr />
                 <div class="row">
                     <div class="col-md mx-1" style="height: 360px; overflow: auto">
-                        <a href="#" style="margin: 2px 3px 0px;" ng-repeat="x in foundlist" ng-mouseenter="select('found', x.code);" title="{{x.fullname}}">{{x.fullname|limitTo:6}}</a>
+                        <a ng-repeat="x in foundlist" ng-mouseenter="select('found', x.code);" 
+                            href="http://fund.eastmoney.com/{{x.code}}.html" target="_blank" title="{{x.fullname}}" 
+                            style="margin: 2px 3px 0px;">{{x.fullname|limitTo:6}}</a>
                     </div>
                 </div>
                 <hr / >

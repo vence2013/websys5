@@ -144,12 +144,12 @@ exports.apply = async (ctx, query)=>{
         } else {
             havingSub = Sequelize.literal(`count(code)<=${query.valueMinLT}`);
         }
-        var valueObj2 = await FoundValue.findAll({raw: true, logging: false, 
+        var valueObj2 = await FoundValue.findAll({raw: true, //logging: false, 
             attributes: ['code'],
             group: 'code',
             having: havingSub,
             where: {
-                "value3": {[Op.gte]: query.valueMin},
+                "value3": {[Op.lte]: query.valueMin},
                 'code': foundCodes,
             },        
         });
@@ -172,7 +172,7 @@ exports.apply = async (ctx, query)=>{
             group: 'code',
             having: havingSub,
             where: {
-                "value3": {[Op.lte]: query.valueMax},
+                "value3": {[Op.gte]: query.valueMax},
                 'code': foundCodes,
             },
         });

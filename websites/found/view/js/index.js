@@ -4,7 +4,14 @@ appConfiguration(app)
 .controller('indexCtrl', indexCtrl);
 
 
-function indexCtrl($scope, $http) {    
+function indexCtrl($scope, $http) 
+{
+    // 基础配置
+    toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
+        onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
+        showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
+    };
+    // 基金数据    
     $scope.opts = {'companyCreate':'', 'companyMoney':'', 'companyManager':'', 
         'foundCreate':'', 'foundMoney':'', 'foundShare':'', 
         'statisticWeek':'', 'statisticMonth':'', 'statisticQuarter':'', 'statisitcHalfyear':'', 'statistic1year':'', 
@@ -16,21 +23,25 @@ function indexCtrl($scope, $http) {
     $scope.filterid    = 0;
     $scope.company = null;
     $scope.found   = null;
-    
+
     get();
-    apply();
+    window.setTimeout(apply, 100);
 
     // 净值数据筛选耗时太长，随时提交只会增加服务器负担，改为手动应用筛选。
     $scope.apply = apply;
     function apply() {
         $scope.companylist = [];
         $scope.foundlist   = [];
-      
+        $scope.company = null;
+        $scope.found   = null;
+        
+        $('#applyFilter').popover('show');
         $http
         .get('/found/filter/apply', {params:$scope.opts})
         .then((res)=>{
             if (errorCheck(res)) return ;
 
+            $('#applyFilter').popover('hide');
             var ret = res.data.message;
             $scope.companylist = ret.companylist;
             $scope.foundlist   = ret.foundlist;
