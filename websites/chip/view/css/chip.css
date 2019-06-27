@@ -1,6 +1,6 @@
 /* chip map */
 .item { border-bottom: 1px dashed #cccccc; }
-.item>a { margin: 0px 5px; padding: 0px 5px; line-height: 30px; }
+.item>a { margin: 0px 3px; padding: 0px 2px; line-height: 30px; }
 
 .chipsel  { background-color: #cccccc; }
 .modulesel { background-color: #cccccc; }

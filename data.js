@@ -58,6 +58,7 @@ exports.interfaces = {
         {'method': 'GET', 'url': '/chip/all/:chipid',   'group':'/chip'},
         {'method': 'GET', 'url': '/chip/module/chip/:chipid',   'group':'/chip'},
         {'method': 'GET', 'url': '/chip/module/:moduleid',      'group':'/chip'},
+        {'method': 'GET', 'url': '/chip/register/map/:moduleid',     'group':'/chip'},
         {'method': 'GET', 'url': '/chip/register/module/:moduleid',  'group':'/chip'},
         {'method': 'GET', 'url': '/chip/register/:registerid',       'group':'/chip'},
         {'method': 'GET', 'url': '/chip/bits/register/:registerid',  'group':'/chip'},
