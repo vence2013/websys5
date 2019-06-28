@@ -33,14 +33,13 @@
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row mt-1" style="height: 100px;">
                     <div class="col-md item chipContainer">
-                        <a href="#" style="color: #FF8000;" ng-repeat="x in chiplist" 
+                        <a href="#" style="color: #FF8000; float: left;" ng-repeat="x in chiplist" 
                             ng-click="chipSelect(x);" title="{{x.fullname}}">{{x.name}}</a>
                     </div>                    
                 </div>
-                <hr/>
                 <div class="row" style="height: 100px;">
                     <div class="col-md item moduleContainer">
-                        <a href="#" style="color: #0489B1;" ng-repeat="x in modulelist" 
+                        <a href="#" style="color: #0489B1; float: left;" ng-repeat="x in modulelist" 
                             ng-click="moduleSelect(x);" title="{{x.fullname}}">{{x.name}}</a>
                     </div>
                 </div>

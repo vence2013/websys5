@@ -115,8 +115,9 @@ function documentCtrl($scope, $http, $interval, user)
         .then((res)=>{
             if (errorCheck(res)) return ;
 
-            var ret = res.data.message;
-            $('#bitsInfo').html(ret.fullname+'<br/>'+ret.desc).css('display', 'block');
+            var ret = res.data.message;            
+            var desc = ret.desc.replace(new RegExp('\n',"gm"),'<br/>');
+            $('#bitsInfo').html(ret.fullname+'<br/>'+desc).css('display', 'block');
         });
     }
 
