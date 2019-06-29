@@ -61,25 +61,30 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" ng-show="module" ng-model="str" placeholder="搜索寄存器和位组">
+                    </div>
                     <div class="col-md text-right">
                         <button type="button" class="btn btn-outline-success px-3" ng-click="edit();">编辑</button>
                         <button type="button" class="btn btn-outline-danger px-3" ng-show="docid" data-toggle="modal" data-target="#docDeleteConfirmWnd">删除</button>
                     </div>
                 </div>
             </div>
-            <div class="col-md-7 border border-secondary rounded my-2 mr-1">
-                <div class="reg header" ng-show="module">
-                    <div class="regname">Register</div>
+            <div class="col-md-7 border border-secondary rounded my-2 mr-1" style="overflow-x: auto;">
+                <div class="reg header" ng-show="module" style="width: 50px; position: fixed; opacity: 0.7">
+                    <div class="regname">Reg</div>
                     <div ng-repeat="x in bitindex" class="bit bh">{{x}}</div>
                 </div>
-                <div class="reg" ng-repeat="x in registerlist" ng-show="module">
-                    <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
-                        {{x.name|limitTo:10}}
-                    </div>
-                    <div ng-repeat="y in x.bitlist2 track by $index" bitsid="{{y.id}}" 
-                        class="bit bh{{y.cnt}} bg{{y.id}}" ng-class="{'bitValid':y.id}" 
-                        ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(y.id);">
-                        {{y.name}}
+                <div id="map" style="margin-left: 51px;">
+                    <div class="reg" ng-repeat="x in registerlist" ng-show="module">
+                        <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
+                            {{x.name|limitTo:10}}
+                        </div>
+                        <div ng-repeat="y in x.bitlist2 track by $index" bitsid="{{y.id}}" 
+                            class="bit bh{{y.cnt}} bg{{y.id}}" ng-class="{'bitValid':y.id}" 
+                            ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(y.id);">
+                            {{y.name}}
+                        </div>
                     </div>
                 </div>
             </div>

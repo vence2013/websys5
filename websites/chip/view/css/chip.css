@@ -50,3 +50,4 @@
 
 #bitsInfo { display: none; position: absolute; top: 50px; left: 10px; width: 40%; min-height: 70px; 
     opacity: 0.8; z-index: 999; border-radius: 5px; background-color: #F5ECCE; }
+#bitsInfo>span { color: #008080; font-style: italic; margin-left: 5px; }
