@@ -49,7 +49,9 @@ app.keys = ['cookie sign random: 802566 338402 994741 227937 868228'];
 
 app
 .use(Body({
-    multipart: true, formidable: { maxFileSize: 5*1024*1024*1024 } /* 最大5GB(不考虑视频) */
+    /* 上传文件必须小于100MB，过大的文件纳入NAS管理。
+     */
+    multipart: true, formidable: { maxFileSize: 100*1024*1024 }
 }))
 .use(Views(__dirname+'/websites', {
     map: {html: 'underscore'}

@@ -17,7 +17,7 @@ services:
   
   web:
     image: "node:9.11"
-    restart: "always"  
+    restart: "on-failure"  
     container_name: "${CONTAINER_WEB_NAME}"
     command: "npm start"    
     working_dir: /web
