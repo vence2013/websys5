@@ -221,7 +221,7 @@ module.exports = (app, webdir, config)=>{
     // 创建数据库连接，并关联到 ctx.sequelize 。
     var sequelize = new Sequelize(config.SYSNAME, config.SYSNAME, config.MYSQL_ROOT_PASSWORD, 
         {
-            host: config.CONTAINER_MYSQL_NAME, dialect: 'mysql', pool: 
+            host: config.MYSQL_IP, dialect: 'mysql', pool: 
             { max: 5, min: 0, acquire: 30000, idle: 10000 }
         }
     );

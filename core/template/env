@@ -9,6 +9,8 @@ SYSNAME=websys4
 CONTAINER_MYSQL_NAME=mysql
 # 网页服务器容器的配置
 CONTAINER_WEB_NAME=web4
+MYSQL_IP=x.x.x.x
+
 
 # 存放数据的宿主机目录，绝对路径，最后不带/， 比如/data
 ROOTFS_DATA=x

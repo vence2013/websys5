@@ -16,7 +16,7 @@ services:
       - MYSQL_DATABASE=${SYSNAME}
 
   web:
-    image: "node:9.11"
+    image: "node"
     restart: "always"
     container_name: "${CONTAINER_WEB_NAME}"
     command: "npm start"
