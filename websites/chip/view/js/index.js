@@ -71,7 +71,7 @@ function indexCtrl($scope, $http, user)
             $(".modulesel").removeClass('modulesel');
             window.setTimeout(()=>{            
                 var idx = $scope.modulelist.indexOf(module);
-                $(".moduleContainer>div:eq("+idx+")").addClass('modulesel');
+                $(".moduleContainer>a:eq("+idx+")").addClass('modulesel');
             }, 0);
         }
     }
@@ -111,7 +111,7 @@ function indexCtrl($scope, $http, user)
             moduleGet();
             window.setTimeout(()=>{
                 var idx = $scope.chiplist.indexOf(chip);
-                $(".chipContainer>div:eq("+idx+")").addClass('chipsel');
+                $(".chipContainer>a:eq("+idx+")").addClass('chipsel');
             }, 0);
         }
     }
