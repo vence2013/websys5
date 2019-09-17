@@ -15,47 +15,17 @@ const moment = require('moment');
 const mkdirp = require('mkdirp');
 
 
-/* 
- * Function     : genPath
- * Description  : 生成文件上传后的存储路径。
- * 路径格式: dataroot/upload/{big, median, small}/yearmonth/hash.ext
- * 
- * 路径说明：
- * 1. 目录使用年月命名， 比如201809
- * 2. 文件名称使用上传时文件的名称和时间戳进行sha256加密的字符串。
- * Parameter    : 
- *      filename    - 文件名称， 用户计算存储文件名
- * Return       : 文件在服务器上的存储路径
- */
-
-function genPath(name, ext, size) {
-    const hash = crypto.createHash('sha256');
-    var filepath = '/upload/';
-
-    if (size<(100*1024*1024)) { filepath += 'small/'; }         // <100MB
-    else if (size<(1024*1024*1024)) { filepath += 'median/';  } // <1GB
-    else { filepath += 'big/'; }
-    var datestr =  moment().format("YYYYMMDD");
-    filepath += datestr+'/';
-    // 如果目录不存在，则创建该目录。
-    if (!fs.existsSync(filepath)) { mkdirp.sync(filepath); }
-
-    // 添加时间戳，修正已上传文件被覆盖的问题
-    hash.update(name+datestr);
-    var filename = (new Date().getTime())+hash.digest('hex')+'.'+ext;
-    filepath += filename;
-
-    return filepath;
-}
-
 exports.create = async (ctx, userid, file)=>{
     const File = ctx.models['File'];
 
-    var name = file.name.replace(/(^\s*)|(\s*$)/g, "");
     var size = file.size;
+    var name = file.name.replace(/(^\s*)|(\s*$)/g, "");
     var ext  = (name.indexOf('.')!=-1) ? name.split('.').pop().toLowerCase() : '';
-    // 生成服务器的存储路径
-    var location = genPath(name, ext, size);
+    // 生成（创建）上传后的存储路径
+    var datestr =  moment().format("YYYYMMDD");
+    var directory = '/upload/'+datestr+'/';    
+    if (!fs.existsSync(directory)) { mkdirp.sync(directory); } // 如果目录不存在，则创建该目录。
+    var location = directory+name;
 
     // 添加数据库信息， 默认权限为任何人可读    
     var [fileIns, created] = await File.findOrCreate({logging: false,
