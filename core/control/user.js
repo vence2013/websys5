@@ -16,27 +16,34 @@ const crypto = require('crypto');
  * 全局变量
  *****************************************************************************/
 
-var newPassword = '123456'; // 新创建用户的密码
 
-
-/* 创建用户 */
-exports.create = async (ctx, username)=>{    
+exports.create = async (ctx, username, password)=>{    
     const User = ctx.models['User'];
-    const Group= ctx.models['Group'];
     const hash = crypto.createHash('sha256');
-
-    hash.update(newPassword);
+    
+    hash.update(password);
     var cryptoPassword = hash.digest('hex');
     var [ userIns, created ] = await User.findOrCreate({logging: false,
-        where: {'username': username}, defaults: {'password': cryptoPassword, 'interfaces': ''}
+        where: {'username': username}, defaults: {'password': cryptoPassword}
     });
-    // 同时添加同名组
-    if (created) { await Group.findOrCreate({logging: false, where: {'name': username} }); }
 
     return created;
 }
 
-/* 修改密码 */
+exports.edit = async (ctx, username, password)=>{    
+    const User = ctx.models['User'];
+    const hash = crypto.createHash('sha256');
+    
+    hash.update(password);
+    var cryptoPassword = hash.digest('hex');
+    var userIns = await User.findOne({logging:false, 
+        where:{'username':username}
+    });
+    await userIns.update({'password': cryptoPassword}, {logging:false});
+    return true;
+}
+
+
 exports.changePassword = async (ctx, userid, oldPassword, password)=>{
     const User = ctx.models['User'];
     const hash1 = crypto.createHash('sha256');
@@ -59,12 +66,7 @@ exports.changePassword = async (ctx, userid, oldPassword, password)=>{
 /* 删除指定的用户 */
 exports.delete = async (ctx, id)=>{
     const User = ctx.models['User'];
-    const Group= ctx.models['Group'];
-
-    // 查找该用户的名称， 然后删除同名的组
-    var ret = await User.findOne({logging: false, raw: true, where: {'id': id}});
-    if (ret) { await Group.destroy({ logging: false, where: {'name': ret.username} }); }
-    // 最后删除用户
+    
     await User.destroy({logging: false, where: {'id': id} });
 }
 
@@ -78,16 +80,18 @@ exports.delete = async (ctx, id)=>{
  * Return       : 用户实例或实例数组。
  */
 
-exports.get = async (ctx, username)=>{
+exports.get = async (ctx)=>{
     const User = ctx.models['User'];
 
-    if (username) {
-        return await User.findOne({logging: false, 
-            where: {username: username}
-        });
-    } else {
-        return await User.findAll({logging: false, order: [['username', 'ASC']] });
-    }
+    return await User.findAll({logging: false, order: [['username', 'ASC']] });
+}
+
+exports.getByUsername = async (ctx, username)=>{
+    const User = ctx.models['User'];
+
+    return await User.findOne({logging: false, 
+        where: {username: username}
+    });
 }
 
 
@@ -108,10 +112,11 @@ exports.get = async (ctx, username)=>{
 exports.login = async (ctx, username, password)=>{    
     const User = ctx.models['User'];
     const hash = crypto.createHash('sha256');
-
+    
     // 获取密码的sha256结果    
     hash.update(password);
     var cryptoPassword = hash.digest('hex');
+
     // 获取当前用户的数据库记录
     var res =  await User.findOne({logging: false, raw: true, 
         where: {'username': username}

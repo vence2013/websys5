@@ -53,7 +53,7 @@ app
      */
     multipart: true, formidable: { maxFileSize: 1024*1024*1024 }
 }))
-.use(Views(__dirname+'/websites', {
+.use(Views(__dirname, {
     map: {html: 'underscore'}
 }))
 .use(Session({ 
@@ -61,8 +61,15 @@ app
     httpOnly: true/* 只有服务器端可以获取cookie */, signed: true/* 签名 */, rolling: true, renew: false
 }, app))
 .use(Logger((str, args)=>{
-    var fmt = args.shift();
-    console.log(fmt, args);
+    var fmt = args.shift();    
+    switch (args.length)
+    {
+        case 2:
+            console.log("%s %s", args[0], args[1]);   
+            break;
+        case 5:
+            console.log("%s %s\t(%s %s %s)", args[0], args[1], args[2], args[3], args[4]);    
+    }
 }))
 .use(Errors({
     engine: 'underscore',

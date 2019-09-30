@@ -6,6 +6,7 @@
  * 创建者   ： wuxb
  * 修改历史 ： 
  *  2019/04/01    - 创建文件。
+ *  2019/09/30    - 简化用户设计
  */
 
 module.exports = (sequelize, DataTypes) => {
@@ -17,12 +18,6 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        /* 记录该用户可以访问的用户接口列表，格式为字符串，以逗号分隔，接口项格式如： GET/logout, POST/document
-         */
-        interfaces: {
-            type: DataTypes.BLOB,
-            allowNull: true
         }
     })
 }

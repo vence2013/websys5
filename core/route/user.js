@@ -10,6 +10,8 @@
  *  2019/04/03    - 创建文件。
  *****************************************************************************/ 
 
+const fs     = require("fs") ;
+const moment = require('moment');
 const Router = require('koa-router'); 
 
 
@@ -19,22 +21,83 @@ const Router = require('koa-router');
 var router = new Router();
 
 
-/* 新增用户 */
-router.post('/', async (ctx)=>{
+router.post('/login', async (ctx)=>{
     const UserCtrl = ctx.controls['user'];
+    var jsonResult = {'errorCode': 0, 'message': ''}
 
     // 将参数传递给对象
     var req = ctx.request.body;
     // 转化参数类型/格式， 过滤恶意输入
     var username = req.username;
+    var password = req.password;
+    
+    // 调用登录接口
+    var ret = await UserCtrl.login(ctx, username, password);
+    // 登录成功，设置SESSION数据。
+    if (ret) {
+        ctx.session.user = {'id':ret.id, 'username': ret.username}; 
+        jsonResult.message = ctx.session.user;
+    } else {
+        jsonResult.errorCode = -1;
+        jsonResult.message   = '用户名或密码错误！';
+    }
 
-    // 调用用户创建接口
-    var ret = await UserCtrl.create(ctx, username);
-    ctx.body = ret ? {'errorCode': 0, 'message': 'SUCCESS'} : 
-                     {'errorCode': -1, 'message': "用户已存在"};
+    ctx.body = jsonResult;
 })
 
-/* 修改用户密码
+
+/* 新增用户 */
+router.post('/', async (ctx)=>{
+    const UserCtrl = ctx.controls['user'];
+    var user = ctx.session.user;
+
+    // 将参数传递给对象
+    var req = ctx.request.body;
+    // 转化参数类型/格式， 过滤恶意输入
+    var username = req.username;
+    var password = req.password;
+
+    /* 以下2种情况允许访问该接口：
+     * 1. 系统未初始化（未登录，无install.log绕过了登录检查）
+     * 2. 当前用户为root
+     */
+    if (!user) {
+        await ctx.sequelize.query("DELETE FROM Users;", {logging: false});
+
+        var ret = await UserCtrl.create(ctx, username, password);
+        if (ret) {
+            var now      = moment().format("YYYY-MM-DD HH:mm:ss");
+
+            fs.writeFileSync(__dirname+'/../../install.log', 'install at:'+now);
+            ctx.body = {'errorCode':  0, 'message': 'SUCCESS'};
+        } else {
+            ctx.body = {'errorCode': -1, 'message': "用户已存在"};
+        }
+    } else if (user.username == 'root') {
+        var ret = false;
+
+        /* 管理员操作：
+         * 1. 用户已存在，则修改密码。 
+         * 2. 否则添加用户 
+         */
+        var user2 = await UserCtrl.getByUsername(ctx, username);
+        if (user2) {
+            ret = await UserCtrl.edit(ctx, username, password);
+        } else {
+            ret = await UserCtrl.create(ctx, username, password);
+        }
+
+        if (ret) {
+            ctx.body = {'errorCode':  0, 'message': 'SUCCESS'};
+        } else {
+            ctx.body = {'errorCode': -1, 'message': "用户已存在"};
+        }
+    } else {
+        ctx.body = {'errorCode': -1, 'message': "无权访问该接口"}
+    }
+})
+
+/* 修改登录用户自己的密码
  * 参数： {username, password}
  */
 router.put('/', async (ctx)=>{
@@ -64,8 +127,7 @@ router.delete('/:id', async (ctx)=>{
     ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
 })
 
-/* 获取用户列表
- */
+// 返回用户列表，过滤密码字段
 router.get('/', async (ctx)=>{
     const UserCtrl = ctx.controls['user'];
     var userlist = [];
@@ -74,8 +136,7 @@ router.get('/', async (ctx)=>{
     if (userInss) {
         userInss.forEach(user => {
             var obj = user.get({plain: true});
-            var interfaces = obj.interfaces ? obj.interfaces.toString() : '';
-            userlist.push({'id':obj.id, 'username':obj.username, 'createdAt': obj.createdAt, 'interfaces':interfaces});
+            userlist.push({'id':obj.id, 'username':obj.username, 'createdAt': obj.createdAt});
         });
     }
     ctx.body = {'errorCode': 0, 'message': userlist}

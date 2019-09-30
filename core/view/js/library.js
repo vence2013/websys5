@@ -43,32 +43,12 @@ function navCtrl($scope, $http, user, locals) {
         subCloseTimer = window.setTimeout(()=>{ $('#navSub').css('display', 'none'); }, 1000);
     }
 
-    // 用户登录
-    $scope.login = ()=>{
-        var username = $scope.username;
-        var password = $scope.password;
-        if (!username) { return toastr.info("请输入有效的用户名和密码!", '', {"positionClass": "toast-bottom-right"}); }
-        
-        $http
-        .post('/login', {'username': username, 'password': password})
-        .then((res)=>{
-            if (res.data.errorCode) {
-                toastr.info(res.data.message, '', {"positionClass": "toast-bottom-right"});
-            } else {
-                $("#loginWnd").modal( "hide" );
-                // 将登录用户注册到localStorage中
-                locals.setObject('/user', res.data.message);
-                navRefresh();
-            }
-        })
-    }
-
     $scope.logout = ()=>{
         $http
         .get('/logout')
         .then((res)=>{            
             locals.setObject('/user', null);
-            location.reload(); // 注销后刷新页面， 避免保留在私有页面
+            window.location.href = '/';
         })
     }
 }

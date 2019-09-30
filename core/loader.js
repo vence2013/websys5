@@ -9,11 +9,8 @@
  *****************************************************************************/ 
 
 const fs        = require("fs") ;
-const url       = require('url');
 const path      = require('path');
-const crypto    = require('crypto');
 const glob      = require('glob'); 
-const moment    = require('moment');
 const compose   = require('koa-compose');
 const Sequelize = require('sequelize');
 const StaticServer = require('koa-static-server');
@@ -124,93 +121,24 @@ function route(dirlist)
     return compose(routers);
 }
 
-
-/* 检查接口访问权限的中间件。
- */
-
-function authCheck() {
-    return async function(ctx, next) { 
-        var user = ctx.session.user;
-        var success = false;
-        
-        // 1. 访问的接口为公开接口
-        var publiclist = sysdata.interfaces.public;
-        var reqstr = ctx.method+url.parse(ctx.url).pathname;
-        // 将公开接口转换为正则表达式， 比如'/docment/:id' > /^\/document\/[^\/]*$/
-        for (var i=0; !success && (i<publiclist.length); i++) {
-            var str1 = publiclist[i].method+publiclist[i].url;
-            
-            var str2 = str1
-                       .replace(/:[^/]+/g, '[^/]*')  // 1. 将':*'替换为'[^/]*'
-                       .replace(/\//g, '\\\/')         // 2. 将所有的'/'替换为'\/'
-            // 根据字符串构建正则表达式
-            if ((new RegExp('^'+str2+'$')).test(reqstr)) success = true;
-        }
-    
-        if (!success && user) {
-            // 2. 当前登录用户为超级管理员(root)
-            if (user.username=='root') success = true;
-            else {
-                // 3. 访问的接口为私有接口，用户具有访问该接口的权限
-                var privatelist = user.interfaces
-                                  .replace(/[\s]+/, ' ')  // 删除多余的空格
-                                  .replace(/^\s+|\s+$/g,'') // 删除首尾的空格
-                                  .split(' ');
-                // 参考公开列表处理
-                for (var i=0; !success && (i<privatelist.length); i++) {            
-                    var str2 = privatelist[i]
-                               .replace(/:[^/]+/g, '[^/]*')  // 1. 将':*'替换为'[^/]*'
-                               .replace(/\//g, '\\\/')         // 2. 将所有的'/'替换为'\/'
-                    // 根据字符串构建正则表达式
-                    if ((new RegExp('^'+str2+'$')).test(reqstr)) success = true;
-                }
-            }
-        }
-    
-        if (!success) { ctx.throw(401); }
-        await next(); 
-    }
-}
-
-/* 检查系统是否初始化
- */
-
-function installCheck() {
+function loginCheck() 
+{
     return async function(ctx, next) {
-        if (fs.existsSync("./install.log")) await next();
-        else {
-            var req = ctx.method+ctx.url;
-
-            if (req == 'POST/user') { // 添加超级管理员用户
-                const hash = crypto.createHash('sha256');
-
-                var req = ctx.request.body;
-                // 转化参数类型/格式， 过滤恶意输入
-                var username = req.username;
-                var password = req.password;
-                var now      = moment().format("YYYY-MM-DD HH:mm:ss");
-
-                // 添加用户
-                // 获取密码的sha256结果    
-                hash.update(password);
-                var cryptoPassword = hash.digest('hex');
-                await ctx.sequelize.query("INSERT INTO `Users` (`username`, `password`, `interfaces`, `createdAt`, `updatedAt`) VALUES('"+
-                    username+"','"+cryptoPassword+"','','"+now+"','"+now+"');", {logging: false});
-                // 添加分组
-                await ctx.sequelize.query("INSERT INTO `Groups` (`name`, `createdAt`, `updatedAt`) VALUES('"+username+"','"+now+"','"+now+"');", {logging: false});
-
-                // 创建 install.log 
-                fs.writeFileSync(__dirname+'/../install.log', 'install at:'+now);
-
-                ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
-            } else { // 清理数据库
-                await ctx.sequelize.query("DELETE FROM Users;", {logging: false});
-                await ctx.sequelize.query("DELETE FROM Groups;", {logging: false});
-                await ctx.sequelize.query("DELETE FROM Categories;", {logging: false});
-                ctx.throw(403);
+        if (!fs.existsSync("./install.log")) {
+            if (ctx.method+ctx.url === 'POST/user') {
                 await next();
+            } else {
+                await ctx.render('core/view/init.html'); 
+            }            
+        } else if (!ctx.session.user) {
+            if (ctx.method+ctx.url === 'POST/user/login') {
+                await next();
+            } else {
+                await ctx.render('core/view/login.html'); 
             }
-        }       
+        } else {
+            await next();
+        }
     }
 }
 
@@ -221,7 +149,7 @@ module.exports = (app, webdir, config)=>{
     // 创建数据库连接，并关联到 ctx.sequelize 。
     var sequelize = new Sequelize(config.SYSNAME, config.SYSNAME, config.MYSQL_ROOT_PASSWORD, 
         {
-            host: config.MYSQL_IP, dialect: 'mysql', pool: 
+            host: config.MYSQL_HOST, dialect: 'mysql', pool: 
             { max: 5, min: 0, acquire: 30000, idle: 10000 }
         }
     );
@@ -236,11 +164,9 @@ module.exports = (app, webdir, config)=>{
         app.context.models  = [];
         app.context.controls= [];
 
-        /* 加载系统核心和子网站的静态资源 */
-        app
-        .use(installCheck())  // 检查系统是否安装， 放在系统核心前（包括静态资源）
-        .use(StaticServer({ rootDir: path.join(__dirname, 'view'), rootPath: '/view' }))
-
+        // 加载静态资源： 核心
+        app.use(StaticServer({ rootDir: path.join(__dirname, 'view'), rootPath: '/view' }))
+        // 加载核心资源： 子网站
         glob.sync(webdir+"/*/").map(async (dir)=>{
             if (fs.existsSync(path.join(dir, 'view')))    {
                 var dirObj = path.parse(dir);
@@ -249,15 +175,15 @@ module.exports = (app, webdir, config)=>{
             }
         });
 
+        // 检查登录
+        app.use(loginCheck());
+
         /* 首先加载核心资源， 然后加载子网站资源。
          * 分开加载的原因是： 子网站需要权限管理的支持，同时权限管理需要在子网站资源加载前执行。
          */
         await model(sequelize, [ path.join(__dirname, 'model') ], app.context.models);
         await control([ path.join(__dirname, 'control') ], app.context.controls);
-        app
-        .use(authCheck()) // 认证检查， 放在子网站静态资源后，路由前
-        .use(route([ path.join(__dirname, 'route') ]))
-        
+        app.use(route([ path.join(__dirname, 'route') ]))        
 
         // 加载子网站
         {

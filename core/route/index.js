@@ -19,34 +19,9 @@ const Router = require('koa-router');
 var router = new Router();
 
 
-/* 用户登录 */
-router.post('/login', async (ctx)=>{
-    const UserCtrl = ctx.controls['user'];
-    var jsonResult = {'errorCode': 0, 'message': ''}
-
-    // 将参数传递给对象
-    var req = ctx.request.body;
-    // 转化参数类型/格式， 过滤恶意输入
-    var username = req.username;
-    var password = req.password;
-    
-    // 调用登录接口
-    var ret = await UserCtrl.login(ctx, username, password);
-    // 登录成功，设置SESSION数据。
-    if (ret) {
-        ctx.session.user = {'id':ret.id, 'username': ret.username, 'interfaces': ret.interfaces.toString()}; 
-        jsonResult.message = ctx.session.user;
-    } else {
-        jsonResult.errorCode = -1;
-        jsonResult.message   = '用户名或密码错误！';
-    }
-
-    ctx.body = jsonResult;
-})
-
 /* 系统首页 */
 router.get('/', async (ctx)=>{
-    ctx.redirect('/view');
+    await ctx.render('core/view/index.html'); 
 })
 
 
