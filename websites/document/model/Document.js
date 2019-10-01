@@ -14,9 +14,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BLOB, 
             allowNull: false, 
         },
-        private: { // 私有权限
-            type: DataTypes.STRING(20),   
-            allowNull: false
+        owner: { // 创建者的账户名称， 非必须
+            type: DataTypes.STRING(20)
         },
     }, {
         charset: 'utf8',

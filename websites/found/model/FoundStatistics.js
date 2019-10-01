@@ -11,10 +11,6 @@
 
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('FoundStatistics', {
-        code: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
-        },
         lastWeek: {
             type: DataTypes.FLOAT
         }, 

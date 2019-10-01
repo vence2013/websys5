@@ -9,8 +9,6 @@
  */
 
 exports.link = async (models)=>{
-    models['Document'].belongsTo(models['User'], {as: 'owner'});
-
     // 文档 - 标签
     models['Document'].belongsToMany(models['Tag'], {through: 'DocumentTag'});
     models['Tag'].belongsToMany(models['Document'], {through: 'DocumentTag'});

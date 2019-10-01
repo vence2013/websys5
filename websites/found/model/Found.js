@@ -13,11 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         code: {
             type: DataTypes.STRING(255),
             allowNull: false,
-        },      
-        companyId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },           
+            primaryKey: true,
+        },    
         fullname: {
             type: DataTypes.STRING(255)
         },

@@ -19,6 +19,9 @@ module.exports = (sequelize, DataTypes) => {
         desc: {
             type: DataTypes.BLOB
         },
+        owner: { // 创建者的账户名称， 非必须
+            type: DataTypes.STRING(20)
+        }
     }, {
         charset: 'utf8',
         collate: 'utf8_general_ci'        

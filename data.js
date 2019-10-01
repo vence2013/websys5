@@ -4,7 +4,6 @@ exports.navigation = [
     {'name':'User',          'father':'websys',            'url':'/view/user.html',      'access':'root'},
     // 用户设置界面
     {'name':'Setting',       'father':'websys',            'url':'/view/setting.html',   'access':'user'},
-    {'name':'Finance',       'father':'websys',            'url':'/finance',             'access':'user'},
     {'name':'Found',         'father':'websys',            'url':'/found',               'access':'any'},
     {'name':'Tag',           'father':null,                'url':'/tag',                 'access':'any'},
     {'name':'Category',      'father':null,                'url':'/category',                    'access':'user'},

@@ -10,10 +10,6 @@
 
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('FoundValue', {
-        code: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
-        },        
         date: {
             type: DataTypes.DATE
         },

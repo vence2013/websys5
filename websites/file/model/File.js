@@ -24,10 +24,6 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.BLOB, 
             allowNull: true,
         },
-        private: { // 私有权限
-            type: DataTypes.STRING(20),   
-            allowNull: false
-        },
         // 文件固有属性
         size: {
             type: DataTypes.INTEGER(10),   // byte
@@ -37,6 +33,9 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.STRING(32),
             allowNull: true
         },
+        owner: { // 创建者的账户名称， 非必须
+            type: DataTypes.STRING(20)
+        }
     }, {
         charset: 'utf8',
         collate: 'utf8_general_ci'        
