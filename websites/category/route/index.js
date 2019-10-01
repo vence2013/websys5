@@ -16,6 +16,10 @@ const Router = require('koa-router');
  *****************************************************************************/
 var router = new Router();
 
+router.get('/', async (ctx)=>{
+    await ctx.render('websites/category/view/index.html'); 
+});
+
 
 // 添加子节点
 router.post('/', async (ctx)=>{
@@ -28,16 +32,16 @@ router.post('/', async (ctx)=>{
     var father  = req.father;
 
     var user = ctx.session.user;
-    var ret  = await CategoryCtrl.create(ctx, user.id, father, name, desc);
+    var ret  = await CategoryCtrl.create(ctx, user.username, father, name, desc);
     switch(ret) {
-        case -1: ctx.body = {'errorCode': -1, 'message': '无权在不是自己创建的节点下添加子节点'}; break;
-        case -2: ctx.body = {'errorCode': -1, 'message': '该目录已经存在！'}; break;
+        case -1: ctx.body = {'errorCode': -1, 'message': '当前目录下已存在该子目录！'}; break;
         default: ctx.body = {'errorCode':  0, 'message': 'SUCCESS'};
     }
 })
 
 router.put('/:id', async (ctx)=>{
     const CategoryCtrl = ctx.controls['category/category'];
+    var user = ctx.session.user;
 
     var req = ctx.request.body;
     // 提取有效参数
@@ -45,31 +49,28 @@ router.put('/:id', async (ctx)=>{
     var name = req.name;
     var desc = req.desc;
     var id = parseInt(req2.id);
-
-    var user = ctx.session.user;
-    var ret = await CategoryCtrl.update(ctx, user.id, id, name, desc);
+    
+    var ret = await CategoryCtrl.update(ctx, user.username, id, name, desc);
     ctx.body = ret ? {'errorCode':  0, 'message': 'SUCCESS'}
-                   : {'errorCode': -1, 'message': '无效的节点！'}
+                   : {'errorCode': -1, 'message': '无效的节点或无权修改！'}
 })
 
 
 router.delete('/:id', async (ctx)=>{
     const CategoryCtrl = ctx.controls['category/category'];
+    var user = ctx.session.user;
 
     var req2 = ctx.params;
     // 提取有效参数
     var id = parseInt(req2.id);
 
-    var user = ctx.session.user;
-    await CategoryCtrl.delete(ctx, user.id, id);
-    ctx.body = {'errorCode': 0, 'message': "SUCCESS"};
+    if (user.username == 'root') {
+        await CategoryCtrl.delete(ctx, id);
+        ctx.body = {'errorCode': 0, 'message': "SUCCESS"};
+    } else {
+        ctx.body = {'errorCode':-1, 'message': "无权删除，请联系管理员"};
+    }
 })
-
-
-/* 页面：首页 */
-router.get('/', async (ctx)=>{
-    await ctx.render('category/view/index.html'); 
-});
 
 /* 
  * URL          : /category/tree/:rootid
@@ -88,9 +89,7 @@ router.get('/tree/:rootid', async (ctx)=>{
     // 获取有效参数
     var rootid = /^\d+$/.test(req2.rootid) ? parseInt(req2.rootid) : 0;
 
-    // 获取根节点的子树
-    var user = ctx.session.user;
-    var tree = await CategoryCtrl.getTreeByRoot(ctx, user.id, rootid);
+    var tree = await CategoryCtrl.getTreeByRoot(ctx, rootid);
     ctx.body = {'errorCode': 0, 'message': tree};
 })
 

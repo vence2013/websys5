@@ -20,6 +20,11 @@ const Router = require('koa-router');
 var router = new Router();
 
 
+router.get('/', async (ctx)=>{
+    await ctx.render('websites/file/view/index.html'); 
+});
+
+
 /* 文件上传和编辑分开进行 */
 router.post('/upload', async (ctx, next)=>{
     const FileCtrl = ctx.controls['file/file'];
@@ -30,7 +35,7 @@ router.post('/upload', async (ctx, next)=>{
     var file = ctx.request.files.file;
 
     var user = ctx.session.user;
-    var ret = await FileCtrl.create(ctx, user.id, file);
+    var ret = await FileCtrl.create(ctx, user.username, file);
     ctx.body = ret ? {'errorCode':  0, 'message': 'SUCCESS'}
                    : {'errorCode': -1, 'message': '文件已经存在，添加失败！'};
 });
@@ -38,6 +43,7 @@ router.post('/upload', async (ctx, next)=>{
 
 router.put('/:fileid', async (ctx, next)=>{
     const FileCtrl = ctx.controls['file/file'];
+    var user = ctx.session.user;
 
     var req     = ctx.request.body;
     var req2    = ctx.params;
@@ -45,11 +51,9 @@ router.put('/:fileid', async (ctx, next)=>{
     var fileid  = req2.fileid;
     var name    = req.name;
     var desc    = req.desc;
-    var private = req.private;
     var taglist = req.taglist;
     
-    var user = ctx.session.user;
-    var ret = await FileCtrl.update(ctx, user.id, fileid, name, desc, private, taglist);
+    var ret = await FileCtrl.update(ctx, user.username, fileid, name, desc, taglist);
     switch (ret) {
         case -1: ctx.body = {'errorCode':-1, 'message': '无效的文件，或该文件不属于当前用户，无法进行修改'}; break;
         default: ctx.body = {'errorCode': 0, 'message': 'SUCCESS'} ;
@@ -59,21 +63,16 @@ router.put('/:fileid', async (ctx, next)=>{
 
 router.delete('/:fileid', async (ctx, next)=>{
     const FileCtrl = ctx.controls['file/file'];
+    var user = ctx.session.user;
 
     var req2    = ctx.params;
     // 提取有效的参数
     var fileid  = req2.fileid;
-
-    var user = ctx.session.user;
-    await FileCtrl.delete(ctx, user.id, fileid);
+    
+    await FileCtrl.delete(ctx, user.username, fileid);
     ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
 })
 
-
-/* 文件页面：首页 */
-router.get('/', async (ctx)=>{
-    await ctx.render('file/view/index.html'); 
-});
 
 /* 主要用于编辑文件(必须放到GET/, GET/advance后， 否则其他的将被忽略)
  * 获取文件的详细信息，包括：文件信息， 创建用户名， 标签， 所属目录。 
@@ -85,10 +84,7 @@ router.get('/detail/:fileid', async (ctx, next)=>{
     // 提取有效参数
     var fileid = req2.fileid;
 
-    // 允许非登录用户访问， 所以userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var ret = await FileCtrl.detail(ctx, userid, fileid);
+    var ret = await FileCtrl.detail(ctx, fileid);
     ctx.body = {'errorCode': 0, 'message': ret};
 })
 
@@ -98,6 +94,7 @@ router.get('/detail/:fileid', async (ctx, next)=>{
  */
 router.get('/last', async (ctx, next)=>{
     const FileCtrl = ctx.controls['file/file'];
+    var user = ctx.session.user;
 
     var req2  = ctx.query;
     // 提取有效参数
@@ -107,9 +104,8 @@ router.get('/last', async (ctx, next)=>{
               .split(' ');
     var page     = parseInt(req2.page);
     var pageSize = parseInt(req2.pageSize);
-
-    var user = ctx.session.user;
-    var res = await FileCtrl.search(ctx, user.id, str, page, pageSize);
+    
+    var res = await FileCtrl.search(ctx, user.username, str, page, pageSize);
     ctx.body = {'errorCode': 0, 'message': res};
 })
 
@@ -151,10 +147,7 @@ router.get('/search', async (ctx, next)=>{
         default: query['order'] = ['createdAt', 'DESC'];
     }
     
-    // 允许非登录用户访问， 所以userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var res = await FileCtrl.search2(ctx, userid, query, page, pageSize);
+    var res = await FileCtrl.search2(ctx, query, page, pageSize);
     ctx.body = {'errorCode': 0, 'message': res};
 })
 

@@ -12,7 +12,4 @@ exports.link = async (models)=>{
     // 文件 - 标签
     models['File'].belongsToMany(models['Tag'], {through: 'FileTag'});
     models['Tag'].belongsToMany(models['File'], {through: 'FileTag'});
-    // 文件 - 目录
-    models['File'].belongsToMany(models['Category'], {through: 'FileCategory'});
-    models['Category'].belongsToMany(models['File'], {through: 'FileCategory'});
 }

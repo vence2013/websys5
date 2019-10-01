@@ -15,7 +15,7 @@ const moment = require('moment');
 const mkdirp = require('mkdirp');
 
 
-exports.create = async (ctx, userid, file)=>{
+exports.create = async (ctx, username, file)=>{
     const File = ctx.models['File'];
 
     var size = file.size;
@@ -29,8 +29,8 @@ exports.create = async (ctx, userid, file)=>{
 
     // 添加数据库信息， 默认权限为任何人可读    
     var [fileIns, created] = await File.findOrCreate({logging: false,
-        where: {'name': name, 'size': size, 'ext': ext, 'ownerId':userid},
-        defaults: {'location': location, 'desc': '', 'private': 'GR1OR1' }
+        where: {'name': name, 'size': size, 'ext': ext, 'owner':username},
+        defaults: {'location': location, 'desc': '' }
     });
     if (created) { // 移动上传的文件到指定路径
         const reader = fs.createReadStream(file.path);
@@ -41,13 +41,13 @@ exports.create = async (ctx, userid, file)=>{
     return created;
 }
 
-exports.update = async (ctx, userid, id, name, desc, private, taglist)=>{
+exports.update = async (ctx, username, id, name, desc, taglist)=>{
     const File = ctx.models['File'];
     const Tag  = ctx.models['Tag'];
 
-    var fileIns = await File.findOne({logging:false, where: {'id':id, 'ownerId':userid}});
+    var fileIns = await File.findOne({logging:false, where: {'id':id, 'owner':username}});
     if (!fileIns) return -1; // 无效的文件， 或该文件不属于当前用户
-    await fileIns.update({'name':name, 'desc':desc, 'private':private}, {logging: false});
+    await fileIns.update({'name':name, 'desc':desc}, {logging: false});
     // 更新关联标签
     var tagInss = await Tag.findAll({logging:false, where:{'name':taglist}});
     fileIns.setTags(tagInss, {logging: false});
@@ -55,10 +55,10 @@ exports.update = async (ctx, userid, id, name, desc, private, taglist)=>{
 }
 
 
-exports.delete = async (ctx, userid, id)=>{
+exports.delete = async (ctx, username, id)=>{
     const File = ctx.models['File'];
 
-    var fileIns = await File.findOne({logging: false, where: {'id': id, 'ownerId':userid}});
+    var fileIns = await File.findOne({logging: false, where: {'id': id, 'owner':username}});
     if (!fileIns) return -1;
 
     var fileObj = fileIns.get({plain: true});
@@ -76,8 +76,7 @@ exports.delete = async (ctx, userid, id)=>{
 }
 
 /* 获取文件相关的所有信息，包括文件信息，关联的标签列表， 关联的目录ID列表 */
-exports.detail = async (ctx, userid, fileid)=>{
-    const User = ctx.models['User'];
+exports.detail = async (ctx, fileid)=>{
     const File = ctx.models['File'];
 
     var fileIns = await File.findOne({logging: false, 
@@ -87,27 +86,19 @@ exports.detail = async (ctx, userid, fileid)=>{
 
     var fileObj = fileIns.get({plain: true});
     fileObj['desc'] = fileObj['desc'].toString();
-    // 获取创建用户名称
-    var userObj = await User.findOne({raw:true, logging:false, where:{'id': fileObj.ownerId}});
-    fileObj['owner'] = userObj.username;
     // 获取关联的标签和目录
     var tagObjs = await fileIns.getTags({raw:true, logging:false});
     fileObj['tagnames'] = tagObjs.map((x)=>{ return x.name; });
-    // 如果当前的用户为文件的创建者，则获取目录信息
-    if (fileObj.ownerId == userid) {
-        var categoryObjs = await fileIns.getCategories({raw:true, logging:false});
-        fileObj['categoryids'] = categoryObjs.map((x)=>{ return x.id; });
-    }
 
     return fileObj;
 }
 
 /* 该函数只用于编辑页面的文件列表搜索， 所以只获取创建者为当前用户的文件 */
-exports.search = async (ctx, userid, str, page, pageSize)=>{
+exports.search = async (ctx, username, str, page, pageSize)=>{
     var sql, sqlCond="";
 
     // 构建查询条件
-    sqlCond = " WHERE `ownerId`="+userid+" ";
+    sqlCond = " WHERE `owner`='"+username+"' ";
     if (str && str.length) {
         str.map((x)=>{
             if (x) sqlCond += " AND (`name` LIKE '%"+x+"%' OR `desc` LIKE '%"+x+"%') ";
@@ -136,33 +127,9 @@ exports.search = async (ctx, userid, str, page, pageSize)=>{
 
 
 // 高级搜索
-exports.search2 = async (ctx, userid, query, page, pageSize)=>{
-    const User = ctx.models['User'];
-    const Group = ctx.models['Group'];
+exports.search2 = async (ctx, query, page, pageSize)=>{
     const Tag  = ctx.models['Tag']; 
     var sql, sqlCond = '';
-
-    /* 搜索可读取的文件
-     * 1. 允许其他用户访问的文件
-     * ( 如果是登录用户 )
-     * 2. 创建者为当前用户的文件
-     * 3. 创建者为当前用户所属组对应用户的，且允许组用户访问的，
-     */    
-    sqlCond = " WHERE (`private` LIKE '%OR1%' "; // 其他用户可访问
-    if (userid) {        
-        var res = await User.findAll({logging:false, raw:true, 
-            where: {'id':userid}, 
-            include: [{ model: Group }]
-        });
-        var names = res.map((x)=>{ return x['Groups.name']; })
-        var res2 = await User.findAll({logging: false, raw:true, 
-            where: {'username': names}
-        });
-        var ids = res2.map((x)=>{ return x['id']; });
-        sqlCond += " OR `ownerId`="+userid+" ";
-        if (ids.length) { sqlCond += " OR (`ownerId` IN ("+ids.join(',')+") AND `private` LIKE '%GR1%') "; }
-    }
-    sqlCond += " ) ";
 
     // 根据搜索条件构建SQL条件
     if (query.name && query.name.length) {
@@ -192,6 +159,7 @@ exports.search2 = async (ctx, userid, query, page, pageSize)=>{
             sqlCond += " AND `id` IN ("+sql2+") "; 
         }
     }
+    sqlCond = sqlCond ? " WHERE "+sqlCond.substr(4) : '';
 
     // 计算分页数据
     sql = "SELECT COUNT(*) AS num FROM `Files` "+sqlCond;
@@ -201,20 +169,12 @@ exports.search2 = async (ctx, userid, query, page, pageSize)=>{
     maxpage = (maxpage<1) ? 1 : maxpage;
     page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
 
-    // 获取创建者的用户名称
-    var userlist = await User.findAll({raw:true, logging:false, attributes:['id', 'username']});
     // 查询当前分页的列表数据
     var offset = (page - 1) * pageSize;
     sql = "SELECT * FROM `Files` "+sqlCond+" ORDER BY "+query.order.join(' ')+" LIMIT "+offset+", "+pageSize+" ;";
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
     var filelist = res.map((x)=>{
         x['desc'] = x.desc ? x.desc.toString() : '';
-        // 查找创建者的用户名
-        for (var i=0; i<userlist.length; i++) {
-            if (userlist[i]['id']!=x.ownerId) continue;
-            x['owner'] = userlist[i]['username'];
-            break;
-        }
         return x;
     });
 

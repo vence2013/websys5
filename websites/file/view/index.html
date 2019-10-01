@@ -35,7 +35,7 @@
     <link  href="/view/css/all.css" rel="stylesheet" />
     <script src="/file/view/js/index.js" type="text/javascript"></script>
     <style>
-        .filesel { background-color: #cccccc; }
+        .filesel { font-size: 18px; }
     </style>
 </head>
 <body ng-app="indexApp">
@@ -97,14 +97,8 @@
                                 </h4>
                             </div>
                         </div>
-                        <hr />
-                        <div class="row" style="height: 320px; overflow: hidden;">
-                            <div class="col mt-2">
-                                <treecontrol class="tree-classic" options="treeOptions" tree-model="treeView" expanded-nodes="listExpand" selected-nodes="nodeSelected"
-                                    filter-expression="predicate" filter-comparator="comparator">
-                                    <span ng-class="{'privateResource': node.private}" title="{{node.desc}}">{{node.name}} /{{node.id}}</span>
-                                </treecontrol>
-                            </div>
+                        <div class="row mx-1" style="height: 320px; overflow: hidden; border-top: 1px solid #cccccc;">
+                            <div class="col mt-2">{{detail.desc}}</div>
                         </div>
                     </div>
                 </div>

@@ -9,27 +9,20 @@
  *  2019/4/27    - 创建文件。
  *****************************************************************************/  
 
-
-exports.create = async (ctx, userid, father, name, desc)=>{    
+exports.create = async (ctx, username, father, name, desc)=>{    
     const Category = ctx.models['Category'];
     
-    // 新增节点的父节点只能是：根节点， 自己创建的节点
-    if (father) {
-        var categoryObj = await Category.findOne({raw:true, logging:false, where:{'id':father}});
-        if (!categoryObj || (categoryObj.ownerId!=userid)) return -1;  // 无权在该节点下添加子节点
-    }
     var [categoryIns, created] = await Category.findOrCreate({logging:false, 
-        where: {'name': name, 'father': father}, defaults: {'desc': desc, 'ownerId':userid}
+        where: {'name': name, 'father': father}, defaults: {'desc': desc, 'owner':username}
     });
-    return created ? 0 : -2;
+    return created ? 0 : -1;
 }
 
-
-exports.update = async (ctx, userid, categoryid, name , desc)=>{
+exports.update = async (ctx, username, categoryid, name , desc)=>{
     const Category = ctx.models['Category'];
     
     var categoryIns = await Category.findOne({logging: false,
-        where: {'id': categoryid, 'ownerId': userid}  // 只能修改自己创建的目录节点
+        where: {'id': categoryid, 'owner': username}  // 只能修改自己创建的目录节点
     });
     if (categoryIns) {
         await categoryIns.update({'name': name, 'desc': desc}, {logging: false}); 
@@ -54,12 +47,9 @@ async function getListByRoot(ctx, rootid) {
     return list;
 }
 
-exports.delete = async (ctx, userid, categoryid)=>{
+// 只有root才能删除
+exports.delete = async (ctx, categoryid)=>{
     var Category = ctx.models['Category'];
-    
-    // 当前节点的创建者必须为当前用户，否则无权删除
-    var categoryObj = await Category.findOne({raw:true, logging:false, where:{'id':categoryid}});
-    if (!categoryObj || (categoryObj.ownerId!=userid)) return;
     
     // 获取所有的子树节点
     var ids = [ categoryid ];
@@ -67,30 +57,29 @@ exports.delete = async (ctx, userid, categoryid)=>{
     for (var i in list) { ids.push(list[i]['id']); }
 
     await Category.destroy({logging: false, 
-        where: {'id': ids, 'ownerId': userid}
+        where: {'id': ids}
     });
 }
 
 
 exports.getTreeByRoot = getTreeByRoot;
-
 /* 
  * Function     : getTreeByRoot
- * Description  : 通过ID获取(具有访问权限的)目录树对象数据。
+ * Description  : 通过ID获取目录树对象数据。
  * Parameter    : 
  * Return       : 树形结构的目录树对象
  */
 
-async function getTreeByRoot(ctx, userid, rootid) {
+async function getTreeByRoot(ctx, rootid) {
     const Category = ctx.models['Category'];
 
     var brothers = await Category.findAll({raw: true, logging: false, 
-        where: {'father': rootid, 'ownerId':userid}
+        where: {'father': rootid}
     });
     // 递归查找子树
     for (var i=0; i<brothers.length; i++) { 
         brothers[i]['desc'] = brothers[i]['desc'] ? brothers[i]['desc'].toString() : '';
-        brothers[i]['children'] = await getTreeByRoot(ctx, userid, brothers[i]['id']);
+        brothers[i]['children'] = await getTreeByRoot(ctx, brothers[i]['id']);
     }
 
     return brothers;
