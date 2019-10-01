@@ -16,6 +16,11 @@ const Router = require('koa-router');
 var router = new Router();
 
 
+router.get('/', async (ctx)=>{
+    await ctx.render('websites/tag/view/index.html'); 
+});
+
+
 router.post('/', async (ctx)=>{
     const TagCtrl = ctx.controls['tag/tag'];
 
@@ -39,11 +44,6 @@ router.delete('/:tagid', async (ctx)=>{
     ctx.body = {'errorCode':  0, 'message': 'SUCCESS'}
 })
 
-
-/* 标签页面：首页 */
-router.get('/', async (ctx)=>{
-    await ctx.render('tag/view/index.html'); 
-});
 
 /* 搜索标签列表
  * 参数： {str, page, pageSize }

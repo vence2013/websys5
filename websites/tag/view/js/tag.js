@@ -18,33 +18,9 @@ function tagCtrl($scope, $http, user)
     $scope.opts = {'str':'', 'page':1, 'pageSize':100};
     $scope.pages   = [];
     $scope.taglist = [];
-    // 关联文档
-    $scope.docOpts = {'str':'', 'page':1, 'pageSize':12};
-    $scope.docPages = [];
-    $scope.doclist  = [];
-    // 关联文件
-    $scope.fileOpts = {'str':'', 'page':1, 'pageSize':12};
-    $scope.filePages = [];
-    $scope.filelist  = [];
 
     // opts对象更改后刷新标签列表。
     $scope.$watch('opts', get, true);
-    $scope.$watch('docOpts', docRelate, true);
-    $scope.$watch('fileOpts', docRelate, true);
-
-
-    function viewReset() {
-        // 关联文档
-        $scope.docPages = [];
-        $scope.doclist  = [];
-        $scope.docOpts['page']= 1;
-        $scope.docOpts['str'] = '';        
-        // 关联文件
-        $scope.filePages = [];
-        $scope.filelist  = [];
-        $scope.fileOpts['page']= 1;
-        $scope.fileOpts['str'] = '';        
-    }
 
     $scope.get = get;
 
@@ -53,7 +29,6 @@ function tagCtrl($scope, $http, user)
         .get('/tag/search', {params: $scope.opts})
         .then((res)=>{
             if (errorCheck(res)) return ;
-            viewReset();
 
             var ret = res.data.message;           
             $scope.taglist = ret.taglist;
@@ -71,7 +46,8 @@ function tagCtrl($scope, $http, user)
         .post('/tag', {'name': name})
         .then((res)=>{
             if (errorCheck(res)) return ;  
-            $scope.opts['str'] = '';          
+
+            $scope.opts['str'] = ''; 
             get();
         })      
     }
@@ -81,52 +57,19 @@ function tagCtrl($scope, $http, user)
         .delete('/tag/'+$scope.tagsel.id)
         .then((res)=>{
             $("#deleteConfirmWnd").modal( "hide" );
+
+            $scope.tagsel  = null;
             get();  // 删除操作可能没有修改opts对象， 因此需要手动刷新。
         })
     }
 
     $scope.select = (x)=>{
-        $(".badge-danger").removeClass('badge-danger').addClass('badge-secondary');
-
         if (x == $scope.tagsel) {
-            viewReset();
+            $scope.tagsel  = null;
+            $(".badge-danger").removeClass('badge-danger').addClass('badge-secondary');            
         } else {
-            $("h4[id='"+x.id+"']").find('span').removeClass('badge-secondary').addClass('badge-danger');
             $scope.tagsel  = x;
-            docRelate();
-            fileRelate();
+            $("h4[id='"+x.id+"']").find('span').removeClass('badge-secondary').addClass('badge-danger');            
         }
-    }
-
-    function fileRelate() {
-        if (!$scope.tagsel) return;
-
-        $http
-        .get('/file/tag/'+$scope.tagsel.id, {params: $scope.fileOpts})
-        .then((res)=>{
-            if (errorCheck(res)) return ;  
-            
-            var ret = res.data.message;
-            $scope.filelist = ret.filelist;
-
-            $scope.fileOpts['page'] = ret.page;
-            $scope.filePages = initPage(ret.page, $scope.fileOpts.pageSize, ret.total, 6);               
-        })
-    }
-
-    function docRelate() {
-        if (!$scope.tagsel) return;
-
-        $http
-        .get('/document/tag/'+$scope.tagsel.id, {params: $scope.docOpts})
-        .then((res)=>{
-            if (errorCheck(res)) return ;  
-
-            var ret = res.data.message;
-            $scope.doclist = ret.doclist;
-
-            $scope.docOpts['page'] = ret.page;
-            $scope.docPages = initPage(ret.page, $scope.docOpts.pageSize, ret.total, 6);               
-        })
     }
 }

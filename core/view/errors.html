@@ -29,39 +29,6 @@
         <div style="text-align: center;">
             <a href="/">返回首页</a>
         </div>
-    <% } else if (status==403) { %>        
-        <h1 class="display-5">创建超级管理员</h1>
-        <p class="lead font-italic">超级管理员账户名称固定为'root'， 但需要在首次安装系统时设置超级管理员密码。请记住该密码以便日后使用！</p>
-        <hr class="my-4">
-        <form class="container">
-            <div class="form-group row">
-                <label for="username" class="col-sm-2 col-form-label">账户</label>
-                <div class="col-sm-10">
-                    <input type="text" readonly class="form-control-plaintext" id="username" ng-model="username" value="root">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="password" class="col-sm-2 col-form-label">初始密码</label>
-                <div class="col-sm-10">
-                <input type="password" class="form-control" id="password" ng-model="password" placeholder="至少6位， 字母/数字和标点符号的组合">
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="password" class="col-sm-2 col-form-label">确认密码</label>
-                <div class="col-sm-10">
-                <input type="password" class="form-control" id="password2" ng-model="password2" placeholder="和初始化密码相同">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md text-center">
-                    <button type="button" class="btn btn-outline-success" ng-click="create();">创建超级管理员(root)</button>
-                </div>
-                <div class="col-md-3 form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="passwordDisplay" ng-model="passwordDisplay" />
-                    <label class="form-check-label" for="passwordDisplay">显示密码</label>
-                </div>
-            </div>
-        </form>        
     <% } else if (status==404) { %>
         <h1 class="display-5">Not Found</h1>
         <p class="lead font-italic">没有找到访问的页面！</p>
@@ -77,34 +44,5 @@
 <script>
 angular
 .module('errorsApp', [])
-.controller('errorsCtrl', ($scope, $http)=>{
-    $scope.username  = 'root';
-    $scope.password  = '';
-    $scope.password2 = '';
-    $scope.passwordDisplay = false;
-
-
-    $scope.$watch('passwordDisplay', (val)=>{
-        if (val) {
-            $('#password').prop('type', 'text');
-            $('#password2').prop('type', 'text');
-        } else {
-            $('#password').prop('type', 'password');
-            $('#password2').prop('type', 'password');
-        }
-    })
-    
-    $scope.create = ()=>{
-        var username = $scope.username;
-        var password = $scope.password;
-        if (!password || (password != $scope.password2)) { return toastr.info("请输入有效的密码及确认密码!", '', {"positionClass": "toast-bottom-right"}); }
-
-        $http
-        .post('/user', {'username':username, 'password': password})
-        .then((res)=>{
-            if (res.errorCode) { return toastr.info(res.message, '', {"positionClass": "toast-bottom-right"}); }
-            window.location.href = '/';
-        });
-    }
-});  
+.controller('errorsCtrl', ($scope, $http)=>{});  
 </script>

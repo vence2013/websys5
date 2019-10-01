@@ -51,7 +51,12 @@ function userCtrl($scope, $http) {
     }
 
     $scope.userSelect = (x)=>{
-        $scope.usersel = x;
-        $scope.username = x.username;
+        if ($scope.usersel == x) {
+            $scope.usersel  = null;
+            $scope.username = '';
+        } else {
+            $scope.usersel  = x;
+            $scope.username = x.username;
+        }
     }
 }

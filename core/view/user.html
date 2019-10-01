@@ -49,16 +49,17 @@
                         </div>
                     </form>
                 </div>
-                <hr class="my-4">
                 <div class="row">
-                    <div class="col-md">
-                        <div class="row" ng-repeat="x in userlist" 
+                    <div class="col-md text-white bg-dark rounded-lg mx-3 pb-3">
+                        <div class="row mt-3" ng-repeat="x in userlist" 
                             ng-click="userSelect(x)"
-                            style="border-bottom: 1px dashed #cccccc;">
-                            <div class="col-md-8">{{x.username}}</div>
-                            <div class="col-md-2" style="font-style: italic;">{{x.createdAt|limitTo:10}}</div>
+                            style="border-bottom: 1px dashed #cccccc; line-height: 30px;">
+                            <div class="col-md-6" style="font-size: 18px; font-weight: bold;">{{x.username}}</div>
+                            <div class="col-md-4" style="font-style: italic;">{{x.createdAt|limitTo:10}}</div>
                             <div class="col-md-2">
-                                    <a href="#" ng-show="usersel==x" data-toggle="modal" data-target="#delUserConfirm" class="mx-2"><i class="fa fa-trash-o" title="Delete User"></i></a>
+                                <a href="#" ng-show="usersel==x" data-toggle="modal" data-target="#delUserConfirm" class="mx-2">
+                                    <i class="fa fa-trash-o" title="Delete User" style="color: #ffffff;"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

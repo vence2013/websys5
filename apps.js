@@ -27,10 +27,6 @@ const Logger  = require('koa-logger');
 // Session
 const Session = require('koa-session');
 
-
-// 系统数据
-global.sysdata = require('./data');
-
 // SSL证书文件
 const options = {
     key : fs.readFileSync('cert/server-key.pem'),
