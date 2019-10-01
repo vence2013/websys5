@@ -17,76 +17,68 @@ const Router = require('koa-router');
 var router = new Router();
 
 
-router.post('/:docid', async (ctx)=>{
-    const DocumentCtrl = ctx.controls['document/document'];
-
-    var req = ctx.request.body;
-    var req2= ctx.params;
-    
-    var content = req.content;
-    var private = req.private;
-    var taglist = req.taglist;
-    var categoryids = req.categoryids;
-    var docid= parseInt(req2.docid);
-
-    var user = ctx.session.user;
-    var ret = await DocumentCtrl.edit(ctx, user.id, docid, content, private, taglist, categoryids);
-    switch (ret) {
-    case -1: ctx.body = {'errorCode': -1, 'message': '无效文档或无权修改'}; break;
-    case  0: ctx.body = {'errorCode':  0, 'message': 'SUCCESS'}
-    }
-});
-
-/* 删除文档， 只有登录用户可以执行 */
-router.delete('/:docid', async (ctx)=>{
-    const DocumentCtrl = ctx.controls['document/document'];
-
-    var req2 = ctx.params;
-    var docid = parseInt(req2.docid);
-
-    var user = ctx.session.user;
-    await DocumentCtrl.delete(ctx, user.id, docid);
-
-    ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
-});
-
-
-/* 文档搜索页面 */
+// 刷新保留标签搜索
 router.get('/', async (ctx)=>{
     var req2 = ctx.query;
     var taglist = req2.taglist;
     
-    await ctx.render('document/view/index.html', {'taglist':taglist}); 
+    await ctx.render('websites/document/view/index.html', {'taglist':taglist}); 
 });
 
-/* 文档编辑页面 */
+// 添加/编辑文档
 router.get('/edit/:docid', async (ctx)=>{
     var req2 = ctx.params;
     var docid= parseInt(req2.docid);
 
-    await ctx.render('document/view/document.html', {'id':docid}); 
+    await ctx.render('websites/document/view/edit.html', {'id':docid}); 
 });
 
 router.get('/display/:docid', async (ctx)=>{
     var req2 = ctx.params;
     var docid= parseInt(req2.docid);
 
-    await ctx.render('document/view/display.html', {'id':docid}); 
+    await ctx.render('websites/document/view/display.html', {'id':docid}); 
 });
 
-/* 获取文档的详细信息：文档信息， 关联标签列表， 关联目录ID列表 
- * 该接口用于查看文件的详细信息， 不能进行修改，所以没有权限限制（查看权限的限制在列表和详细页面检查）
- */
+router.post('/:docid', async (ctx)=>{
+    const DocumentCtrl = ctx.controls['document/document'];
+    var user = ctx.session.user;
+
+    var req = ctx.request.body;
+    var req2= ctx.params;
+    // 有效参数
+    var content = req.content;
+    var taglist = req.taglist;
+    var docid= parseInt(req2.docid);
+    
+    var ret = await DocumentCtrl.edit(ctx, user.username, docid, content, taglist);
+    switch (ret) {
+        case -1: ctx.body = {'errorCode': -1, 'message': '无效文档或无权修改'}; break;
+        case  0: ctx.body = {'errorCode':  0, 'message': 'SUCCESS'}
+    }
+});
+
+/* 删除文档， 只有登录用户可以执行 */
+router.delete('/:docid', async (ctx)=>{
+    const DocumentCtrl = ctx.controls['document/document'];
+    var user = ctx.session.user;
+
+    var req2 = ctx.params;
+    var docid = parseInt(req2.docid);
+    
+    await DocumentCtrl.delete(ctx, user.username, docid);
+
+    ctx.body = {'errorCode': 0, 'message': 'SUCCESS'};
+});
+
+/* 获取文档的详细信息：文档信息， 关联标签列表 */
 router.get('/detail/:docid', async (ctx)=>{
     const DocumentCtrl = ctx.controls['document/document'];
 
     var req2= ctx.params;
     var docid= parseInt(req2.docid);
 
-    // 允许未登录用户访问， userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var ret = await DocumentCtrl.detail(ctx, userid, docid);
+    var ret = await DocumentCtrl.detail(ctx, docid);
     ctx.body = ret ? {'errorCode':  0, 'message': ret}
                    : {'errorCode': -1, 'message': '无效的文档'};
 })
@@ -127,10 +119,7 @@ router.get('/search', async (ctx)=>{
     var req2  = ctx.query;
     var query = reqCheck(req2); // 提取有效参数
 
-    // 允许未登录用户访问， userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var res = await DocumentCtrl.search(ctx, userid, query);
+    var res = await DocumentCtrl.search(ctx, query);
     ctx.body = {'errorCode': 0, 'message': res};
 })
 
@@ -140,11 +129,7 @@ router.get('/export', async (ctx)=>{
     var req2  = ctx.query;
     var query = reqCheck(req2); // 提取有效参数
 
-    // 允许未登录用户访问， userid可以为0
-    var user = ctx.session.user;
-    var userid = (user && user.id) ? user.id : 0;
-    var res = await DocumentCtrl.export2file(ctx, userid, query);
-
+    await DocumentCtrl.export2file(ctx, query);
     ctx.body = {'errorCode': 0, 'message': 'Finished!'};
 })
 

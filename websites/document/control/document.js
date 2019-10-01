@@ -14,97 +14,58 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 
 
-exports.edit = async (ctx, userid, docid, content, private, taglist, categoryids)=>{
+exports.edit = async (ctx, username, docid, content, taglist)=>{
     const Document = ctx.models['Document'];
     const Tag = ctx.models['Tag'];
-    const Category = ctx.models['Category'];
 
     if (docid) {
         var docIns = await Document.findOne({logging: false, where: {'id':docid}});
         if (!docIns) return -1; // 无效或无权修改
-        await docIns.update({'content':content, 'private':private});
+        await docIns.update({'content':content});
     } else {
         var [docIns, created] = await Document.findOrCreate({logging: false,
-            where: {'content':content, 'ownerId':userid},
-            defaults: {'private':private}
+            where: {'content':content, 'owner':username}
         });
     }
     // 关联标签
     var tagInss = await Tag.findAll({logging:false, where:{'name':taglist}});
     await docIns.setTags(tagInss);
-    // 关联目录
-    var categoryInss = await Category.findAll({logging:false, where:{'id':categoryids}});
-    await docIns.setCategories(categoryInss);
-
     return 0;
 }
 
-exports.delete = async(ctx, userid, docid)=>{
+exports.delete = async(ctx, username, docid)=>{
     const Document = ctx.models['Document'];
 
     var docObj = await Document.findOne({logging: false, raw:true, 'where': {'id': docid}});
     // 文件有效， 且创建者为当前用户
-    if (docObj && (docObj.ownerId==userid)) {
+    if (docObj && (docObj.owner==username)) {
         await Document.destroy({logging: false, 'where': {'id': docid}});
     }
 }
 
-/* 返回文档的详细信息：doc[*], owner, tagnames, categoryids */
-exports.detail = async (ctx, userid, docid)=>{
+/* 返回文档的详细信息：doc[*], tagnames */
+exports.detail = async (ctx, docid)=>{
     const Document = ctx.models['Document'];
-    const User = ctx.models['User'];
 
     var docIns = await Document.findOne({logging:false, where:{'id':docid}});
     if (!docIns) return null;
 
     var docObj = docIns.get({plain:true});
     docObj['content'] = docObj['content'].toString();
-    // 获取创建用户名
-    var userObj = await User.findOne({logging:false, raw:true, where:{'id':docObj.ownerId}});
-    docObj['owner'] = userObj.username;
     // 关联标签名称列表
     var tagObjs = await docIns.getTags({raw:true, logging:false});
     docObj['tagnames'] = tagObjs.map((x)=>{ return x.name; });
-    // 如果当前的用户为创建者，则获取目录信息
-    if (docObj.ownerId == userid) {
-        var categoryObjs = await docIns.getCategories({raw:true, logging:false});
-        docObj['categoryids'] = categoryObjs.map((x)=>{ return x.id; });
-    }
 
     return docObj;
 }
 
 exports.search = search;
 
-async function search(ctx, userid, query) 
+async function search(ctx, query) 
 {
-    const User = ctx.models['User'];
-    const Group = ctx.models['Group'];
     const Tag  = ctx.models['Tag']; 
     const Document  = ctx.models['Document']; 
     var sql, sqlCond = '';
-
-    /* 搜索可读取的文件
-     * 1. 允许其他用户访问的， 或
-     * ( 如果是登录用户 )
-     * 2. 创建者为当前用户的， 或
-     * 3. 创建者为当前用户所属组对应用户的，且允许组用户访问的，
-     */    
-    sqlCond = " WHERE (`private` LIKE '%OR1%' "; // 其他用户可访问
-    if (userid) {
-        var res = await User.findAll({logging:false, raw:true, 
-            where: {'id':userid}, 
-            include: [{ model: Group }]
-        });
-        var names = res.map((x)=>{ return x['Groups.name']; })
-        var res2 = await User.findAll({logging: false, raw:true, 
-            where: {'username': names}
-        });
-        var ids = res2.map((x)=>{ return x['id']; });
-        sqlCond += " OR `ownerId`="+userid+" ";
-        if (ids.length) { sqlCond += " OR (`ownerId` IN ("+ids.join(',')+") AND `private` LIKE '%GR1%') "; }
-    }
-    sqlCond += " ) ";
 
     // 根据搜索条件构建SQL条件
     if (query.content && query.content.length) {
@@ -124,6 +85,7 @@ async function search(ctx, userid, query)
             sqlCond += " AND `id` IN ("+sql2+") "; 
         }
     }
+    sqlCond = sqlCond ? " WHERE "+sqlCond.substr(4) : "";
 
     var page     = query.page;
     var pageSize = query.pageSize;
@@ -135,8 +97,6 @@ async function search(ctx, userid, query)
     maxpage = (maxpage<1) ? 1 : maxpage;
     page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
 
-    // 获取创建者的用户名称
-    var userlist = await User.findAll({raw:true, logging:false, attributes:['id', 'username']});
     // 查询当前分页的列表数据
     var docids = [];
     var offset = (page - 1) * pageSize;
@@ -146,12 +106,6 @@ async function search(ctx, userid, query)
         docids.push(x.id);
         // 将buffer转换为字符串
         x['content'] = x.content ? x.content.toString() : '';
-        // 查找创建者的用户名
-        for (var i=0; i<userlist.length; i++) {
-            if (userlist[i]['id']!=x.ownerId) continue;
-            x['owner'] = userlist[i]['username'];
-            break;
-        }
         return x;
     });
 
@@ -169,8 +123,8 @@ async function search(ctx, userid, query)
 }
 
 
-exports.export2file = async (ctx, userid, query)=>{
-    var ret = await search(ctx, userid, query);
+exports.export2file = async (ctx, query)=>{
+    var ret = await search(ctx, query);
     
     // 提取文档中的文件
     var filelist = [];
@@ -189,6 +143,7 @@ exports.export2file = async (ctx, userid, query)=>{
     }
     // 如果 /export/file/ 不存在，则创建
     var fileExportDir = '/export/file/';
+    if (!fs.existsSync(fileExportDir)) { mkdirp.sync(fileExportDir); } // 如果目录不存在，则创建该目录。
     // 复制相关文件
     for (var i=0; i<filelist.length; i++) {
         var dst = fileExportDir+filelist[i].substr(8);

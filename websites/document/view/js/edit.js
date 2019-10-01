@@ -11,19 +11,6 @@ function docCtrl($scope, $http, $interval, user)
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
     $scope.user = user;
-    // 目录树相关的数据
-    $scope.treeRoot = [];
-    $scope.listRoot = [];
-    $scope.treeView = [];
-    $scope.listView = [];
-    $scope.listExpand = [];
-    // 目录搜索
-    $scope.predicate = '';
-    $scope.comparator = false;
-    $scope.treeOptions = { dirSelectable: true, multiSelection: true };
-    // 文档属性
-    $scope.groupRead  = true;
-    $scope.otherRead  = true;
     // 标签相关数据
     $scope.tagstr = '';
     $scope.tagrel = [];
@@ -37,7 +24,7 @@ function docCtrl($scope, $http, $interval, user)
     var editor = editormd("editormd", {
         path : '/node_modules/editor.md/lib/',
         width: '100%',
-        height: 820,
+        height: 800,
         toolbarIcons : function() {
             return editormd.toolbarModes['simple']; // full, simple, mini
         },    
@@ -55,7 +42,7 @@ function docCtrl($scope, $http, $interval, user)
 
     $scope.tagGet = tagGet;
     function tagGet() {
-        var query = {'str':$scope.tagstr, 'page':1, 'pageSize':20, 'order': ['createdAt', 'DESC']};
+        var query = {'str':$scope.tagstr, 'page':1, 'pageSize':50, 'order': ['createdAt', 'DESC']};
         $http
         .get('/tag/search', {'params': query})
         .then((res)=>{
@@ -82,28 +69,12 @@ function docCtrl($scope, $http, $interval, user)
         tagGet();
     }
 
-    /* 组用户读取权限和其他用户读取权限具有包含关系
-     * 1. 其他用户可读取时， 组用户一定可读取
-     * 2. 组用户可读取时， 其他用户选择是否可读取
-     */
-    $scope.otherReadCheck = ()=>{
-        if (!$scope.otherRead) $scope.groupRead = true;
-    }
-    $scope.groupReadCheck = ()=>{
-        if ($scope.groupRead) $scope.otherRead = false;
-    }
-
     // 文档编辑提交
     $scope.submit = ()=>{
-        // 文档内容， 阅读权限；标签列表；目录节点列表
-        var private = '';
-        private += $scope.groupRead  ? 'GR1' : 'GR0';
-        private += $scope.otherRead  ? 'OR1' : 'OR0';
         var taglist = $scope.tagrel;
-        var categoryids = $scope.nodeSelected.map((x)=>{ return x.id; });
 
         $http
-        .post('/document/'+docid, {'content':content, 'private':private, 'taglist':taglist, 'categoryids':categoryids})
+        .post('/document/'+docid, {'content':content, 'taglist':taglist})
         .then((res)=>{
             if (errorCheck(res)) return ;
             // 显示更新成功后，刷新该页面
@@ -111,26 +82,6 @@ function docCtrl($scope, $http, $interval, user)
             window.setTimeout(()=>{ 
                 window.location.href = '/document';    
             }, 1000);
-        });
-    }
-
-    function categoryRefresh (categoryids) {       
-        $http
-        .get('/category/tree/0', {})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            
-            $scope.treeRoot = res.data.message;
-            $scope.treeView = res.data.message; 
-
-            // 获取基础数据
-            var {dir, list} = treeTravel($scope.treeView, 0, 20);
-            var {dir2, list2} = treeSearch(list, categoryids);  
-            $scope.listExpand = dir2;
-            var sel = [];
-            list.map((x)=>{ if (categoryids.indexOf(x.id)!=-1) sel.push(x); });
-            $scope.nodeSelected = sel;
-            $scope.predicate = (node)=>{ return (list2.indexOf(node.id)!=-1); };
         });
     }
 
@@ -143,12 +94,9 @@ function docCtrl($scope, $http, $interval, user)
             
             var ret = res.data.message;
             editor.setMarkdown(ret.content); 
-            $scope.groupRead  = (ret.private.indexOf('GR1')!=-1) ? true : false;
-            $scope.otherRead  = (ret.private.indexOf('OR1')!=-1) ? true : false;
             // 关联标签
             $scope.tagrel = ret.tagnames;
-            tagGet();
-            if ($scope.user && $scope.user.username) { categoryRefresh(ret.categoryids); }            
+            tagGet();      
         });
     }
 
@@ -162,6 +110,7 @@ function docCtrl($scope, $http, $interval, user)
     }
 
     $scope.display = ()=>{
-        window.open('/document/display/'+docid+'?r='+Math.random(), "_blank");
+        window.location.href = '/document/display/'+docid+'?r='+Math.random();
+        //window.open('/document/display/'+docid+'?r='+Math.random(), "_blank");
     }
 }
