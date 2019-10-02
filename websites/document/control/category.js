@@ -36,8 +36,8 @@ exports.dettach = async (ctx, categoryid, docid)=>{
     return 0;
 }
 
-// 搜索不在目录下的文件
-exports.searchNotInCategory = async (ctx, categoryid, page, pageSize, str)=>{
+// 搜索目录下的文档， 以及未在目录下的文档
+exports.searchRelateCategory = async (ctx, categoryid, page, pageSize, str)=>{
     const Document = ctx.models['Document'];
     const Category = ctx.models['Category'];  
     var total=0, list, rellist=[], doclist=[];
@@ -70,6 +70,53 @@ exports.searchNotInCategory = async (ctx, categoryid, page, pageSize, str)=>{
     // 计算分页数据
     sql = "SELECT COUNT(*) AS num FROM `Documents` "+sqlCond;
     
+    var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
+    total = res[0]['num'];
+    var maxpage  = Math.ceil(total/pageSize);
+    maxpage = (maxpage<1) ? 1 : maxpage;
+    page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
+
+    // 查询当前分页的列表数据
+    var offset = (page - 1) * pageSize;
+    sql = "SELECT * FROM `Documents` "+sqlCond+" ORDER BY `createdAt` DESC LIMIT "+offset+", "+pageSize+" ;";
+    var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
+    doclist = res.map((x)=>{
+        x['content'] = x.content ? x.content.toString() : '';
+        return x;
+    });
+
+    return {'total':total, 'page':page, 'rellist':rellist, 'doclist':doclist};
+}
+
+// 搜索目录下的文档
+exports.searchInCategory = async (ctx, categoryid, page, pageSize, str)=>{
+    const Document = ctx.models['Document'];
+    const Category = ctx.models['Category'];  
+    var rellist=[];
+
+    // 查找目录关联的文档
+    var categoryIns = await Category.findOne({logging:false, where:{'id':categoryid}});
+    var docInss = await categoryIns.getDocuments({logging:false}); 
+    var ids = docInss.map((x)=>{ return x.get({plain:true})['id']; });
+    if (!ids.length) {
+        return {'total':total, 'page':page, 'rellist':[]};
+    }
+
+    var sqlCond = " WHERE `id` IN("+ids.join(',')+") "; 
+    // 搜索文件的名称或描述
+    if (str && str.length) {
+        str.map((x)=>{
+            if (x) sqlCond += " AND `content` LIKE '%"+x+"%' ";
+        });
+    }
+    var res = await Document.findAll({logging:false, raw:true, where:{'id':ids}});
+    rellist = res.map((x)=>{
+        x['content'] = x.content ? x.content.toString() : '';
+        return x;
+    });
+
+    // 计算分页数据
+    var sql = "SELECT COUNT(*) AS num FROM `Documents` "+sqlCond;    
     var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
     total = res[0]['num'];
     var maxpage  = Math.ceil(total/pageSize);

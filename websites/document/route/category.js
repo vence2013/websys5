@@ -50,6 +50,24 @@ router.delete('/:categoryid', async (ctx)=>{
     }
 })
 
+router.get('/relate/:categoryid', async (ctx)=>{
+    const CategoryCtrl2 = ctx.controls['document/category'];
+
+    var req  = ctx.query;
+    var req2 = ctx.params;
+    // 提取有效参数
+    var categoryid = /^\d+$/.test(req2.categoryid) ? parseInt(req2.categoryid) : 0;
+    var str = req.str
+        .replace(/[\s]+/, ' ') // 将多个空格替换为一个
+        .replace(/(^\s*)|(\s*$)/g, "") // 删除字符串首尾的空格
+        .split(' ');
+    var page     = /^\d+$/.test(req.page) ? parseInt(req.page) : 1;
+    var pageSize = /^\d+$/.test(req.pageSize) ? parseInt(req.pageSize) : 100;
+
+    var ret = await CategoryCtrl2.searchRelateCategory(ctx, categoryid, page, pageSize, str);
+    ctx.body = {'errorCode':0, 'message':ret};
+})
+
 router.get('/:categoryid', async (ctx)=>{
     const CategoryCtrl2 = ctx.controls['document/category'];
 
@@ -64,7 +82,7 @@ router.get('/:categoryid', async (ctx)=>{
     var page     = /^\d+$/.test(req.page) ? parseInt(req.page) : 1;
     var pageSize = /^\d+$/.test(req.pageSize) ? parseInt(req.pageSize) : 100;
 
-    var ret = await CategoryCtrl2.searchNotInCategory(ctx, categoryid, page, pageSize, str);
+    var ret = await CategoryCtrl2.searchInCategory(ctx, categoryid, page, pageSize, str);
     ctx.body = {'errorCode':0, 'message':ret};
 })
 

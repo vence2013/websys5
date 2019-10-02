@@ -1,9 +1,9 @@
-var app = angular.module('categoryApp', ['treeControl'])
+var app = angular.module('viewApp', ['treeControl'])
 
 appConfiguration(app)
-.controller('categoryCtrl', categoryCtrl)
+.controller('viewCtrl', viewCtrl)
 
-function categoryCtrl($scope, $http, user, locals) 
+function viewCtrl($scope, $http, user, locals) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -17,19 +17,20 @@ function categoryCtrl($scope, $http, user, locals)
     $scope.treeView = [];
     $scope.listView = [];
     $scope.listExpand = [];  
-    $scope.treeOptions = { dirSelectable: true };
-    /* 文档搜索
-     * 查找某个目录关联的文档， 以及未关联文档
-     */
-    $scope.docOpts  = {'str':'', 'categoryid':0, 'page':1, 'pageSize':20};
-    $scope.docPages = [];
-    $scope.doclist  = [];
-    $scope.rellist  = [];
-
-    categoryRefresh();
-    $scope.$watch('docOpts', search, true);
+    $scope.treeOptions = {dirSelectable: true};
+    // 节点编辑信息
+    $scope.nodeSel = null;
+    // 关联文档列表
+    $scope.docOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
+    $scope.docPages= [];
+    $scope.doclist = [];
+    
+    $scope.$watch("user", categoryRefresh, true);
+    $scope.$watch('docOpts', docRelate, true);
 
     function categoryRefresh() {
+        if (!$scope.user || !$scope.user.username) return;
+
         $http
         .get('/category/tree/0', {})
         .then((res)=>{
@@ -43,7 +44,7 @@ function categoryCtrl($scope, $http, user, locals)
             $scope.listView   = list;
             // 还原展开节点
             if ($scope.user) {
-                var ids = locals.getObject('/category/document/expaned/'+$scope.user.username);
+                var ids = locals.getObject('/category/expaned/'+$scope.user.username);
                 if (ids.length) {
                     var expand = [];                
                     $scope.listView.map((x)=>{ if (ids.indexOf(x.id)!=-1) expand.push(x); });
@@ -55,58 +56,31 @@ function categoryCtrl($scope, $http, user, locals)
 
     $scope.categoryToggle = (node, expanded)=>{
         var ids = $scope.listExpand.map(node => { return node.id; });
-        locals.setObject('/category/document/expaned/'+$scope.user.username, ids);
+        locals.setObject('/category/expaned/'+$scope.user.username, ids);
     }
 
     $scope.categorySelect = (node, sel)=>{ 
         $scope.nodeSelected = sel ? node : null;
         if (sel) {
-            search();
+            docRelate();
         } else {
-            $scope.reslist = [];
+            $scope.doclist  = [];
         }
     }
 
-    // 获取目录未关联的文档列表
-    function search() {     
-        var cid = $scope.nodeSelected ? $scope.nodeSelected.id : 0;
+    function docRelate() {
+        if (!$scope.nodeSelected) return ;
 
         $http
-        .get('/document/category/relate/'+cid, {params: $scope.docOpts})
+        .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.docOpts})
         .then((res)=>{
-            if (errorCheck(res)) return ;
+            if (errorCheck(res)) return ;            
             var ret = res.data.message;
-            
-            $scope.rellist = ret.rellist;
             $scope.doclist = ret.doclist;
+
             $scope.docOpts['page'] = ret.page;
             $scope.docPages= initPage(ret.page, $scope.docOpts.pageSize, ret.total, 5);
         })
     }
 
-    $scope.attach = (docid)=>{
-        if (!$scope.nodeSelected) return toastr.warning('请先选择一个目录！');
-
-        var categoryid = $scope.nodeSelected.id;
-        $http
-        .post('/document/category/'+categoryid, {'docid':docid})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-
-            search();
-        })
-    }
-
-    $scope.dettach = (docid)=>{
-        // 获取选中的目录
-        var categoryid = $scope.nodeSelected ? $scope.nodeSelected.id : 0;
-
-        $http
-        .delete('/document/category/'+categoryid, {params:{'docid':docid}})
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            
-            search();
-        })
-    }
 }

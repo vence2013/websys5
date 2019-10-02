@@ -18,20 +18,15 @@ function indexCtrl($scope, $http, user, locals)
     $scope.listView = [];
     $scope.listExpand = [];  
     $scope.treeOptions = {dirSelectable: true};
+    $scope.predicate = "";
+    $scope.comparator = false;
     // 节点编辑信息
+    $scope.name = '';
+    $scope.desc = '';
     $scope.nodeSel = null;
-    // 关联文档列表
-    $scope.docOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
-    $scope.docPages= [];
-    $scope.doclist = [];
-    // 关联文件列表
-    $scope.fileOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
-    $scope.filePages= [];
-    $scope.filelist = [];
+
     
-    $scope.$watch("user", refresh, true);
-    $scope.$watch('docOpts', docRelate, true);
-    $scope.$watch('fileOpts', fileRelate, true);
+    $scope.$watch("user", refresh, true)
 
     function refresh() {
         if (!$scope.user || !$scope.user.username) return;
@@ -41,7 +36,7 @@ function indexCtrl($scope, $http, user, locals)
         .then((res)=>{
             if (errorCheck(res)) return ;
             $scope.treeRoot = res.data.message;
-            $scope.treeView = res.data.message; 
+            $scope.treeView = res.data.message;
 
             // 获取基础数据
             var {dir, list} = treeTravel($scope.treeView, 0, $scope.expand);
@@ -49,7 +44,7 @@ function indexCtrl($scope, $http, user, locals)
             $scope.listView   = list;
             // 还原展开节点
             if ($scope.user) {
-                var ids = locals.getObject('/category/expaned/'+$scope.user.username);
+                var ids = locals.getObject('/category/edit/expaned/'+$scope.user.username);
                 if (ids.length) {
                     var expand = [];                
                     $scope.listView.map((x)=>{ if (ids.indexOf(x.id)!=-1) expand.push(x); });
@@ -59,49 +54,64 @@ function indexCtrl($scope, $http, user, locals)
         });
     }
 
-    $scope.toggle = (node, expanded)=>{
-        var ids = $scope.listExpand.map(node => { return node.id; });
-        locals.setObject('/category/expaned/'+$scope.user.username, ids);
-    }
 
-    function docRelate() {
-        if (!$scope.nodeSelected) return ;
-
-        $http
-        .get('/document/category/'+$scope.nodeSelected.id, {params: $scope.docOpts})
-        .then((res)=>{
-            if (errorCheck(res)) return ;            
-            var ret = res.data.message;
-            $scope.doclist = ret.doclist;
-
-            $scope.docOpts['page'] = ret.page;
-            $scope.docPages= initPage(ret.page, $scope.docOpts.pageSize, ret.total, 5);
-        })
-    }
-
-    function fileRelate() {
-        if (!$scope.nodeSelected) return ; 
+    // 添加子节点
+    $scope.create = ()=>{
+        var name   = $scope.name.replace(/^\s+|\s+$/g,'');
+        var desc   = $scope.desc;
+        var father = $scope.nodeSel ? $scope.nodeSel.id : 0;
+        if (!name) { return toastr.info('请输入有效的目录名称！'); }
 
         $http
-        .get('/file/category/'+$scope.nodeSelected.id, {params: $scope.fileOpts})
+        .post('/category', {'father': father, 'name': name, 'desc': desc})
         .then((res)=>{
-            if (errorCheck(res)) return ;            
-            var ret = res.data.message;
-            $scope.filelist = ret.filelist;
+            if (errorCheck(res)) return ;
+            $scope.name = '';
+            $scope.desc = '';
+            toastr.info(res.data.message);
 
-            $scope.fileOpts['page'] = ret.page;
-            $scope.filePages= initPage(ret.page, $scope.fileOpts.pageSize, ret.total, 5);
-        })
+            refresh();            
+        }); 
     }
+
+    $scope.update = ()=>{        
+        var name = $scope.nodeSel.name.replace(/^\s+|\s+$/g,'');
+        var desc = $scope.nodeSel.desc;
+        var id     = $scope.nodeSel.id;
+        if (!name || !id || !angular.isNumber(id)) { return toastr.info('请选择有效节点并输入名称！'); }
+        
+        $http
+        .put('/category/'+id, {'name': name, 'desc': desc})
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            $scope.nodeSel = null;
+            toastr.info(res.data.message);
+
+            refresh();            
+        });
+    }
+
+    $scope.delete = ()=>{
+        $http
+        .delete('/category/'+$scope.nodeSel.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            $scope.nodeSel = null;
+            toastr.info(res.data.message);
+
+            refresh();            
+        });
+    }
+
 
     $scope.select = (node, sel)=>{ 
-        $scope.nodeSelected = sel ? node : null;
-        if (sel) {
-            docRelate();
-            fileRelate();
-        } else {
-            $scope.doclist  = [];
-            $scope.filelist = [];
-        }
+        $scope.nodeSel = sel ? node : null; 
+    }
+
+    $scope.toggle = (node, expanded)=>{
+        if (!$scope.user) return ; // 未登录用户不保存展开的节点
+
+        var ids = $scope.listExpand.map(node => { return node.id; });
+        locals.setObject('/category/edit/expaned/'+$scope.user.username, ids);
     }
 }
