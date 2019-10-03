@@ -10,10 +10,6 @@
 
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('ChipFunction', {
-        name: {  // 功能名称
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         content: {
             type: DataTypes.BLOB, 
             allowNull: false, 

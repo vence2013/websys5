@@ -8,97 +8,65 @@
  *  2019/5/27    - 创建文件。
  *****************************************************************************/  
 
-/* 添加文档，关联标签和位组
- */
-exports.edit = async (ctx, docid, content, chipid, moduleids, bitsids)=>{
-    const ChipModule = ctx.models['ChipModule'];
-    const ChipDocument = ctx.models['ChipDocument'];
+/* 添加文档，关联标签和位组 */
+exports.edit = async (ctx, funcid, content, moduleid, bitsids)=>{
+    const ChipFunction = ctx.models['ChipFunction'];
     var bitslist = bitsids.join(',');
 
-    if (docid) {
-        var docIns = await ChipDocument.findOne({logging: false, where: {'id':docid}});
-        if (!docIns) return -1; // 无效或无权修改
-        await docIns.update({'content':content, 'ChipId':chipid, 'bitslist':bitslist});
-        // 关联模块
-        var moduleInss = await ChipModule.findAll({logging:false, where:{'id':moduleids}});
-        await docIns.setChipModules(moduleInss, {logging:false});
+    if (funcid) {
+        var docIns = await ChipFunction.findOne({logging: false, where: {'id':funcid}});
+        if (!docIns) return -2; // 无效文档
+
+        await docIns.update({'content':content, 'ChipModuleId':moduleid, 'bitslist':bitslist});
+        return 0;
     } else {
-        var [docIns, created] = await ChipDocument.findOrCreate({logging: false,
-            where: {'content':content, 'ChipId':chipid}, defaults:{'bitslist':bitslist}
+        var [docIns, created] = await ChipFunction.findOrCreate({logging: false,
+            where: {'content':content, 'ChipModuleId':moduleid}, defaults:{'bitslist':bitslist}
         });
-        // 关联模块
-        var moduleInss = await ChipModule.findAll({logging:false, where:{'id':moduleids}});
-        await docIns.setChipModules(moduleInss, {logging:false});
+        return created ? 0 : -1; // 修改失败
     }
-
-    return 0;
 }
 
-exports.delete = async(ctx, docid)=>{
-    const ChipDocument = ctx.models['ChipDocument'];
+exports.delete = async(ctx, funcid)=>{    
+    const ChipFunction = ctx.models['ChipFunction'];
 
-    await ChipDocument.destroy({logging: false, 'where': {'id': docid}});
+    await ChipFunction.destroy({logging: false, 'where': {'id': funcid}});
 }
 
-/* 获取文档的信息， 关联的芯片名称， 关联的模块名称， 关联的寄存器名称及位组名称 */
-exports.detail = async (ctx, docid)=>{
-    const Chip = ctx.models['Chip'];
+exports.detail = async (ctx, funcid)=>{
     const ChipModule = ctx.models['ChipModule'];
-    const ChipRegister = ctx.models['ChipRegister'];
-    const ChipBit = ctx.models['ChipBit'];
-    const ChipDocument = ctx.models['ChipDocument'];
+    const ChipFunction = ctx.models['ChipFunction'];
 
-    var docObj = await ChipDocument.findOne({logging: false, raw:true, where: {'id':docid}});
-    if (docObj) {
-        docObj['content'] = docObj['content'].toString();
-        // 获取芯片名称
-        var chipObj = await Chip.findOne({logging:false, raw:true, where:{'id':docObj.ChipId}});
-        docObj['chip'] = chipObj['name'];
-
-        // 根据位组列表，逆向构建'模块列表/寄存器列表/位组列表'树形结构
-        var bitsids = [];
-        if (docObj['bitslist']) {
-            var bitsObjs=[], registerObjs=[], moduleObjs=[];
-            // 搜索相关元素的数据
-            var arr = docObj['bitslist'].split(',');
-            arr.map((x)=>{
-                if (/^\d+$/.test(x)) bitsids.push(parseInt(x));
-            });
-            bitsObjs = await ChipBit.findAll({logging:false, raw:true, where: {'id':bitsids}});
-            if (bitsObjs.length) {               
-                var registerids = bitsObjs.map((x)=>{ return x['ChipRegisterId']; });
-                registerObjs = await ChipRegister.findAll({logging:false, raw:true, where: {'id':registerids}});
-                if (registerObjs.length) {
-                    var moduleids = registerObjs.map((x)=>{ return x['ChipModuleId']; });
-                    moduleObjs = await ChipModule.findAll({logging:false, raw:true, where: {'id':moduleids}});
-                }
-            }
-
-            // 重构数据结构
-            var modulelist=[], registerlist=[];
-            registerObjs.map((x)=>{ 
-                var obj = {'id':x.id, 'name':x.name, 'ChipModuleId':x.ChipModuleId, 'bitslist':[]};
-                for (var i=0; i<bitsObjs.length; i++) {
-                    if (bitsObjs[i]['ChipRegisterId']!=obj.id) continue;
-                    var bits = {'id':bitsObjs[i]['id'], 'name':bitsObjs[i]['name']};
-                    obj['bitslist'].push(bits);
-                }
-                registerlist.push(obj); 
-            });
-            moduleObjs.map((x)=>{
-                var obj = {'id':x.id, 'name':x.name, 'fullname':x.fullname, 'registerlist':[]};
-                for (var i=0; i<registerlist.length; i++) {
-                    if (registerlist[i]['ChipModuleId']!=obj.id) continue;
-                    obj['registerlist'].push(registerlist[i]);
-                }
-                modulelist.push(obj);
-            });
-            docObj['modulelistsel'] = modulelist;
-        }
+    var ret = await ChipFunction.findOne({logging: false, raw:true, 'where': {'id': funcid}});
+    ret['content'] = ret['content'].toString();
+    
+    var moduleObj = await ChipModule.findOne({logging: false, raw:true, 'where': {'id': ret.ChipModuleId}});
+    if (moduleObj) {
+        ret['ChipId'] = moduleObj.ChipId;
     }
-
-    return docObj;
+    return ret;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 exports.search = async (ctx, ChipId, ModuleId, content, createget, createlet, order, page, pageSize)=>{
     var sql, sqlCond = '';

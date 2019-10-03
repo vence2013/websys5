@@ -25,7 +25,9 @@ function functionCtrl($scope, $http, $interval, user)
         },    
         onload : function() {
             // 获取编辑标签的内容
-            if ($scope.funcid) { detail(); }
+            if ($scope.funcid) {
+                detail(); // 等到芯片，寄存器等完成初始化
+            }
         }    
     });  
     // 启动定时解析文章内容    
@@ -60,6 +62,65 @@ function functionCtrl($scope, $http, $interval, user)
 
     chipGetList();
 
+
+    // - 功能编辑 -----------------------------------------------------------
+
+    $scope.edit = ()=>{
+        var moduleid = $scope.modulesel.id;
+        var bitsids  = $scope.bitselist;
+        if (!content) toastr.warning('请输入有效的内容！');
+
+        $http
+        .post('/chip/function/'+$scope.funcid, {'content':content, 'moduleid':moduleid, 'bitsids':bitsids })
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            window.location.href = '/chip';
+        });
+    }
+
+    $scope.detail = detail;
+    function detail() {
+        $http
+        .get('/chip/function/detail/'+$scope.funcid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            
+            var ret = res.data.message;
+            editor.setMarkdown(ret.content); 
+            // 选择芯片
+            for (var i = 0; (i < $scope.chiplist.length) && (ret.ChipId != $scope.chiplist[i].id); i++) ;
+            if (i < $scope.chiplist.length) {
+                chipSelect($scope.chiplist[i]);
+            }
+            // 选择模块
+            function chooseModule() {
+                for (var j = 0; (j < $scope.modulelist.length) && (ret.ChipModuleId != $scope.modulelist[j].id); j++) ;
+                if (j < $scope.modulelist.length) {
+                    moduleSelect($scope.modulelist[j]);
+                }
+                window.setTimeout(()=>{
+                    var list = ret.bitslist.split(',').map((x)=>{ return parseInt(x); });                    
+                    $scope.bitselist = list;
+                    for (var i = 0; i < list.length; i++) {
+                        bitSelect(list[i]);
+                    }
+                }, 500);                
+            }
+            window.setTimeout(chooseModule, 500);
+        });
+    }
+
+    $scope.delete = ()=>{
+        $http
+        .delete('/chip/function/'+$scope.funcid)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+
+            window.location.href = '/chip';
+        });
+    }
+
     // - 寄存器及位组详细信息显示 ---------------------------------------------
 
     // - bits --------------------------------------------------------------
@@ -93,7 +154,9 @@ function functionCtrl($scope, $http, $interval, user)
     }
 
     /* 选择或移除指定ID的位组 */
-    $scope.bitSelect = (bitsid) => {
+    $scope.bitSelect = bitSelect;
+    function bitSelect(bitsid) 
+    {
         if (!bitsid) return ;
 
         var idx = $scope.bitselist.indexOf(bitsid);
@@ -245,7 +308,7 @@ function functionCtrl($scope, $http, $interval, user)
             });
             reglist = list.sort(function(a,b){ return a.address-b.address; });
             
-            mapShow(reglist);
+            mapShow(reglist);     
         })
     }
 
@@ -314,77 +377,4 @@ function functionCtrl($scope, $http, $interval, user)
         })
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // --------------------------------------------------------------------------------------
-
-
-    $scope.edit = ()=>{
-        // 文档， 标签， 关联的芯片或(关联的模块, 关联寄存器)
-        var moduleids=[], bitsids=[];
-        for (var i=0; i<$scope.modulelistsel.length; i++) {
-            moduleids.push($scope.modulelistsel[i]['id']);
-            var registerlist = $scope.modulelistsel[i]['registerlist'];
-            for (var j=0; j<registerlist.length; j++) {
-                for (var k=0; k<registerlist[j]['bitslist'].length; k++) {
-                    bitsids.push(registerlist[j]['bitslist'][k].id);
-                }
-            }
-        }
-        if (!content) toastr.warning('请输入有效的内容！');
-
-        $http
-        .post('/chip/document/'+$scope.docid, {'content':content, 'chipid':$scope.chip.id, 'moduleids':moduleids, 'bitsids':bitsids })
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            window.location.href = '/chip';
-        });
-    }
-
-    $scope.delete = ()=>{
-        $http
-        .delete('/chip/document/'+$scope.docid)
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            window.location.href = '/chip';
-        });
-    }
-
-    $scope.detail = detail;
-    function detail() {
-        $http
-        .get('/chip/document/detail/'+$scope.docid)
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            
-            var ret = res.data.message;
-            editor.setMarkdown(ret.content); 
-            $scope.modulelistsel = ret.modulelistsel;
-            // 选择chip
-            for (var i=0; (i<$scope.chiplist.length) && ($scope.chiplist[i].id!=ret.ChipId); i++) ;
-            if (i>=$scope.chiplist.length) return;
-            if ($scope.chip != $scope.chiplist[i]) chipSelect($scope.chiplist[i]);
-        });
-    }
 }
