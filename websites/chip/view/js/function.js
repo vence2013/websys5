@@ -1,10 +1,10 @@
-var app = angular.module('documentApp', [])
+var app = angular.module('functionApp', [])
 
 appConfiguration(app)
-.controller('documentCtrl', documentCtrl);
+.controller('functionCtrl', functionCtrl);
 
 
-function documentCtrl($scope, $http, $interval, user) 
+function functionCtrl($scope, $http, $interval, user) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -21,9 +21,6 @@ function documentCtrl($scope, $http, $interval, user)
     // 寄存器和位组搜索
     $scope.str = '';
 
-    $scope.$watch('str', mapSearch);
-
-
     var docid   = $('#wrapper').attr('docid');
     $scope.docid= /^\d+$/.test(docid) ? parseInt(docid) : 0;    
     // 选中的位组所属的寄存器列表
@@ -32,8 +29,8 @@ function documentCtrl($scope, $http, $interval, user)
     var registerall = [];
     var bitsall     = [];
 
+    /* 初始化editor.md编辑器 */
     var content = '';
-    // 初始化editor.md
     var editor = editormd("editormd", {
         path : '/node_modules/editor.md/lib/',
         width: '100%',
@@ -50,6 +47,27 @@ function documentCtrl($scope, $http, $interval, user)
     $interval(()=>{ content = editor.getMarkdown(); }, 1000);
 
     chipGet();
+    $scope.$watch('str', mapSearch);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     $scope.edit = ()=>{

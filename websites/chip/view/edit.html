@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="data:;base64,=">  <!-- 禁止加载facon.ico -->
-    <title>chip edit</title>
+    <title>Chip Edit</title>
 
     <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
     <script src="/node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script> 
@@ -62,99 +62,139 @@
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1">
                 <!-- 芯片 -->
-                <div class="row mt-4">
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" ng-model="chip.name" placeholder="芯片名称">
-                    </div>
-                    <div class="col-md">
-                        <input type="text" class="form-control" ng-model="chip.width" placeholder="总线宽度">  
+                <div class="card bg-light mt-3">
+                    <div class="card-body p-2">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" ng-model="chipsel.name" placeholder="芯片名称">
+                            </div>
+                            <div class="col-md">
+                                <input type="text" class="form-control" ng-model="chipsel.width" placeholder="总线宽度">  
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md"></div>
+                            <div class="col-md-1" ng-show="chipsel.id">
+                                <button type="button" class="btn btn-block btn-outline-warning" ng-click="chipReset();">重置</button>
+                            </div>
+                            <div class="col-md-1" ng-show="chipsel.id">
+                                <button type="button" class="btn btn-block btn-outline-danger" data-toggle="modal" data-target="#chipDeleteConfirmWnd">删除</button>
+                            </div>
+                            <div class="col-md-1" ng-show="chipsel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="chipEdit();">编辑</button>
+                            </div>
+                            <div class="col-md-1" ng-show="!chipsel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="chipEdit();">创建</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="chip.id" data-toggle="modal" data-target="#chipDeleteConfirmWnd">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="chip.id" ng-click="chipSubmit();">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="!chip.id" ng-click="chipSubmit();">创建</button>
-                    </div>
-                </div>
-                <!-- 芯片模块 -->
-                <div class="row mt-4">
-                    <div class="col-md">
-                        <input type="text" class="form-control" ng-model="module.name" placeholder="模块名称">
-                    </div>
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" ng-model="module.fullname" placeholder="模块全称">
-                    </div>
-                </div>
-                <div class="row mt-2" style="height: 40px;">
-                    <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="module.id" data-toggle="modal" data-target="#moduleDeleteConfirmWnd">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="module.id" ng-click="moduleSubmit();">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="chip.id && !module.id" ng-click="moduleSubmit();">创建</button>
+                <!-- 模块 -->
+                <div class="card bg-light mt-3">
+                    <div class="card-body p-2">
+                        <div class="row">
+                            <div class="col-md">
+                                <input type="text" class="form-control" ng-model="modulesel.name" placeholder="模块名称">
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" ng-model="modulesel.fullname" placeholder="模块全称">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md"></div>
+                            <div class="col-md-1" ng-show="modulesel.id">
+                                <button type="button" class="btn btn-block btn-outline-warning" ng-click="moduleReset();">重置</button>
+                            </div>
+                            <div class="col-md-1" ng-show="modulesel.id">
+                                <button type="button" class="btn btn-block btn-outline-danger" data-toggle="modal" data-target="#moduleDeleteConfirmWnd">删除</button>
+                            </div>
+                            <div class="col-md-1" ng-show="modulesel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="moduleEdit();">编辑</button>
+                            </div>
+                            <div class="col-md-1" ng-show="chipsel.id && !modulesel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="moduleEdit();">创建</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- 寄存器 -->
-                <div class="card mt-4 bg-light">
-                    <div class="card-body">
+                <div class="card bg-light mt-3">
+                    <div class="card-body p-2">
                         <div class="row">
                             <div class="col-md-2">
-                                <input type="text" class="form-control" ng-model="register.name" placeholder="寄存器名称">
+                                <input type="text" class="form-control" ng-model="registersel.name" placeholder="寄存器名称">
                             </div>
                             <div class="col-md">
-                                <input type="text" class="form-control" ng-model="register.fullname" placeholder="全称">
+                                <input type="text" class="form-control" ng-model="registersel.fullname" placeholder="全称">
                             </div>
                             <div class="col-md-2">
-                                <input type="text" class="form-control" ng-model="register.address" placeholder="地址，比如0x04">
+                                <input type="text" class="form-control" ng-model="registersel.address" placeholder="地址，比如0x04">
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md">
-                                <textarea class="form-control" rows="6" ng-model="register.desc" placeholder="寄存器描述"></textarea>
+                                <textarea class="form-control" rows="4" ng-model="registersel.desc" placeholder="寄存器描述"></textarea>
                             </div>
-                        </div>                        
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="register.id" data-toggle="modal" data-target="#registerDeleteConfirmWnd">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="register.id" ng-click="registerSubmit();">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="module.id && !register.id" ng-click="registerSubmit();">创建</button>
+                        </div>  
+                        <div class="row mt-2">
+                            <div class="col-md"></div>
+                            <div class="col-md-1" ng-show="registersel.id">
+                                <button type="button" class="btn btn-block btn-outline-warning" ng-click="registerReset();">重置</button>
+                            </div>
+                            <div class="col-md-1" ng-show="registersel.id">
+                                <button type="button" class="btn btn-block btn-outline-danger" data-toggle="modal" data-target="#registerDeleteConfirmWnd">删除</button>
+                            </div>
+                            <div class="col-md-1" ng-show="registersel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="registerEdit();">编辑</button>
+                            </div>
+                            <div class="col-md-1" ng-show="modulesel.id && !registersel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="registerEdit();">创建</button>
+                            </div>
+                        </div>                      
                     </div>
                 </div>
                 <!-- 位组 -->
-                <div class="card mt-4 bg-light">
-                    <div class="card-body">
+                <div class="card bg-light mt-3">
+                    <div class="card-body p-2">
                         <div class="row">
                             <div class="col-md-2">
-                                <input type="text" class="form-control" ng-model="bits.name" placeholder="位组名称">
+                                <input type="text" class="form-control" ng-model="bitsel.name" placeholder="位组名称">
                             </div>
                             <div class="col-md">
-                                <input type="text" class="form-control" ng-model="bits.fullname" placeholder="全称">
+                                <input type="text" class="form-control" ng-model="bitsel.fullname" placeholder="全称">
                             </div>
                             <div class="col-md-2">
-                                <input type="text" class="form-control" ng-model="bits.rw" placeholder="读写权限">
+                                <input type="text" class="form-control" ng-model="bitsel.rw" placeholder="读写权限">
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md">
-                                <input type="text" class="form-control" ng-model="bits.bitlist" placeholder="位组序号列表，用逗号分开，比如:1,2,3,4,5,7">
+                                <input type="text" class="form-control" ng-model="bitsel.bitlist" placeholder="位组序号列表，用逗号分开，比如:1,2,3,4,5,7">
                             </div>
                             <div class="col-md">
-                                <input type="text" class="form-control" ng-model="bits.valuelist" placeholder="位组复位值列表，用逗号分开，与序号对应，比如：1,1,1,0,0,1">
+                                <input type="text" class="form-control" ng-model="bitsel.valuelist" placeholder="位组复位值列表，用逗号分开，与序号对应，比如：1,1,1,0,0,1">
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md">
-                                <textarea class="form-control" rows="6" ng-model="bits.desc" placeholder="寄存器描述"></textarea>
+                                <textarea class="form-control" rows="11" ng-model="bitsel.desc" placeholder="寄存器描述"></textarea>
                             </div>
-                        </div>                        
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="bits.id" data-toggle="modal" data-target="#bitsDeleteConfirmWnd">删除</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="bits.id" ng-click="bitsSubmit();">编辑</button>
-                        <button type="button" class="btn btn-outline-success px-3" ng-show="register.id && !bits.id" ng-click="bitsSubmit();">创建</button>
+                        </div> 
+                        <div class="row mt-2">
+                            <div class="col-md"></div>
+                            <div class="col-md-1" ng-show="bitsel.id">
+                                <button type="button" class="btn btn-block btn-outline-warning" ng-click="bitsReset();">重置</button>
+                            </div>
+                            <div class="col-md-1" ng-show="bitsel.id">
+                                <button type="button" class="btn btn-block btn-outline-danger" data-toggle="modal" data-target="#bitsDeleteConfirmWnd">删除</button>
+                            </div>
+                            <div class="col-md-1" ng-show="bitsel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="bitsEdit();">编辑</button>
+                            </div>
+                            <div class="col-md-1" ng-show="registersel.id && !bitsel.id">
+                                <button type="button" class="btn btn-block btn-outline-success" ng-click="bitsEdit();">创建</button>
+                            </div>
+                        </div>                       
                     </div>
                 </div>
             </div>

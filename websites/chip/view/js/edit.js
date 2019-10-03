@@ -16,345 +16,342 @@ function editCtrl($scope, $http)
     $scope.modulelist = [];
     $scope.registerlist = [];
     $scope.bitslist = [];
-
-    $scope.chip = {'id':0, 'name':'', 'width':''};
-    $scope.module = {'id':0, 'name':'', 'fullname':''};
-    $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-    $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
-
-    chipGet();
+    // 页面初始化时会自动选择第1个元素
+    $scope.chipsel = null;
+    $scope.modulesel = null;
+    $scope.registersel = null;
+    $scope.bitsel = null;
 
 
-    // bits
+    /************ 芯片元素（芯片， 模块， 寄存器， 位组）编辑 *********************/
 
-    function bitsUnselect()
-    {
-        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+    // - bits -----------------------------------------------------------------
+
+    $scope.bitsReset = () => {
+        $scope.bitsel = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
     }
 
-    $scope.bitsSelect = bitsSelect;
-    function bitsSelect(bits)
-    {
-        $(".bitsContainer>.sel").removeClass('sel');
-        if ($scope.bits == bits) {
-            bitsUnselect();
-        } else {
-            $scope.bits = bits;
-            window.setTimeout(()=>{            
-                var idx = $scope.bitslist.indexOf(bits);
-                $(".bitsContainer>div:eq("+idx+")").addClass('sel');
-            }, 0);
-        }
-    }
-
-    function bitsGet(sel) {
-        if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
-
-        $http
-        .get('/chip/bits/register/'+$scope.register.id)
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            var ret = res.data.message;
-            $scope.bitslist = ret;
-            //如果没有数据，则清空后续数据
-            if (!ret.length || (sel<0)) {
-                bitsUnselect();
-            } else {
-                // 默认选择第一个
-                var bits = ret[0];
-                // 查看之前的选择是否还有效
-                if ($scope.bits.id) { 
-                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.bits.id); i++) ;
-                    if (i<ret.length) bits = ret[i];
-                }            
-                bitsSelect(bits);
-            }
-        })
-    }
-
-    $scope.bitsSubmit = ()=>{
-        var name = $scope.bits.name;
-        var rw   = $scope.bits.rw;
-        var bitlist   = $scope.bits.bitlist;
-        var valuelist = $scope.bits.valuelist;        
-        if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请先选择一个寄存器！');
+    $scope.bitsEdit = () => {
+        var name = $scope.bitsel.name;
+        var rw   = $scope.bitsel.rw;
+        var bitlist   = $scope.bitsel.bitlist;
+        var valuelist = $scope.bitsel.valuelist;        
         if (!name || !rw || !/^(\d+,)*\d+$/.test(bitlist) || !/^(.,)*.$/.test(valuelist)) return toastr.warning('请输入有效的位组参数！');
         var arr1 = bitlist.split(',');
         var arr2 = valuelist.split(',');
         if (arr1.length!=arr2.length) return toastr.warning('位组的位序号和值数量不一样，请确认！');
+
         var i;
         // 检查位组序号的有效性
-        var chipWidth = parseInt($scope.chip.width);            
+        var chipWidth = parseInt($scope.chipsel.width);            
         for (i=0; (i<arr1.length) && (parseInt(arr1[i])<chipWidth); i++) ;
         if (i<arr1.length) return toastr.warning('位组的序号应小于芯片位宽度， 请输入有效位组序号！');
         // 复位之可以为0/1/x
 
         $http
-        .post('/chip/bits/'+$scope.register.id, $scope.bits)
+        .post('/chip/bits/'+$scope.registersel.id, $scope.bitsel)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-
-            bitsGet(-1);
             toastr.success(res.data.message);
+
+            getBitsList(name);            
         });
     }
 
-    $scope.bitsDelete = ()=>{
-        if (!/^\d+$/.test($scope.bits.id)) return toastr.warning('请选择要删除的寄存器！');
+    $scope.bitsDelete = () => {
+        if (!/^\d+$/.test($scope.bitsel.id)) return toastr.warning('请选择要删除的寄存器！');
 
         $http
-        .delete('/chip/bits/'+$scope.bits.id)
+        .delete('/chip/bits/'+$scope.bitsel.id)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-            
-            bitsGet();
             toastr.success(res.data.message);
+
+            getBitsList();            
         });
     }
 
+    // - register -------------------------------------------------------------
 
-    // register 
-
-    function registerUnselect()
-    {
-        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
-        
-        $scope.bitslist = [];
+    $scope.registerReset = () => {
+        $scope.registersel = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
     }
 
-    $scope.registerSelect = registerSelect;
-    function registerSelect(register)
-    {
-        $(".registerContainer>.sel").removeClass('sel');
-        if ($scope.register == register) {
-            registerUnselect();
-        } else {
-            $scope.register = register;
-            bitsGet();
-            window.setTimeout(()=>{            
-                var idx = $scope.registerlist.indexOf(register);
-                $(".registerContainer>div:eq("+idx+")").addClass('sel');
-            }, 0);
-        }
-    }
-
-    function registerGet(sel) {
-        if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请先选择一款模块！');
-
-        $http
-        .get('/chip/register/module/'+$scope.module.id)
-        .then((res)=>{
-            if (errorCheck(res)) return ;
-            var ret = res.data.message;
-            $scope.registerlist = ret;
-            //如果没有数据，则清空后续数据
-            if (!ret.length || (sel<0)) {
-                registerUnselect();
-            } else {
-                // 默认选择第一个
-                var register = ret[0];
-                // 查看之前的选择是否还有效
-                if ($scope.register.id) { 
-                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.register.id); i++) ;
-                    if (i<ret.length) register = ret[i];
-                }            
-                registerSelect(register);
-            }
-        })
-    }
-
-    $scope.registerSubmit = ()=>{
-        var name = $scope.register.name;
-        var address = $scope.register.address;
-        if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请先选择一个模块！');
+    $scope.registerEdit = ()=>{
+        var name = $scope.registersel.name;
+        var address = $scope.registersel.address;
         if (!name || !/0[xX]{1}[0-9a-fA-F]+/.test(address)) return toastr.warning('请输入有效的寄存器名称以及地址！');
 
         $http
-        .post('/chip/register/'+$scope.module.id, $scope.register)
+        .post('/chip/register/'+$scope.modulesel.id, $scope.registersel)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-
-            registerGet(-1);
             toastr.success(res.data.message);
+
+            getRegisterList(name);            
         });
     }
 
     $scope.registerDelete = ()=>{
-        if (!/^\d+$/.test($scope.register.id)) return toastr.warning('请选择要删除的寄存器！');
+        if (!/^\d+$/.test($scope.registersel.id)) return toastr.warning('请选择要删除的寄存器！');
 
         $http
-        .delete('/chip/register/'+$scope.register.id)
+        .delete('/chip/register/'+$scope.registersel.id)
         .then((res)=>{
             if (errorCheck(res)) return ; 
-            
-            registerGet();
             toastr.success(res.data.message);
+
+            getRegisterList();            
         });
     }
 
+    // - module ---------------------------------------------------------------
 
-    // module
-
-    function moduleUnselect() 
-    {
-        $scope.module = {'id':0, 'name':'', 'fullname':''};
-        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
-        
-        $scope.registerlist = [];
-        $scope.bitslist = [];
+    $scope.moduleReset = ()=> {
+        $scope.modulesel = {'id':0, 'name':'', 'fullname':''};
     }
 
-    $scope.moduleSelect = moduleSelect;
-    function moduleSelect(module) 
-    {
-        $(".moduleContainer>.sel").removeClass('sel');
-        if ($scope.module == module) {
-            moduleUnselect();
-        } else {
-            $scope.module = module;
-            registerGet();
-            window.setTimeout(()=>{            
-                var idx = $scope.modulelist.indexOf(module);
-                $(".moduleContainer>div:eq("+idx+")").addClass('sel');
-            }, 0);
-        }
-    }
-
-    function moduleGet(sel) {
-        if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
+    $scope.moduleEdit = () => {
+        var name = $scope.modulesel.name;
+        if (!name) return toastr.warning('请输入有效的模块名称！');
 
         $http
-        .get('/chip/module/chip/'+$scope.chip.id)
+        .post('/chip/module/'+$scope.chipsel.id, $scope.modulesel)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            toastr.success(res.data.message);
+
+            getModuleList(name);            
+        });
+    }
+
+    $scope.moduleDelete = () => {
+        if (!/^\d+$/.test($scope.modulesel.id)) return toastr.warning('请选择要删除的模块！');
+
+        $http
+        .delete('/chip/module/'+$scope.modulesel.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            toastr.success(res.data.message);
+
+            getModuleList();            
+        });
+    }
+
+    // - chip -----------------------------------------------------------------
+
+    $scope.chipReset = () => {
+        $scope.chipsel = {'id':0, 'name':'', 'width':''};;
+    }
+
+    $scope.chipEdit = ()=>{
+        var id    = $scope.chipsel.id;
+        var name  = $scope.chipsel.name;
+        var width = $scope.chipsel.width;
+        if (!name || !/^\d+$/.test(width)) return toastr.warning('请输入有效的芯片参数！');
+        
+        $http
+        .post('/chip/chip/'+id, $scope.chipsel)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            toastr.success(res.data.message);
+
+            chipGetList(name);            
+        });
+    }
+
+    $scope.chipDelete = () => {
+        if (!/^\d+$/.test($scope.chipsel.id)) return toastr.warning('请选择要删除的芯片！');
+
+        $http
+        .delete('/chip/chip/'+$scope.chipsel.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ; 
+            toastr.success(res.data.message);
+
+            chipGetList();            
+        });
+    }
+
+    /****************** 芯片元素（芯片， 模块， 寄存器， 位组）关联显示 ***********/
+
+    // - bits -----------------------------------------------------------------
+
+    $scope.bitsSelect = bitsSelect;
+    function bitsSelect(bits)
+    {        
+        $scope.bitsel = bits;
+        $(".bitsContainer>.sel").removeClass('sel');
+        window.setTimeout(()=>{            
+            var idx = $scope.bitslist.indexOf(bits);
+            $(".bitsContainer>div:eq("+idx+")").addClass('sel');
+        }, 0);
+    }
+
+    function getBitsList(namePreselect) {
+        $http
+        .get('/chip/bits/register/'+$scope.registersel.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            var ret = res.data.message;
+            $scope.bitslist = ret;
+            
+            if (ret.length) {
+                if (namePreselect) {
+                    for (var i=0; (i<ret.length) && (ret[i].name!=namePreselect); i++) ;
+                    if (i<ret.length) {
+                        bitsSelect(ret[i]);
+                    }
+                } else {
+                    bitsSelect(ret[0]);
+                }
+            } else {
+                $scope.bitsel   = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+            }            
+        })
+    }
+
+    // - register -------------------------------------------------------------
+
+    $scope.registerSelect = registerSelect;
+    function registerSelect(register)
+    {
+        $scope.registersel = register;
+        
+        $(".registerContainer>.sel").removeClass('sel');
+        window.setTimeout(()=>{            
+            var idx = $scope.registerlist.indexOf(register);
+            $(".registerContainer>div:eq("+idx+")").addClass('sel');
+        }, 0);
+
+        getBitsList();
+    }
+
+    function getRegisterList(namePreselect) {
+        $http
+        .get('/chip/register/module/'+$scope.modulesel.id)
+        .then((res)=>{
+            if (errorCheck(res)) return ;
+            var ret = res.data.message;
+            $scope.registerlist = ret;
+            
+            if (ret.length) {
+                if (namePreselect) {
+                    for (var i=0; (i<ret.length) && (ret[i].name!=namePreselect); i++) ;
+                    if (i<ret.length) {
+                        registerSelect(ret[i]);
+                    }
+                } else {
+                    registerSelect(ret[0]);
+                }                
+            } else {
+                $scope.registersel  = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+                $scope.bitslist = [];
+                $scope.bitsel   = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
+            }            
+        })
+    }
+
+    // - module ---------------------------------------------------------------
+
+    $scope.moduleSelect = moduleSelect;
+    function moduleSelect(module)
+    {
+        $scope.modulesel = module;
+        $(".moduleContainer>.sel").removeClass('sel');
+        window.setTimeout(()=>{            
+            var idx = $scope.modulelist.indexOf(module);
+            $(".moduleContainer>div:eq("+idx+")").addClass('sel');
+        }, 0);
+
+        getRegisterList();
+    }
+
+    function getModuleList(namePreselect)
+    {
+        $http
+        .get('/chip/module/chip/'+$scope.chipsel.id)
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;
             $scope.modulelist = ret;
-            //如果没有数据，则清空后续数据
-            if (!ret.length || (sel<0)) {
-                moduleUnselect();
+            
+            if (ret.length) {
+                if (namePreselect) {
+                    for (var i=0; (i<ret.length) && (ret[i].name!=namePreselect); i++) ;
+                    if (i<ret.length) {
+                        moduleSelect(ret[i]);
+                    }
+                } else {
+                    // 默认选择第一个
+                    moduleSelect(ret[0]);
+                }
             } else {
-                // 默认选择第一个
-                var module = ret[0];
-                // 查看之前的选择是否还有效
-                if ($scope.module.id) { 
-                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.module.id); i++) ;
-                    if (i<ret.length) module = ret[i];
-                }            
-                moduleSelect(module);
+                // 没有任何模块时，需要清除所有后续元素：模块编辑， 寄存器列表，编辑， 位组列表， 编辑
+                $scope.modulesel    = {'id':0, 'name':'', 'fullname':''};
+                $scope.registerlist = [];
+                $scope.registersel  = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+                $scope.bitslist = [];
+                $scope.bitsel   = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
             }
         })
     }
 
-    $scope.moduleSubmit = ()=>{
-        if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请先选择一款芯片！');
-        if (!$scope.module.name) return toastr.warning('请输入有效的模块名称！');
-
-        $http
-        .post('/chip/module/'+$scope.chip.id, $scope.module)
-        .then((res)=>{
-            if (errorCheck(res)) return ; 
-            
-            moduleGet(-1);
-            toastr.success(res.data.message);
-        });
-    }
-
-    $scope.moduleDelete = ()=>{
-        if (!/^\d+$/.test($scope.module.id)) return toastr.warning('请选择要删除的模块！');
-
-        $http
-        .delete('/chip/module/'+$scope.module.id)
-        .then((res)=>{
-            if (errorCheck(res)) return ; 
-            
-            moduleGet();
-            toastr.success(res.data.message);
-        });
-    }
-
-
-    // chip
-
-    function chipUnselect() 
-    {
-        $scope.chip = {'id':0, 'name':'', 'width':''};
-        $scope.module = {'id':0, 'name':'', 'fullname':''};
-        $scope.register = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
-        $scope.bits = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
-        
-        $scope.modulelist = [];
-        $scope.registerlist = [];
-        $scope.bitslist = [];
-    }
+    //- chip ------------------------------------------------------------------
 
     $scope.chipSelect = chipSelect;
+    /* 选择某个芯片。
+     * 需要进行的工作有：
+     * 1. 更新数据：选中的芯片
+     * 2. 更新显示：选中的芯片
+     * 3. 更新模块列表
+     */
     function chipSelect(chip)
     {
+        $scope.chipsel = chip;        
         $(".chipContainer>.sel").removeClass('sel');
-        if ($scope.chip.id == chip.id) {
-            chipUnselect();
-        } else {
-            $scope.chip = chip;
-            moduleGet();
-            window.setTimeout(()=>{
-                var idx = $scope.chiplist.indexOf(chip);
-                $(".chipContainer>div:eq("+idx+")").addClass('sel');
-            }, 0);
-        }
+        window.setTimeout(()=>{
+            var idx = $scope.chiplist.indexOf(chip);
+            $(".chipContainer>div:eq("+idx+")").addClass('sel');
+        }, 0);
+
+        getModuleList();
     }
 
-    // sel - 默认选择
-    function chipGet(sel) {
+    /* 获取芯片列表
+     * 1. 获取并更新芯片列表数据
+     * 2. 默认选择第1个芯片
+     * 
+     * 说明： 允许预先选择某个芯片，应用于：新增芯片后选中
+     */
+    function chipGetList(namePreselect) {
         $http
         .get('/chip/chip')
         .then((res)=>{
             if (errorCheck(res)) return ;
             var ret = res.data.message;
-            $scope.chiplist = ret;
-            //如果没有数据，则清空后续数据
-            if (!ret.length || (sel<0)) {
-                chipUnselect();
+            $scope.chiplist = ret;  
+
+            if (ret.length) {
+                if (namePreselect) {
+                    for (var i=0; (i<ret.length) && (ret[i].name!==namePreselect); i++) ;
+                    if (i<ret.length) {
+                        chipSelect(ret[i]);
+                    }
+                } else { // 默认选择第一个
+                    chipSelect(ret[0]);
+                }
             } else {
-                // 默认选择第一个
-                var chip = ret[0];
-                // 查看之前的选择是否还有效
-                if ($scope.chip.id) { 
-                    for (var i=0; (i<ret.length) && (ret[i].id!=$scope.chip.id); i++) ;
-                    if (i<ret.length) chip = ret[i];
-                }            
-                chipSelect(chip);
+                $scope.chipsel = {'id':0, 'name':'', 'width':''};
+                $scope.modulelist = [];
+                $scope.modulesel  = {'id':0, 'name':'', 'fullname':''};
+                $scope.registerlist = [];
+                $scope.registersel  = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
+                $scope.bitslist = [];
+                $scope.bitsel   = {'id':0, 'name':'', 'fullname':'', 'bitlist':'', 'valuelist':'', 'rw':'', 'desc':''};
             }
         })
     }
 
-    $scope.chipSubmit = ()=>{
-        var name = $scope.chip.name;
-        var width = $scope.chip.width;
-        if (!name || !/^\d+$/.test(width)) return toastr.warning('请输入有效的芯片参数！');
-
-        var chipid = /^\d+$/.test($scope.chip.id) ? $scope.chip.id : 0;
-        $http
-        .post('/chip/'+chipid, $scope.chip)
-        .then((res)=>{
-            if (errorCheck(res)) return ; 
-            
-            chipGet(-1);
-            toastr.success(res.data.message);
-        });
-    }
-
-    $scope.chipDelete = ()=>{
-        if (!/^\d+$/.test($scope.chip.id)) return toastr.warning('请选择要删除的芯片！');
-
-        $http
-        .delete('/chip/'+$scope.chip.id)
-        .then((res)=>{
-            if (errorCheck(res)) return ; 
-            
-            chipGet();
-            toastr.success(res.data.message);
-        });
-    }
+    chipGetList();
 }

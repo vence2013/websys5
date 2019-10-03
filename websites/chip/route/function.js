@@ -16,6 +16,12 @@ const Router = require('koa-router');
  *****************************************************************************/
 var router = new Router();
 
+router.get('/edit/:funcid', async (ctx)=>{    
+    var req2 = ctx.params;
+    var funcid= parseInt(req2.funcid);
+
+    await ctx.render('websites/chip/view/function.html', {'id':funcid}); 
+});
 
 router.post('/:docid', async (ctx)=>{
     const DocumentCtrl2 = ctx.controls['chip/document'];
@@ -46,13 +52,6 @@ router.delete('/:docid', async (ctx)=>{
     ctx.body = {'errorCode':0, 'message':'SUCCESS'}
 })
 
-/* 文档编辑页面 */
-router.get('/edit/:docid', async (ctx)=>{    
-    var req2 = ctx.params;
-    var docid= parseInt(req2.docid);
-
-    await ctx.render('chip/view/document.html', {'id':docid}); 
-});
 /* 文档显示页面 */
 router.get('/display/:docid', async (ctx)=>{
     var req2 = ctx.params;
