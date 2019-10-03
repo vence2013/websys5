@@ -26,13 +26,11 @@ exports.edit = async (ctx, chipid, name, width)=>{
     return 0;
 }
 
-
 exports.delete = async (ctx, chipid)=>{
     const Chip = ctx.models['Chip'];
 
     await Chip.destroy({logging: false, where: {'id': chipid}});
 }
-
 
 exports.get = async (ctx)=>{
     const Chip = ctx.models['Chip'];

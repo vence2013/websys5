@@ -1,3 +1,8 @@
+#wrapper { font-size:12px; }
+#wrapper>div>div { height:700px; }
+.item { border-bottom: 1px dashed #cccccc; }
+.item>a { margin: 5px 5px 0px 0px; padding: 0px 2px; line-height: 15px; }
+
 .chipsel  { background-color: #cccccc; }
 .modulesel { background-color: #cccccc; }
 
@@ -7,10 +12,11 @@
 .reg>div { padding: 0px 3px; cursor: pointer; }
 .regname { background-color: #CD5C5C; font-weight: bold; text-align: center; height: 30px; line-height: 30px; }
 .bit { border-bottom: 1px dashed #ffffff; }
+
+#floatInfo { display: none; position: absolute; bottom: 10px; left: 10px; width: 45%; min-height: 70px; padding: 5px;
+    opacity: 0.9; z-index: 999; border-radius: 5px; background-color: #F5ECCE; }
+#floatInfo>span { color: #CD5C5C; font-style: italic; margin-left: 5px; }
+
 .bitValid { background-color: #20B2AA; }
 .bitFocus { background-color: #CD853F; }
-.bitSelect { color: #ff0000; }
-
-#bitsInfo { display: none; position: absolute; top: 50px; left: 10px; width: 40%; min-height: 70px; 
-    opacity: 0.8; z-index: 999; border-radius: 5px; background-color: #F5ECCE; }
-#bitsInfo>span { color: #008080; font-style: italic; margin-left: 5px; }
+.bitSelect { background-color: #ff0000; }

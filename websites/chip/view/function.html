@@ -27,17 +27,11 @@
     <link  href="/view/css/all.css" rel="stylesheet" />
     <script src="/chip/view/js/function.js" type="text/javascript"></script>
     <link  href="/chip/view/css/function.css" rel="stylesheet" />
-    <style>
-    #wrapper { font-size:12px; }
-    #wrapper>div>div { height:700px; }
-    .item { border-bottom: 1px dashed #cccccc; }
-    .item>a { margin: 5px 5px 0px 0px; padding: 0px 2px; line-height: 15px; }
-    </style>
 </head>
 <body ng-app="functionApp">
 
     <div ng-include="'/view/nav.html'"></div>
-    <div id="wrapper" class="container-fluid" ng-controller="functionCtrl" docid="<%=id%>">
+    <div id="wrapper" class="container-fluid" ng-controller="functionCtrl" funcid="<%=id%>">
         <div class="row">
             <div class="col-md border border-success rounded my-2 mx-1">
                 <div class="row" style="height: 50px;">
@@ -50,17 +44,10 @@
                         <a href="#" style="color: #0489B1; float: left;" ng-repeat="x in modulelist" ng-click="moduleSelect(x);">{{x.name}}</a>
                     </div>
                 </div>
-                <div class="row mt-2">
+                <div class="row">
                     <div class="col-md" style="height: 290px;">
-                        <div ng-repeat="x in modulelistsel">
-                            <span style="color: #FF8000;">{{x.name}} {</span>
-                            <span ng-repeat="y in x.registerlist">
-                                <span style="color: #0489B1;">{{y.name}} (</span>
-                                <span class="mx-1" style="font-style:italic;" ng-repeat="z in y.bitslist">{{z.name}}</span>
-                                <span style="color: #0489B1;">), </span>
-                            </span>
-                            <span style="color: #FF8000;">}</span>
-                        </div>
+                        <!-- 显示选中的位组 -->
+                        <span ng-repeat="x in bitselistView" class="badge badge-secondary mx-1 mt-1 px-2" style="line-height: 20px; font-size: 12px;">{{x}}</span>
                     </div> 
                 </div>
                 <div class="row">
@@ -69,22 +56,24 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-5">
-                        <input type="text" class="form-control" ng-show="module" ng-model="str" placeholder="搜索寄存器和位组">
+                    <div class="col-md">
+                        <input type="text" class="form-control" ng-model="str" placeholder="搜索寄存器和位组">
                     </div>
-                    <div class="col-md text-right">
-                        <button type="button" class="btn btn-outline-success px-3" ng-click="edit();">编辑</button>
-                        <button type="button" class="btn btn-outline-danger px-3" ng-show="docid" data-toggle="modal" data-target="#docDeleteConfirmWnd">删除</button>
+                    <div class="col-md-2">                        
+                        <button type="button" class="btn btn-block btn-outline-danger" ng-show="funcid" data-toggle="modal" data-target="#docDeleteConfirmWnd">删除</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-block btn-outline-success" ng-click="edit();">编辑</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-7 border border-secondary rounded my-2 mr-1" style="overflow-x: auto;">
-                <div class="reg header" ng-show="module" style="width: 50px; position: fixed; opacity: 0.7">
+                <div class="reg header" style="width: 50px; position: fixed; opacity: 0.7">
                     <div class="regname">Reg</div>
                     <div ng-repeat="x in bitindex" class="bit" style="height:20px">{{x}}</div>
                 </div>
                 <div id="map" style="margin-left: 51px;">
-                    <div class="reg" ng-repeat="x in registerlist" ng-show="module">
+                    <div class="reg" ng-repeat="x in registerlist">
                         <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
                             {{x.name|limitTo:10}}
                         </div>
@@ -98,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <div id="bitsInfo"></div>
+        <div id="floatInfo"></div>
         <!-- 文档删除确认窗口 -->
         <div class="modal fade" id="docDeleteConfirmWnd" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-dialog-centered" role="document">
