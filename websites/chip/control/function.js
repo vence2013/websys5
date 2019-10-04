@@ -47,59 +47,15 @@ exports.detail = async (ctx, funcid)=>{
     return ret;
 }
 
+exports.get = async (ctx, moduleid)=>{
+    const ChipFunction = ctx.models['ChipFunction'];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exports.search = async (ctx, ChipId, ModuleId, content, createget, createlet, order, page, pageSize)=>{
-    var sql, sqlCond = '';
-
-    sqlCond = " WHERE `ChipId`='"+ChipId+"' ";
-    if (ModuleId) {
-        sqlCond += " AND `id` IN (SELECT `ChipDocumentId` FROM `ChipDocumentModule` WHERE `ChipModuleId`='"+ModuleId+"') ";
-    }
-
-    // 根据搜索条件构建SQL条件
-    if (content && content.length) {
-        content.map((x)=>{ sqlCond += " AND `content` LIKE '%"+x+"%' " });
-    }
-    if (createget)  { sqlCond += " AND `createdAt`>='"+createget+"' "; }
-    if (createlet)  { sqlCond += " AND `createdAt`<='"+createlet+"' "; }
-
-    // 计算分页数据
-    sql = "SELECT COUNT(*) AS num FROM `ChipDocuments` "+sqlCond;
-    var [res, meta] = await ctx.sequelize.query(sql, {logging: false}); 
-    var total = res[0]['num'];
-    var maxpage  = Math.ceil(total/pageSize);
-    maxpage = (maxpage<1) ? 1 : maxpage;
-    page = (page>maxpage) ? maxpage : (page<1 ? 1 : page);
-
-    // 查询当前分页的列表数据
-    var offset = (page - 1) * pageSize;
-    sql = "SELECT * FROM `ChipDocuments` "+sqlCond+" ORDER BY "+order.join(' ')+" LIMIT "+offset+", "+pageSize+" ;";
-    var [res, meta] = await ctx.sequelize.query(sql, {logging: false});
-    var doclist = res.map((x)=>{
-        // 将buffer转换为字符串
-        x['content'] = x.content ? x.content.toString() : '';
+    var list = await ChipFunction.findAll({logging: false, raw: true, 
+        where: {'ChipModuleId': moduleid}
+    });
+    
+    return list.map((x)=>{
+        x['content'] = x['content'].toString();
         return x;
     });
-
-    return {'total':total, 'page':page, 'doclist':doclist};
 }

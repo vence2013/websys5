@@ -63,47 +63,14 @@ router.get('/detail/:funcid', async (ctx)=>{
     ctx.body = {'errorCode':0, 'message':ret}
 });
 
-
-
-
-
-
-
-
-
-
-
-/* 文档显示页面 */
-router.get('/display/:docid', async (ctx)=>{
-    var req2 = ctx.params;
-    var docid= parseInt(req2.docid);
-
-    await ctx.render('chip/view/display.html', {'id':docid}); 
-});
-
-router.get('/search', async (ctx)=>{
-    const DocumentCtrl2 = ctx.controls['chip/document'];
+router.get('/:moduleid', async (ctx)=>{
+    const FunctionCtrl = ctx.controls['chip/function'];
     
-    var req2  = ctx.query;
+    var req2 = ctx.params;
     // 提取有效参数
-    var ChipId   = /^\d$/.test(req2.ChipId) ? parseInt(req2.ChipId) : 0;
-    var ModuleId = /^\d$/.test(req2.ModuleId) ? parseInt(req2.ModuleId) : 0;
-    var content  = req2.content ? req2.content.replace(/[\s]+/, ' ').replace(/(^\s*)|(\s*$)/g, "").split(' ') : [];    
-    var page     = parseInt(req2.page);
-    var pageSize = parseInt(req2.pageSize);
-    // 日期格式
-    var createget='', createlet='';
-    var dateExp = new RegExp(/^\d{4}(-)\d{1,2}\1\d{1,2}$/);
-    if (req2.createget && dateExp.test(req2.createget)) { createget = req2.createget; }
-    if (req2.createlet && dateExp.test(req2.createlet)) { createlet = req2.createlet; }
-    // 排序
-    var order;
-    switch (req2.order) {
-        case '2': order = ['createdAt', 'ASC']; break;
-        default:  order = ['createdAt', 'DESC'];
-    }
+    var moduleid = /^\d$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
 
-    var res = await DocumentCtrl2.search(ctx, ChipId, ModuleId, content, createget, createlet, order, page, pageSize);
+    var res = await FunctionCtrl.get(ctx, moduleid);
     ctx.body = {'errorCode': 0, 'message': res};
 })
 
