@@ -28,6 +28,6 @@ exports.getStatistics = async (ctx, code)=>{
     const FoundStatistics = ctx.models['FoundStatistics'];
 
     return await FoundStatistics.findOne({raw:true, logging: false,
-        where: { 'code': code}
+        where: { 'FoundCode': code}
     });
 }

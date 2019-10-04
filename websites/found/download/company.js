@@ -109,9 +109,9 @@ function CompanyFoundWrapper(cCodes)
                 var codeObjs = [];
                 for (var i=0; (i<100)&&list.length; i++) {
                     var x = list.shift();
-                    codeObjs.push({'code': x, 'companyId': cCode});
+                    codeObjs.push({'code': x, 'FoundCompanyCode': cCode});
                 }
-
+                
                 Found
                 .bulkCreate(codeObjs, {logging: false})
                 .then(()=>{

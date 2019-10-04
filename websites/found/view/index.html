@@ -34,7 +34,7 @@
     <div ng-include="'/view/nav.html'"></div>
     <div id="wrapper" class="container-fluid" ng-controller="indexCtrl">
         <div class="row">
-            <div class="col-md-5 border border-success rounded my-2 mx-1">
+            <div class="col-md border border-success rounded my-2 mx-1">
                 <h5 class="mt-3">基金公司筛选</h5>
                 <div class="form-group row mt-3">
                     <div class="col-md">
@@ -149,12 +149,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md border border-secondary rounded my-2 mr-1" style=" line-height: 20px;">
+            <div class="col-md-7 border border-secondary rounded my-2 mr-1" style=" line-height: 25px;">
                 <div class="row">
                     <div class="col-md mt-1 mx-1" style="height: 240px; overflow: auto">
                         <a ng-repeat="x in companylist" ng-mouseenter="select('company', x.code);" 
                             href="http://fund.eastmoney.com/Company/{{x.code}}.html" target="_blank" title="{{x.name}}" 
-                            style="margin: 2px 3px 0px;">{{x.name|limitTo:6}}</a>
+                            style="margin: 5px 3px 0px;">{{x.name|limitTo:6}}</a>
                     </div>
                 </div>
                 <hr />
@@ -162,7 +162,7 @@
                     <div class="col-md mx-1" style="height: 360px; overflow: auto">
                         <a ng-repeat="x in foundlist" ng-mouseenter="select('found', x.code);" 
                             href="http://fund.eastmoney.com/{{x.code}}.html" target="_blank" title="{{x.fullname}}" 
-                            style="margin: 2px 3px 0px;">{{x.fullname|limitTo:6}}</a>
+                            style="margin: 5px 3px 0px;">{{x.fullname|limitTo:6}}</a>
                     </div>
                 </div>
                 <hr / >

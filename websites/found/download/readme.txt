@@ -2,7 +2,7 @@
 将各个部分的下载功能组织到单个文件中便于维护。
 
 分为以下部分：
-1. 公司代码和基金代码的下载， 这部分包括了公司信息的下载; (codes.js)
+1. 公司代码和基金代码的下载， 这部分包括了公司信息的下载; (company.js)
 2. 基金信息的下载（因为基金数量多，所以都单独下载）
     2.1 基础信息; (found.js)
     2.2 净值数据; (foundValue.js)
@@ -20,7 +20,7 @@ module.exports = {
 
 下载数据使用以下过程：
 在容器内部(才能使用数据库)， 切换到download/路径执行命令。
-1. 下载公司及基金代码数据， node codes.js 
+1. 下载公司及基金代码数据， node company.js 
 2. 下载基金基本信息，      node found.js
 3. 下载基金净值数据，      node foundValue.js
 4. 下载基金统计数据，      node foundStatistics.js

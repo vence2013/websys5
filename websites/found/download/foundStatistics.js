@@ -106,7 +106,7 @@ function FoundStatisticsWrapper()
                         var last3Year  = arr[13] ? arr[13] : null;
                         var thisYear   = arr[14] ? arr[14] : null;
                         var fromCreate = arr[15] ? arr[15] : null;
-                        var obj = {'code':arr[0], 'lastWeek':lastWeek, 'lastMonth':lastMonth, 'lastQuarter':lastQuarter, 'lastHalfYear':lastHalfYear, 
+                        var obj = {'FoundCode':arr[0], 'lastWeek':lastWeek, 'lastMonth':lastMonth, 'lastQuarter':lastQuarter, 'lastHalfYear':lastHalfYear, 
                             'last1Year':last1Year, 'last2Year':last2Year, 'last3Year':last3Year, 'thisYear': thisYear, 'fromCreate':fromCreate};
                         //console.log("DBG["+__filename+"|CompanyRequest()] - l1, arr:%o, obj:%o.", arr, obj);
                         valueObjs.push(obj);

@@ -104,7 +104,7 @@ exports.apply = async (ctx, query)=>{
     var companyCodes = companyObjs.map((x)=>{ return x.code; });
 
     // 筛选符合条件的基金(在符合条件公司的基金中)
-    whereCondition = {'companyId': companyCodes};
+    whereCondition = {'FoundCompanyCode': companyCodes};
     if (query.foundCreate)     { whereCondition['createDate']   = {[Op.lte]:query.foundCreate+'-01-01'}; }
     if (query.foundMoney)   { whereCondition['moneyUpdate']   = {[Op.gte]: query.foundMoney}; }
     if (query.foundShare) { whereCondition['shareUpdate'] = {[Op.gte]: query.foundShare}; }
@@ -125,11 +125,11 @@ exports.apply = async (ctx, query)=>{
     if (query.statisticThisyear) { whereCondition['thisYear'] = {[Op.gte]: query.statisticThisyear}; }
     if (query.statisticCreate) { whereCondition['fromCreate'] = {[Op.gte]: query.statisticCreate}; }
     if (JSON.stringify(whereCondition)!="{}") {
-        whereCondition['code'] = foundCodes;
+        whereCondition['FoundCode'] = foundCodes;
         var statisticsObj = await FoundStatistics.findAll({raw: true, //logging: false, 
-            attributes: ['code'], where: whereCondition
+            attributes: ['FoundCode'], where: whereCondition
         });
-        foundCodes = statisticsObj.map((x)=>{ return x.code; });
+        foundCodes = statisticsObj.map((x)=>{ return x.FoundCode; });
     }
     
     // 通过基金净值中的增长率筛选， 统计增长率小于valueMin，且次数大于valueMinGT，小于valueMinLT
@@ -138,54 +138,54 @@ exports.apply = async (ctx, query)=>{
         var havingSub;
 
         if (query.valueMinGT && query.valueMinLT) {
-            havingSub = Sequelize.literal(`count(code)>=${query.valueMinGT} AND count(code)<=${query.valueMinLT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)>=${query.valueMinGT} AND count(FoundCode)<=${query.valueMinLT}`);
         } else if (query.valueMinGT) {
-            havingSub = Sequelize.literal(`count(code)>=${query.valueMinGT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)>=${query.valueMinGT}`);
         } else {
-            havingSub = Sequelize.literal(`count(code)<=${query.valueMinLT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)<=${query.valueMinLT}`);
         }
         var valueObj2 = await FoundValue.findAll({raw: true, logging: false, 
-            attributes: ['code'],
-            group: 'code',
+            attributes: ['FoundCode'],
+            group: 'FoundCode',
             having: havingSub,
             where: {
                 "value3": {[Op.lte]: query.valueMin},
-                'code': foundCodes,
+                'FoundCode': foundCodes,
             },        
         });
 
-        foundCodes = valueObj2.map((x)=>{ return x.code; });
+        foundCodes = valueObj2.map((x)=>{ return x.FoundCode; });
     }
 
     if (query.valueMax && (query.valueMaxGT || query.valueMaxLT)) {
         var havingSub;
 
         if (query.valueMaxGT && query.valueMaxLT) {
-            havingSub = Sequelize.literal(`count(code)>=${query.valueMaxGT} AND count(code)<=${query.valueMinLT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)>=${query.valueMaxGT} AND count(FoundCode)<=${query.valueMinLT}`);
         } else if (query.valueMaxGT) {
-            havingSub = Sequelize.literal(`count(code)>=${query.valueMaxGT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)>=${query.valueMaxGT}`);
         } else {
-            havingSub = Sequelize.literal(`count(code)<=${query.valueMaxLT}`);
+            havingSub = Sequelize.literal(`count(FoundCode)<=${query.valueMaxLT}`);
         }
         var valueObj2 = await FoundValue.findAll({raw: true, logging: false, 
-            attributes: ['code'],
-            group: 'code',
+            attributes: ['FoundCode'],
+            group: 'FoundCode',
             having: havingSub,
             where: {
                 "value3": {[Op.gte]: query.valueMax},
-                'code': foundCodes,
+                'FoundCode': foundCodes,
             },
         });
 
-        foundCodes = valueObj2.map((x)=>{ return x.code; });
+        foundCodes = valueObj2.map((x)=>{ return x.FoundCode; });
     }
 
     // 获取符合条件基金的信息
     var foundObj2 = await Found.findAll({raw: true, logging: false, 
-        attributes: ['code', 'companyId', 'fullname'],
+        attributes: ['code', 'FoundCompanyCode', 'fullname'],
         where: { 'code': foundCodes }
     });
-    var companyCodes2 = foundObj2.map((x)=>{ return x.companyId; });
+    var companyCodes2 = foundObj2.map((x)=>{ return x.FoundCompanyCode; });
     var companyObj2 = await FoundCompany.findAll({raw: true, logging: false, 
         attributes: ['code', 'name'], where:{'code':companyCodes2}
     });

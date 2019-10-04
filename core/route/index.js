@@ -31,7 +31,6 @@ const navigation = [
     {'name':'category',      'father':'Document',          'url':'/document/view/category.html', 'access':'user'},
     {'name':'edit',          'father':'Document',          'url':'/document/edit/0',     'access':'user'},
     {'name':'Chip',          'father':null,                'url':'/chip',                    'access':'any'},
-    {'name':'document',      'father':'Chip',              'url':'/chip/view/document.html', 'access':'user'},
     {'name':'function',      'father':'Chip',              'url':'/chip/function/edit/0',    'access':'user'},
     {'name':'edit',          'father':'Chip',              'url':'/chip/view/edit.html',     'access':'user'},
 ];

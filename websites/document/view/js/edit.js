@@ -3,14 +3,13 @@ var app = angular.module('docApp', ['treeControl'])
 appConfiguration(app)
 .controller('docCtrl', docCtrl);
 
-function docCtrl($scope, $http, $interval, user) 
+function docCtrl($scope, $http, $interval) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
         onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
-    $scope.user = user;
     // 标签相关数据
     $scope.tagstr = '';
     $scope.tagrel = [];

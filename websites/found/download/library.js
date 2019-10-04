@@ -81,6 +81,7 @@ exports.dbConnect = (cb)=>{
         DBConn['model']['FoundCompany'] = await sequelize.import(__dirname+"/../model/FoundCompany");
         DBConn['model']['FoundValue']   = await sequelize.import(__dirname+"/../model/FoundValue");
         DBConn['model']['FoundStatistics']= await sequelize.import(__dirname+"/../model/FoundStatistics");
+        await require(__dirname+"/../model/Relations").link(DBConn['model'], sequelize);
 
         // 同步到数据库
         sequelize

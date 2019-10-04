@@ -18,7 +18,7 @@ var router = new Router();
 
 /* 基金页面：首页 */
 router.get('/', async (ctx)=>{
-    await ctx.render('found/view/index.html'); 
+    await ctx.render('websites/found/view/index.html'); 
 });
 
 /* 获取基金公司信息 */

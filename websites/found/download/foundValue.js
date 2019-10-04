@@ -104,7 +104,7 @@ function FoundValueWrapper(foundCodes)
                     var value = x.DWJZ ? x.DWJZ : 0;
                     var value2 = x.LJJZ ? x.LJJZ : 0;
                     var value3 = x.JZZZL ? x.JZZZL : 0;
-                    valueObjs.push({'code': foundCode, 'date': x.FSRQ, 'value': value, 'value2': value2, 'value3': value3});
+                    valueObjs.push({'FoundCode': foundCode, 'date': x.FSRQ, 'value': value, 'value2': value2, 'value3': value3});
                 }
 
                 FoundValue
