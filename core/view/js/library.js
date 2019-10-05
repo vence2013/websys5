@@ -2,10 +2,8 @@
 function navCtrl($scope, $http, user, locals) {
     $scope.user = user;
     $scope.navlist = [];
-    $scope.sub = null;
-    $scope.username = '';
-    $scope.password = '';    
-    
+    $scope.sub = null;    
+
     navRefresh();
     
     $scope.navRefresh = navRefresh;
@@ -14,15 +12,15 @@ function navCtrl($scope, $http, user, locals) {
         $http
         .get('/nav')
         .then((res)=>{
+            if (errorCheck(res)) return ;
             var ret = res.data.message;
             
             $scope.navlist = ret.nav;
-            var user  = ret.user;
-            var userl = locals.getObject('/user');
+            var userRet  = ret.user;
             // 服务器端用户未登录， 服务器端和客户端状态不一致， 都注销客户端保留的用户数据。
-            if (!userl || !user || (user.username != userl.username)) { localStorage.removeItem("/user"); }
-            var res = locals.getObject('/user');
-            angular.copy(res, $scope.user);
+            if (!userRet || !user || (userRet.username != user.username)) { 
+                logout();
+            }
         });
     }
 
@@ -43,7 +41,9 @@ function navCtrl($scope, $http, user, locals) {
         subCloseTimer = window.setTimeout(()=>{ $('#navSub').css('display', 'none'); }, 1000);
     }
 
-    $scope.logout = ()=>{
+    $scope.logout = logout;
+    function logout()
+    {
         $http
         .get('/logout')
         .then((res)=>{            
@@ -62,7 +62,10 @@ function navCtrl($scope, $http, user, locals) {
  * Return       : none.
  */
 
-function appConfiguration(app) {
+function appConfiguration(app) 
+{
+    var user = JSON.parse(localStorage['/user'] || '{}');
+
     app
     .config(["$httpProvider", function($httpProvider) { 
         $httpProvider.interceptors.push('httpInterceptor'); 
@@ -77,7 +80,7 @@ function appConfiguration(app) {
         }
     }])
     .factory('user', function(){ // 控制器之间共享数据
-        return {};
+        return user;
     })
     .factory('locals',['$window', ($window)=>{
         return{        

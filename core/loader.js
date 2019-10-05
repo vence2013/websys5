@@ -124,21 +124,13 @@ function route(dirlist)
 function loginCheck() 
 {
     return async function(ctx, next) {
-        if (!fs.existsSync("./install.log")) {
-            if (ctx.method+ctx.url === 'POST/user') {
-                await next();
-            } else {
-                await ctx.render('core/view/init.html'); 
-            }            
-        } else if (!ctx.session.user) {
-            if (ctx.method+ctx.url === 'POST/user/login') {
-                await next();
-            } else {
-                await ctx.render('core/view/login.html'); 
-            }
-        } else {
-            await next();
+        var req = ctx.method + ctx.url;
+        if (!fs.existsSync("./install.log") && (req !== 'POST/user')) {
+            await ctx.render('core/view/init.html'); 
+        } else if (!ctx.session.user && (req !== 'POST/user/login')) {
+            ctx.throw(401);
         }
+        await next();
     }
 }
 

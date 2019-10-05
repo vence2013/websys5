@@ -4,7 +4,7 @@ appConfiguration(app)
 .controller('editCtrl', editCtrl);
 
 
-function editCtrl($scope, $http) 
+function editCtrl($scope, $http, user, locals) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -217,6 +217,7 @@ function editCtrl($scope, $http)
     function registerSelect(register)
     {
         $scope.registersel = register;
+        locals.set('/chip/edit/registersel/'+user.username, register.id);
         
         $(".registerContainer>.sel").removeClass('sel');
         window.setTimeout(()=>{            
@@ -242,7 +243,15 @@ function editCtrl($scope, $http)
                         registerSelect(ret[i]);
                     }
                 } else {
-                    registerSelect(ret[0]);
+                    var registeridPrevious = locals.get('/chip/edit/registersel/'+user.username);
+                    if (registeridPrevious) {
+                        for (var i = 0; (i < ret.length) && (ret[i].id != registeridPrevious); i++) ;
+                        if (i < ret.length) {
+                            registerSelect(ret[i]);
+                        }
+                    } else { // 默认选择第一个
+                        registerSelect(ret[0]);
+                    }
                 }                
             } else {
                 $scope.registersel  = {'id':0, 'name':'', 'fullname':'', 'address':'', 'desc':''};
@@ -258,6 +267,8 @@ function editCtrl($scope, $http)
     function moduleSelect(module)
     {
         $scope.modulesel = module;
+        locals.set('/chip/edit/modulesel/'+user.username, module.id);
+
         $(".moduleContainer>.sel").removeClass('sel');
         window.setTimeout(()=>{            
             var idx = $scope.modulelist.indexOf(module);
@@ -283,8 +294,15 @@ function editCtrl($scope, $http)
                         moduleSelect(ret[i]);
                     }
                 } else {
-                    // 默认选择第一个
-                    moduleSelect(ret[0]);
+                    var moduleidPrevious = locals.get('/chip/edit/modulesel/'+user.username);
+                    if (moduleidPrevious) {
+                        for (var i = 0; (i < ret.length) && (ret[i].id != moduleidPrevious); i++) ;
+                        if (i < ret.length) {
+                            moduleSelect(ret[i]);
+                        }
+                    } else { // 默认选择第一个
+                        moduleSelect(ret[0]);
+                    }
                 }
             } else {
                 // 没有任何模块时，需要清除所有后续元素：模块编辑， 寄存器列表，编辑， 位组列表， 编辑
@@ -308,7 +326,9 @@ function editCtrl($scope, $http)
      */
     function chipSelect(chip)
     {
-        $scope.chipsel = chip;        
+        $scope.chipsel = chip;
+        locals.set('/chip/edit/chipsel/'+user.username, chip.id);
+
         $(".chipContainer>.sel").removeClass('sel');
         window.setTimeout(()=>{
             var idx = $scope.chiplist.indexOf(chip);
@@ -338,8 +358,16 @@ function editCtrl($scope, $http)
                     if (i<ret.length) {
                         chipSelect(ret[i]);
                     }
-                } else { // 默认选择第一个
-                    chipSelect(ret[0]);
+                } else { 
+                    var chipidPrevious = locals.get('/chip/edit/chipsel/'+user.username);
+                    if (chipidPrevious) {  // 恢复上次的选择
+                        for (var i = 0; (i < ret.length) && (ret[i].id != chipidPrevious); i++) ;
+                        if (i < ret.length) {
+                            chipSelect(ret[i]);
+                        }
+                    } else { // 默认选择第一个
+                        chipSelect(ret[0]);
+                    }
                 }
             } else {
                 $scope.chipsel = {'id':0, 'name':'', 'width':''};

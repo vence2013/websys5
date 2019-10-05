@@ -24,10 +24,10 @@
     <div class="jumbotron jumbotron-fluid px-3" style="margin-top: 100px;">
     <% if (status==401) { %>
         <h1 class="display-5">Unauthorized</h1>
-        <p class="lead font-italic">访问的数据要求用户具有指定权限， 当前无法访问，请联系管理员</p>
+        <p class="lead font-italic">未登录无权访问！请登录系统或联系管理员创建账户。</p>
         <hr class="my-4">
         <div style="text-align: center;">
-            <a href="/">返回首页</a>
+            <a href="/view/login.html">登录入口</a>
         </div>
     <% } else if (status==404) { %>
         <h1 class="display-5">Not Found</h1>

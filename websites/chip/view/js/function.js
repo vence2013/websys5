@@ -4,7 +4,7 @@ appConfiguration(app)
 .controller('functionCtrl', functionCtrl);
 
 
-function functionCtrl($scope, $http, $interval, user) 
+function functionCtrl($scope, $http, $interval, user, locals) 
 {
     /* 基础配置 */ 
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -318,6 +318,8 @@ function functionCtrl($scope, $http, $interval, user)
     function moduleSelect(module) 
     {
         $scope.modulesel = module;
+        locals.set('/chip/function/modulesel/'+user.username, module.id);
+
         $(".modulesel").removeClass('modulesel');
         window.setTimeout(()=>{            
             var idx = $scope.modulelist.indexOf(module);
@@ -338,7 +340,15 @@ function functionCtrl($scope, $http, $interval, user)
             var ret = res.data.message;
             $scope.modulelist = ret;
             if (ret.length) {
-                moduleSelect(ret[0]);
+                var moduleidPrevious = locals.get('/chip/function/modulesel/'+user.username);
+                if (moduleidPrevious) {
+                    for (var i = 0; (i < ret.length) && (ret[i].id != moduleidPrevious); i++) ;
+                    if (i < ret.length) {
+                        moduleSelect(ret[i]);
+                    }
+                } else {
+                    moduleSelect(ret[0]);
+                }
             }
         })
     }
@@ -349,6 +359,8 @@ function functionCtrl($scope, $http, $interval, user)
     function chipSelect(chip)
     {        
         $scope.chipsel = chip;
+        locals.set('/chip/function/chipsel/'+user.username, chip.id);
+
         $(".chipsel").removeClass('chipsel');
         window.setTimeout(()=>{
             var idx = $scope.chiplist.indexOf(chip);
@@ -372,7 +384,15 @@ function functionCtrl($scope, $http, $interval, user)
             var ret = res.data.message;
             $scope.chiplist = ret;
             if (ret.length) {
-                chipSelect(ret[0]);
+                var chipidPrevious = locals.get('/chip/function/chipsel/'+user.username);
+                if (chipidPrevious) {
+                    for (var i = 0; (i < ret.length) && (ret[i].id != chipidPrevious); i++) ;
+                    if (i < ret.length) {
+                        chipSelect(ret[i]);
+                    }
+                } else {
+                    chipSelect(ret[0]);
+                }  
             }
         })
     }

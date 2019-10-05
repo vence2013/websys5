@@ -10,7 +10,6 @@ function viewCtrl($scope, $http, user, locals)
         onclick: null, showDuration: "300", hideDuration: "1000", timeOut: "2000", extendedTimeOut: "1000",  
         showEasing: "swing", hideEasing: "linear", showMethod: "fadeIn", hideMethod: "fadeOut"  
     };
-    $scope.user = user;
     // 目录树相关的数据
     $scope.treeRoot = [];
     $scope.listRoot = [];
@@ -23,14 +22,12 @@ function viewCtrl($scope, $http, user, locals)
     // 关联文档列表
     $scope.docOpts = {'str':'', 'page':1, 'pageSize':13, 'isRelate':true};
     $scope.docPages= [];
-    $scope.doclist = [];
-    
-    $scope.$watch("user", categoryRefresh, true);
+    $scope.doclist = [];    
     $scope.$watch('docOpts', docRelate, true);
 
-    function categoryRefresh() {
-        if (!$scope.user || !$scope.user.username) return;
+    categoryRefresh();
 
+    function categoryRefresh() {
         $http
         .get('/category/tree/0', {})
         .then((res)=>{
@@ -43,20 +40,18 @@ function viewCtrl($scope, $http, user, locals)
             $scope.listRoot   = list; 
             $scope.listView   = list;
             // 还原展开节点
-            if ($scope.user) {
-                var ids = locals.getObject('/category/expaned/'+$scope.user.username);
-                if (ids.length) {
-                    var expand = [];                
-                    $scope.listView.map((x)=>{ if (ids.indexOf(x.id)!=-1) expand.push(x); });
-                    $scope.listExpand = expand;
-                }
+            var ids = locals.getObject('/category/expaned/'+user.username);
+            if (ids.length) {
+                var expand = [];                
+                $scope.listView.map((x)=>{ if (ids.indexOf(x.id)!=-1) expand.push(x); });
+                $scope.listExpand = expand;
             }
         });
     }
 
     $scope.categoryToggle = (node, expanded)=>{
         var ids = $scope.listExpand.map(node => { return node.id; });
-        locals.setObject('/category/expaned/'+$scope.user.username, ids);
+        locals.setObject('/category/expaned/'+user.username, ids);
     }
 
     $scope.categorySelect = (node, sel)=>{ 

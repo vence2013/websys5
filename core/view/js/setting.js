@@ -4,8 +4,8 @@ appConfiguration(app)
 .controller('settingCtrl', settingCtrl);
 
 
-function settingCtrl($scope, $http, user, locals) {
-    $scope.user = user;
+function settingCtrl($scope, $http, locals) 
+{
     $scope.oldPassword = '';
     $scope.newPassword = '';
     $scope.confirmPassword = '';

@@ -4,7 +4,7 @@ appConfiguration(app)
 .controller('indexCtrl', indexCtrl);
 
 
-function indexCtrl($scope, $http, user) 
+function indexCtrl($scope, $http, user, locals) 
 {
     // 基础配置
     toastr.options = { closeButton: false, debug: false, progressBar: true, positionClass: "toast-bottom-right",  
@@ -20,7 +20,6 @@ function indexCtrl($scope, $http, user)
             $('#funcInfo').find('.editormd-preview-close-btn').remove();
         } 
     });
-
     // 应用数据
     $scope.chiplist = [];
     $scope.chipsel  = null;
@@ -277,6 +276,8 @@ function indexCtrl($scope, $http, user)
     function moduleSelect(module) 
     {
         $scope.modulesel = module;
+        locals.set('/chip/modulesel/'+user.username, module.id);
+
         $(".modulesel").removeClass('modulesel');
         window.setTimeout(()=>{            
             var idx = $scope.modulelist.indexOf(module);
@@ -297,8 +298,17 @@ function indexCtrl($scope, $http, user)
 
             var ret = res.data.message;
             $scope.modulelist = ret;
+
             if (ret.length) {
-                moduleSelect(ret[0]);
+                var moduleidPrevious = locals.get('/chip/modulesel/'+user.username);
+                if (moduleidPrevious) {
+                    for (var i = 0; (i < ret.length) && (ret[i].id != moduleidPrevious); i++) ;
+                    if (i < ret.length) {
+                        moduleSelect(ret[i]);
+                    }
+                } else {
+                    moduleSelect(ret[0]);
+                }
             }
         })
     }
@@ -309,6 +319,8 @@ function indexCtrl($scope, $http, user)
     function chipSelect(chip)
     {        
         $scope.chipsel = chip;
+        locals.set('/chip/chipsel/'+user.username, chip.id);
+
         $(".chipsel").removeClass('chipsel');
         window.setTimeout(()=>{
             var idx = $scope.chiplist.indexOf(chip);
@@ -331,8 +343,17 @@ function indexCtrl($scope, $http, user)
 
             var ret = res.data.message;
             $scope.chiplist = ret;
+
             if (ret.length) {
-                chipSelect(ret[0]);
+                var chipidPrevious = locals.get('/chip/chipsel/'+user.username);
+                if (chipidPrevious) {
+                    for (var i = 0; (i < ret.length) && (ret[i].id != chipidPrevious); i++) ;
+                    if (i < ret.length) {
+                        chipSelect(ret[i]);
+                    }
+                } else {
+                    chipSelect(ret[0]);
+                }                
             }
         })
     }
