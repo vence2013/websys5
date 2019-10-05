@@ -50,7 +50,7 @@ exports.detail = async (ctx, funcid)=>{
 exports.get = async (ctx, moduleid)=>{
     const ChipFunction = ctx.models['ChipFunction'];
 
-    var list = await ChipFunction.findAll({logging: false, raw: true, 
+    var list = await ChipFunction.findAll({/*logging: false, */raw: true, 
         where: {'ChipModuleId': moduleid}
     });
     

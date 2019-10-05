@@ -29,7 +29,7 @@ router.post('/:funcid', async (ctx)=>{
     var req = ctx.request.body;
     var req2= ctx.params;
     // 提取有效参数
-    var funcid  = /^\d$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
+    var funcid  = /^\d+$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
     var content = req.content;
     var moduleid = req.moduleid; 
     var bitsids  = req.bitsids;
@@ -46,7 +46,7 @@ router.delete('/:funcid', async (ctx)=>{
     const FunctionCtrl = ctx.controls['chip/function'];
 
     var req2 = ctx.params;
-    var funcid= /^\d$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
+    var funcid= /^\d+$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
 
     await FunctionCtrl.delete(ctx, funcid);
     ctx.body = {'errorCode':0, 'message':'SUCCESS'}
@@ -57,7 +57,7 @@ router.get('/detail/:funcid', async (ctx)=>{
     const FunctionCtrl = ctx.controls['chip/function'];
 
     var req2 = ctx.params;
-    var funcid= /^\d$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
+    var funcid= /^\d+$/.test(req2.funcid) ? parseInt(req2.funcid) : 0;
 
     var ret = await FunctionCtrl.detail(ctx, funcid);
     ctx.body = {'errorCode':0, 'message':ret}
@@ -68,8 +68,8 @@ router.get('/:moduleid', async (ctx)=>{
     
     var req2 = ctx.params;
     // 提取有效参数
-    var moduleid = /^\d$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
-
+    var moduleid = /^\d+$/.test(req2.moduleid) ? parseInt(req2.moduleid) : 0;
+    
     var res = await FunctionCtrl.get(ctx, moduleid);
     ctx.body = {'errorCode': 0, 'message': res};
 })

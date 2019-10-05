@@ -20,10 +20,4 @@ router.get('/', async (ctx)=>{
     await ctx.render('websites/chip/view/index.html'); 
 });
 
-
-
-
-
-
-
 module.exports = router;
