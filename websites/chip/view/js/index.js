@@ -14,7 +14,7 @@ function indexCtrl($scope, $http, user)
     var editor = editormd("funcInfo", {
         path : '/node_modules/editor.md/lib/',
         width: '41%',
-        height: 500,
+        height: 690,
         onload : function() { 
             this.previewing(); 
             $('#funcInfo').find('.editormd-preview-close-btn').remove();
