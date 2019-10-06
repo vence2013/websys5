@@ -48,7 +48,7 @@
                     <div class="col-md" style="height: 535px;">
                         <!-- 显示功能 -->
                         <span ng-repeat="x in functionlist" ng-click="functionSelect(x);" funcid='{{x.id}}' title="{{x.content|limitTo:200}}"
-                        class="badge badge-secondary mx-1 mt-1 px-2" style="line-height: 20px; font-size: 12px; cursor: pointer;">{{x.content|limitTo:10}}</span>
+                        class="badge badge-secondary mx-1 mt-1 px-2" style="line-height: 20px; font-size: 12px; cursor: pointer;">{{x.content|getTitle|limitTo:20}}</span>
                     </div> 
                 </div>
                 <div class="row">

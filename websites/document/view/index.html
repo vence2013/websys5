@@ -71,7 +71,7 @@
                         </div>
                         <hr class="mx-1" />
                         <div class="row">
-                            <div class="col mx-2">{{detail.content|limitTo:1200}}</div>
+                            <div class="col mx-2">{{detail.content|getBrief|limitTo:1200}}</div>
                         </div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
                     <div class="col-md doclist" style="height: 780px; line-height: 30px;">
                         <div class="row mx-1" style="border-bottom: 1px dashed #000000;" ng-repeat="x in doclist" ng-mouseenter="focus(x);">
                             <div class="col-md">
-                                <a href="/document/display/{{x.id}}">{{x.content|limitTo:60}}</a>
+                                <a href="/document/display/{{x.id}}">{{x.content|getTitle|limitTo:60}}</a>
                                 <span class="ml-2" style="font-style: italic; color: #888888; font-size: 12px;">{{x.createdAt|limitTo:10}}, {{x.owner}}</span>
                                 <a href="/document/edit/{{x.id}}" class="ml-2"><i class="fa fa-edit"></i></a>
                             </div>

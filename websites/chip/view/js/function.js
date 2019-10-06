@@ -1,4 +1,6 @@
-var app = angular.module('functionApp', [])
+var app = angular
+    .module('functionApp', []);
+
 
 appConfiguration(app)
 .controller('functionCtrl', functionCtrl);

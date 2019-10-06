@@ -1,4 +1,11 @@
-var app = angular.module('indexApp', [])
+var app = angular
+    .module('indexApp', [])
+    .filter('getTitle',function(){
+        return function(content){
+            var regExp = /[^ ] ([^\n]+)\n/;
+            return content.match(regExp)[1];
+        }
+    });
 
 appConfiguration(app)
 .controller('indexCtrl', indexCtrl);

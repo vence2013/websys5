@@ -1,4 +1,21 @@
-var app = angular.module('indexApp', ['treeControl'])
+var app = angular
+    .module('indexApp', ['treeControl'])
+    .filter('getTitle', function() {
+        return function(content){
+            if (!content) return; 
+
+            var regExp = /[^ ] ([^\n]+)\n/;
+            return content.match(regExp)[1];
+        }
+    })
+    .filter('getBrief', function() {
+        return function(content){
+            if (!content) return; 
+
+            var regExp = /[^\n]\n([^\n]+)\n/;
+            return content.match(regExp)[1];
+        }
+    });
 
 appConfiguration(app)
 .controller('indexCtrl', indexCtrl);
