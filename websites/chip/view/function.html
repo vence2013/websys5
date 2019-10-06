@@ -75,10 +75,10 @@
                 <div id="map" style="margin-left: 51px;">
                     <div class="reg" ng-repeat="x in registerlist">
                         <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
-                            {{x.name|limitTo:10}}
+                            {{x.name|limitTo:12}}
                         </div>
                         <div ng-repeat="y in x.bitlist2 track by $index" bitsid="{{y.id}}" 
-                            class="bit bg{{y.id}}" ng-class="{'bitValid':y.id}" 
+                            class="bit bg{{y.id}} text-center" ng-class="{'bitValid':y.id}" 
                             style="height: {{20 * y.cnt}}px; line-height:{{20 * y.cnt}}px"
                             ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();" ng-click="bitSelect(y.id);">
                             {{y.name}}

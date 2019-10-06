@@ -37,7 +37,8 @@ function indexCtrl($scope, $http, user, locals)
     $scope.str = ''; // 寄存器或位组搜索
     $scope.$watch('str', mapSearch);
     $scope.functionlist = [];
-    $scope.functionlast = null;
+    $scope.functionsels = []; // 选中功能列表
+    $scope.multiSelect = false;
 
     chipGetList();
 
@@ -47,26 +48,13 @@ function indexCtrl($scope, $http, user, locals)
         $('#funcInfo').css('display', 'none');
     }
 
-    $scope.functionDetail = () => {
-        editor.setMarkdown($scope.functionlast.content); 
-        $('#funcInfo').css('display', 'block');
-    }
-
     // 选中所有被选功能的位组
     function functionBits() 
     {
-        var list = [];
-        if ($scope.functionlast) {
-            list.push($scope.functionlast.id);
-        }
-        $('.badge-primary').map((idx, itm)=>{
-            var id = $(itm).attr('funcid');
-            list.push(parseInt(id));
-        })
-
+        $('.bitSelect').removeClass('bitSelect');
         for (i = 0; i < $scope.functionlist.length; i++) {
             var func = $scope.functionlist[i];
-            if (list.indexOf(func.id) == -1) continue;
+            if ($scope.functionsels.indexOf(func.id) == -1) continue;
             var bits = func.bitslist.split(',');
             for (var j = 0; j < bits.length; j++) {
                 $('.bg'+bits[j]).removeClass('bitFocus').addClass('bitSelect');
@@ -75,22 +63,25 @@ function indexCtrl($scope, $http, user, locals)
     }
 
     $scope.functionEdit = () => {
-        window.location.href = '/chip/function/edit/'+$scope.functionlast.id;
+        window.location.href = '/chip/function/edit/'+$scope.functionsels[0];
     }
 
-    $scope.functionSelect = (func) => {
-        var obj = $(".badge[funcid='"+func.id+"']");        
-        if (obj.hasClass('badge-success') || obj.hasClass('badge-primary')) {
-            if (obj.hasClass('badge-success')) {
-                $scope.functionlast = null;
-            }
-            obj.removeClass('badge-primary').removeClass('badge-success').addClass('badge-secondary');
+    $scope.functionSelect = (func) => {        
+        if ($scope.multiSelect) { // 多选
+            $('.badge-success').removeClass('badge-success').addClass('badge-primary');
+            $(".badge[funcid='"+func.id+"']").removeClass('badge-secondary').addClass('badge-primary');
+            $scope.functionsels.push(func.id);
         } else {
-            // 取消之前的最后一个选择
-            $(".badge-success").removeClass('badge-success').addClass('badge-primary');
+            $('.badge-primary').removeClass('badge-primary').addClass('badge-secondary');
+            $('.badge-success').removeClass('badge-success').addClass('badge-secondary');
             $(".badge[funcid='"+func.id+"']").removeClass('badge-secondary').addClass('badge-success');
-            $scope.functionlast = func;
+            $scope.functionsels = [ func.id ];
+
+            // 选择单个功能， 自动显示详细信息
+            editor.setMarkdown(func.content); 
+            $('#funcInfo').css('display', 'block');
         }
+
         window.setTimeout(functionBits, 0);
     }
 
@@ -170,8 +161,10 @@ function indexCtrl($scope, $http, user, locals)
         if (!$scope.modulesel) return;
 
         var str = $scope.str;
-        if (!str) mapShow(reglist);
-        else {
+        if (!str) {
+            mapShow(reglist);
+            window.setTimeout(functionBits, 0);
+        } else {
             // 搜索寄存器的：name, fullname, 位组的：name, fullname
             var list = [];
 

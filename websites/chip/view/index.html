@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="data:;base64,=">  <!-- 禁止加载facon.ico -->
-    <title>chip</title>
+    <title>Chip</title>
 
     <!-- 软件包导入(jquery放在anguarjs前， bootstrap放在jquery-ui前) -->
     <script src="/node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script> 
@@ -52,15 +52,17 @@
                     </div> 
                 </div>
                 <div class="row">
-                    <div class="col-md"></div>
-                    <div class="col-md-2" ng-show="functionlast">
-                        <button type="button" class="btn btn-block btn-outline-success" ng-click="functionEdit();">编辑</button>
-                    </div>
-                    <div class="col-md-2" ng-show="functionlast">
-                        <button type="button" class="btn btn-block btn-outline-success" ng-click="functionDetail();">详细</button>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md">
                         <input type="text" class="form-control" ng-model="str" placeholder="搜索寄存器或位组">
+                    </div>
+                    <div class="col-md-2">
+                        <button ng-show="!multiSelect && functionsels.length" type="button" class="btn btn-block btn-outline-success" ng-click="functionEdit();">编辑</button>
+                    </div>
+                    <div class="col-md-2 text-right">
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="multipleCheck" ng-model="multiSelect">
+                            <label class="form-check-label" for="multipleCheck">多选</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,10 +74,10 @@
                 <div id="map" style="margin-left: 51px;">
                     <div class="reg" ng-repeat="x in registerlist">
                         <div class="regname" title="{{x.fullname}}" ng-mouseenter="registerFocus(x.id);" ng-mouseleave="registerUnfocus();">
-                            {{x.name|limitTo:10}}
+                            {{x.name|limitTo:12}}
                         </div>
                         <div ng-repeat="y in x.bitlist2 track by $index" bitsid="{{y.id}}" 
-                            class="bit bg{{y.id}}" ng-class="{'bitValid':y.id}" 
+                            class="bit bg{{y.id}} text-center" ng-class="{'bitValid':y.id}" 
                             style="height: {{20 * y.cnt}}px; line-height:{{20 * y.cnt}}px"
                             ng-mouseenter="bitFocus(y.id);" ng-mouseleave="bitUnfocus();">
                             {{y.name}}
