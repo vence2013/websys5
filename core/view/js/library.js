@@ -18,7 +18,7 @@ function navCtrl($scope, $http, user, locals) {
             $scope.navlist = ret.nav;
             var userRet  = ret.user;
             // 服务器端用户未登录， 服务器端和客户端状态不一致， 都注销客户端保留的用户数据。
-            if (!userRet || !user || (userRet.username != user.username)) { 
+            if (user && (!userRet || (userRet.username != user.username))) { 
                 logout();
             }
         });

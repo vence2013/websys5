@@ -5,7 +5,7 @@
                 class="mx-2" style="font-size: 16px; font-weight: bold; color: #ffffff;">{{x.name}}</a>
         </div>
         <div id="navLogin" class="col-sm-2" style="text-align: right; color: #ffffff; font-style: italic; cursor: pointer;">
-            <div data-toggle="modal" data-target="#logoutWnd"><i class="fa fa-user-o mx-2"></i>{{user.username}}</div>
+            <div data-toggle="modal" data-target="#logoutWnd" ng-show="user"><i class="fa fa-user-o mx-2"></i>{{user.username}}</div>
         </div>
     </div>
     <!-- 二级菜单 -->
