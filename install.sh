@@ -37,7 +37,7 @@ while true; do
         -c|--clean)
             shift
             docker-compose -p websys down
-            rm -fv index.js docker-compose.yml 
+            rm -fv index.js docker-compose.yml install.log
             echo "Cleand!"            
             exit
             ;;
