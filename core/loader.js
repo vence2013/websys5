@@ -129,8 +129,8 @@ function loginCheck()
             await ctx.render('core/view/init.html'); 
         } else if (!ctx.session.user && (req !== 'POST/user/login')) {
             ctx.throw(401);
-        }
-        await next();
+            await next();
+        }        
     }
 }
 
