@@ -56,22 +56,22 @@ router.post('/', async (ctx)=>{
     // 转化参数类型/格式， 过滤恶意输入
     var username = req.username;
     var password = req.password;
-
-    /* 以下2种情况允许访问该接口：
-     * 1. 系统未初始化（未登录，无install.log绕过了登录检查）
-     * 2. 当前用户为root
-     */
-    if (!user) {
-        await ctx.sequelize.query("DELETE FROM Users;", {logging: false});
-
-        var ret = await UserCtrl.create(ctx, username, password);
-        if (ret) {
+    
+    /* 1. 如果未初始化（无install.log），
+     *    a. 且请求编辑的用户为root， 则：清除用户，创建root用户，并完成初始化（创建install.log） 
+     * 2. 否则，如果登陆用户为root，
+     *    a. 请求编辑的用户不存在，则创建用户
+     *    b. 否则， 则修改用户
+     */    
+    if (!fs.existsSync("./install.log")) {
+        if (username == 'root') {
             var now      = moment().format("YYYY-MM-DD HH:mm:ss");
+
+            await ctx.sequelize.query("DELETE FROM Users;", {logging: false});
+            await UserCtrl.create(ctx, username, password);
 
             fs.writeFileSync(__dirname+'/../../install.log', 'install at:'+now);
             ctx.body = {'errorCode':  0, 'message': 'SUCCESS'};
-        } else {
-            ctx.body = {'errorCode': -1, 'message': "用户已存在"};
         }
     } else if (user.username == 'root') {
         var ret = false;
