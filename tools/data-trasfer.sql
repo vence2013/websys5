@@ -4,9 +4,9 @@
 /*
 DELETE FROM `websys5`.`Chips`;
 INSERT INTO 
-	`websys5`.`Chips`(`name`, `width`, `createdAt`, `updatedAt`)
+	`websys5`.`Chips`(`id`, `name`, `width`, `createdAt`, `updatedAt`)
 SELECT
-	`name`, `width`, `createdAt`, `updatedAt`
+	`id`, `name`, `width`, `createdAt`, `updatedAt`
 FROM
 	`websys5-copy2`.`Chips`;
 */
@@ -14,9 +14,9 @@ FROM
 /*
 DELETE FROM `websys5`.`ChipModules`;
 INSERT INTO 
-	`websys5`.`ChipModules`(`name`, `fullname`, `createdAt`, `updatedAt`, `ChipId`)
+	`websys5`.`ChipModules`(`id`, `name`, `fullname`, `createdAt`, `updatedAt`, `ChipId`)
 SELECT
-	`name`, `fullname`, `createdAt`, `updatedAt`, `ChipId`
+	`id`, `name`, `fullname`, `createdAt`, `updatedAt`, `ChipId`
 FROM
 	`websys5-copy2`.`ChipModules`;
 */
@@ -24,9 +24,9 @@ FROM
 /*
 DELETE FROM `websys5`.`ChipRegisters`;
 INSERT INTO 
-	`websys5`.`ChipRegisters`(`name`, `fullname`, `address`, `desc`, `createdAt`, `updatedAt`, `ChipModuleId`)
+	`websys5`.`ChipRegisters`(`id`, `name`, `fullname`, `address`, `desc`, `createdAt`, `updatedAt`, `ChipModuleId`)
 SELECT
-	`name`, `fullname`, `address`, `desc`, `createdAt`, `updatedAt`, `ChipModuleId`
+	`id`, `name`, `fullname`, `address`, `desc`, `createdAt`, `updatedAt`, `ChipModuleId`
 FROM
 	`websys5-copy2`.`ChipRegisters`;
 */
