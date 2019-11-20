@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/vence2013/websys4#readme",
   "dependencies": {
-    "angular": "^1.7.8",
+    "angular": "^1.7.9",
     "angular-clipboard": "^1.7.0",
     "angular-file-upload": "^2.5.0",
     "angular-tree-control": "^0.2.30",
