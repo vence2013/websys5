@@ -54,7 +54,7 @@
     "popper.js": "^1.15.0",
     "request": "^2.88.0",
     "sequelize": "^5.2.13",
-    "tar": "^4.4.8",
+    "tar": "^4.4.15",
     "toastr": "^2.1.4",
     "underscore": "^1.9.1",
     "video.js": "^7.5.4"
