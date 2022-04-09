@@ -47,7 +47,7 @@
     "koa-views": "^6.2.0",
     "magnific-popup": "^1.1.0",
     "mkdirp": "^0.5.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mysql2": "^1.6.5",
     "mysqldump": "^3.0.0",
     "ngclipboard": "^2.0.0",
